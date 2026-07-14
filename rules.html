@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Asian Tier List [1.8+] — Rules</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --void:#0a0d14;
+    --panel:#12151f;
+    --panel-hi:#181c29;
+    --red:#e8384f;
+    --red-glow:#ff4d63;
+    --blue:#3e7cb1;
+    --blue-glow:#5aa3d8;
+    --ink:#f5f7fa;
+    --muted:#8b93a7;
+    --border:rgba(245,247,250,0.08);
+    --glass:rgba(18,21,31,0.55);
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--void);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    overflow-x:hidden;
+    position:relative;
+  }
+  ::selection{background:var(--red);color:var(--ink);}
+  a{color:inherit;text-decoration:none;}
+  h1,h2,h3,.display{font-family:'Orbitron',sans-serif;letter-spacing:0.02em;}
+  .mono{font-family:'JetBrains Mono',monospace;}
+
+  /* ============ BACKGROUND — BLUEPRINT GRID + DIGITAL LINES ============ */
+  .bg-layer{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+
+  .blueprint{
+    position:absolute;inset:-10%;
+    background-image:
+      linear-gradient(rgba(62,124,177,0.14) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(62,124,177,0.14) 1px, transparent 1px),
+      linear-gradient(rgba(62,124,177,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(62,124,177,0.06) 1px, transparent 1px);
+    background-size:120px 120px, 120px 120px, 24px 24px, 24px 24px;
+    mask-image:radial-gradient(ellipse 90% 70% at 50% 30%, black 20%, transparent 78%);
+    animation: gridDrift 40s linear infinite;
+  }
+  @keyframes gridDrift{
+    from{ background-position:0 0, 0 0, 0 0, 0 0; }
+    to{ background-position:120px 120px, 120px 120px, 24px 24px, 24px 24px; }
+  }
+
+  .schematic-glow{
+    position:absolute;inset:0;
+    background:
+      radial-gradient(circle at 15% 15%, rgba(232,56,79,0.10), transparent 40%),
+      radial-gradient(circle at 85% 60%, rgba(62,124,177,0.14), transparent 45%);
+  }
+
+  .glow-lines{position:absolute;inset:0;overflow:hidden;}
+  .gline{
+    position:absolute;
+    height:1px;
+    background:linear-gradient(90deg, transparent, rgba(90,163,216,0.7), transparent);
+    animation: lineTravel 6s linear infinite;
+    opacity:0;
+  }
+  .gline:nth-child(1){ top:18%; width:40%; left:-40%; animation-delay:0s;}
+  .gline:nth-child(2){ top:42%; width:55%; left:-55%; animation-delay:1.6s; background:linear-gradient(90deg, transparent, rgba(232,56,79,0.55), transparent);}
+  .gline:nth-child(3){ top:64%; width:35%; left:-35%; animation-delay:3.2s;}
+  .gline:nth-child(4){ top:82%; width:60%; left:-60%; animation-delay:4.6s; background:linear-gradient(90deg, transparent, rgba(232,56,79,0.4), transparent);}
+
+  @keyframes lineTravel{
+    0%{ opacity:0; transform:translateX(0);}
+    10%{ opacity:1;}
+    90%{ opacity:1;}
+    100%{ opacity:0; transform:translateX(220vw);}
+  }
+
+  .node-dot{
+    position:absolute;
+    width:4px;height:4px;
+    border-radius:50%;
+    background:var(--blue-glow);
+    box-shadow:0 0 8px var(--blue-glow);
+    animation: nodeBlink 3s ease-in-out infinite;
+  }
+  @keyframes nodeBlink{
+    0%,100%{opacity:0.2;}
+    50%{opacity:1;}
+  }
+
+  /* ============ NAVIGATION (shared) ============ */
+  header{
+    position:sticky;top:0;z-index:100;
+    background:rgba(10,13,20,0.72);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+    border-bottom:1px solid var(--border);
+  }
+  nav{
+    max-width:1400px;margin:0 auto;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 32px;gap:24px;
+  }
+  .brand{display:flex;align-items:center;gap:12px;font-family:'Orbitron',sans-serif;font-weight:800;font-size:1.15rem;white-space:nowrap;}
+  .brand-mark{width:40px;height:40px;border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;box-shadow:0 0 20px rgba(232,56,79,0.4);flex-shrink:0;}
+  .brand-mark img{width:100%;height:100%;object-fit:cover;}
+  .brand span{background:linear-gradient(90deg, var(--ink), var(--muted));-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .brand em{font-style:normal;color:var(--red);}
+  .nav-links{display:flex;align-items:center;gap:4px;flex-wrap:wrap;font-size:0.82rem;font-weight:600;letter-spacing:0.02em;}
+  .nav-links a{padding:8px 14px;border-radius:8px;color:var(--muted);transition:all 0.25s ease;position:relative;}
+  .nav-links a:hover{color:var(--ink);background:rgba(245,247,250,0.06);}
+  .nav-links a.active{color:var(--ink);}
+  .nav-links a.active::after{content:'';position:absolute;bottom:2px;left:14px;right:14px;height:2px;background:linear-gradient(90deg, var(--red), var(--blue));border-radius:2px;}
+  .discord-btn{display:flex;align-items:center;gap:8px;padding:10px 20px;background:linear-gradient(135deg, var(--blue), #2f5f87);border-radius:10px;font-weight:700;font-size:0.85rem;white-space:nowrap;border:1px solid rgba(255,255,255,0.12);transition:all 0.25s ease;box-shadow:0 4px 18px rgba(62,124,177,0.25);}
+  .discord-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(62,124,177,0.4);}
+  .nav-toggle{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;}
+  .nav-toggle span{width:24px;height:2px;background:var(--ink);border-radius:2px;}
+
+  /* ============ PAGE HERO ============ */
+  main{position:relative;z-index:1;}
+  .page-hero{
+    padding:100px 24px 60px;
+    text-align:center;
+    max-width:900px;
+    margin:0 auto;
+  }
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:10px;
+    padding:8px 18px;border:1px solid var(--border);
+    background:var(--glass);backdrop-filter:blur(10px);
+    border-radius:100px;font-size:0.78rem;font-weight:600;
+    letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);
+    margin-bottom:28px;
+  }
+  .eyebrow-dot{width:7px;height:7px;border-radius:50%;background:var(--blue-glow);box-shadow:0 0 10px var(--blue-glow);animation:pulse 1.6s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.5;transform:scale(0.8);}}
+  .page-hero h1{font-size:clamp(2.2rem, 5.5vw, 3.6rem);font-weight:900;line-height:1.1;}
+  .page-hero h1 .grad{
+    background:linear-gradient(120deg, var(--blue-glow), var(--red-glow));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .page-hero p{margin-top:20px;color:var(--muted);font-size:1.05rem;line-height:1.7;}
+
+  /* ============ SECTION SHARED ============ */
+  section{padding:0 24px 60px;position:relative;max-width:1100px;margin:0 auto;}
+
+  .rules-nav{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    justify-content:center;
+    margin-bottom:56px;
+  }
+  .rules-nav a{
+    padding:9px 18px;
+    border-radius:100px;
+    background:var(--glass);
+    border:1px solid var(--border);
+    font-size:0.82rem;
+    font-weight:600;
+    color:var(--muted);
+    transition:all 0.25s ease;
+  }
+  .rules-nav a:hover{
+    color:var(--ink);
+    border-color:rgba(90,163,216,0.4);
+    background:rgba(62,124,177,0.1);
+  }
+
+  .rule-block{
+    background:var(--glass);
+    border:1px solid var(--border);
+    backdrop-filter:blur(16px);
+    border-radius:20px;
+    padding:40px;
+    margin-bottom:28px;
+    position:relative;
+    overflow:hidden;
+  }
+
+  .rule-block::before{
+    content:'';
+    position:absolute;
+    top:0;left:0;
+    width:3px;height:100%;
+    background:linear-gradient(180deg, var(--blue-glow), var(--red-glow));
+    opacity:0.7;
+  }
+
+  .rule-head{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    margin-bottom:24px;
+  }
+
+  .rule-icon{
+    width:48px;height:48px;
+    border-radius:12px;
+    background:linear-gradient(135deg, rgba(62,124,177,0.2), rgba(232,56,79,0.2));
+    border:1px solid var(--border);
+    display:flex;align-items:center;justify-content:center;
+    font-size:1.3rem;
+    flex-shrink:0;
+  }
+
+  .rule-head h2{font-size:1.4rem;font-weight:800;}
+  .rule-num{
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.75rem;
+    color:var(--blue-glow);
+    display:block;
+    margin-bottom:2px;
+  }
+
+  .rule-list{list-style:none;}
+  .rule-list li{
+    position:relative;
+    padding:14px 0 14px 30px;
+    border-bottom:1px solid var(--border);
+    color:var(--muted);
+    line-height:1.65;
+    font-size:0.95rem;
+  }
+  .rule-list li:last-child{border-bottom:none;padding-bottom:0;}
+  .rule-list li::before{
+    content:'';
+    position:absolute;
+    left:0;top:22px;
+    width:8px;height:8px;
+    background:var(--red);
+    clip-path:polygon(50% 0%, 95% 25%, 95% 75%, 50% 100%, 5% 75%, 5% 25%);
+  }
+  .rule-list li strong{color:var(--ink);font-weight:700;}
+
+  .tier-note{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    background:rgba(62,124,177,0.08);
+    border:1px solid rgba(62,124,177,0.25);
+    border-radius:12px;
+    padding:16px 20px;
+    margin-top:20px;
+    font-size:0.9rem;
+    color:var(--muted);
+  }
+  .tier-note .tag{
+    font-family:'JetBrains Mono',monospace;
+    font-weight:700;
+    color:var(--blue-glow);
+    flex-shrink:0;
+  }
+
+  .severity-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(200px,1fr));
+    gap:16px;
+    margin-top:8px;
+  }
+  .severity-card{
+    padding:20px;
+    border-radius:12px;
+    border:1px solid var(--border);
+    background:rgba(245,247,250,0.02);
+  }
+  .severity-card .lvl{
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.7rem;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    margin-bottom:8px;
+    display:inline-block;
+    padding:4px 10px;
+    border-radius:100px;
+  }
+  .lvl.low{background:rgba(62,124,177,0.15);color:#9cc7e6;}
+  .lvl.mid{background:rgba(232,180,56,0.15);color:#f0c96a;}
+  .lvl.high{background:rgba(232,56,79,0.15);color:#ff8a97;}
+  .severity-card p{color:var(--muted);font-size:0.87rem;line-height:1.6;}
+
+  /* ============ FOOTER (shared) ============ */
+  footer{border-top:1px solid var(--border);padding:64px 24px 32px;position:relative;z-index:1;}
+  .footer-inner{max-width:1400px;margin:0 auto;}
+  .footer-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:48px;margin-bottom:48px;}
+  .footer-brand p{color:var(--muted);font-size:0.9rem;line-height:1.7;margin-top:16px;max-width:280px;}
+  .footer-col h4{font-size:0.85rem;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:18px;color:var(--ink);}
+  .footer-col ul{list-style:none;}
+  .footer-col li{margin-bottom:12px;}
+  .footer-col a{color:var(--muted);font-size:0.9rem;transition:color 0.2s ease;}
+  .footer-col a:hover{color:var(--red-glow);}
+  .footer-bottom{padding-top:28px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;color:var(--muted);font-size:0.82rem;}
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 900px){ .footer-grid{grid-template-columns:1fr 1fr;} }
+  @media (max-width: 768px){
+    .nav-links{position:absolute;top:100%;left:0;right:0;background:rgba(10,13,20,0.98);backdrop-filter:blur(20px);flex-direction:column;align-items:stretch;padding:16px;border-bottom:1px solid var(--border);display:none;}
+    .nav-links.open{display:flex;}
+    .nav-links a{padding:14px;}
+    .nav-toggle{display:flex;}
+    .discord-btn span.dbtn-label{display:none;}
+    .rule-block{padding:28px 22px;}
+    .rule-head{flex-wrap:wrap;}
+    .footer-grid{grid-template-columns:1fr;gap:32px;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.01ms !important;animation-iteration-count:1 !important;transition-duration:0.01ms !important;}
+  }
+  a:focus-visible, button:focus-visible{outline:2px solid var(--red-glow);outline-offset:3px;}
+</style>
+</head>
+<body>
+
+<div class="bg-layer">
+  <div class="blueprint"></div>
+  <div class="schematic-glow"></div>
+  <div class="glow-lines">
+    <div class="gline"></div>
+    <div class="gline"></div>
+    <div class="gline"></div>
+    <div class="gline"></div>
+  </div>
+  <div class="node-dot" style="top:22%;left:18%;"></div>
+  <div class="node-dot" style="top:38%;left:72%;animation-delay:0.8s;"></div>
+  <div class="node-dot" style="top:58%;left:30%;animation-delay:1.6s;"></div>
+  <div class="node-dot" style="top:74%;left:64%;animation-delay:2.2s;"></div>
+  <div class="node-dot" style="top:16%;left:84%;animation-delay:1s;"></div>
+</div>
+
+<header>
+  <nav>
+    <a href="index.html" class="brand">
+      <div class="brand-mark"><img src="assets/logo.png" alt="Asian Tier List logo"></div>
+      <span>ASIAN<em> TIER</em> LIST</span>
+    </a>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="nav-links" id="navLinks">
+      <a href="index.html">Home</a>
+      <a href="rules.html" class="active">Rules</a>
+      <a href="announcements.html">Announcements</a>
+      <a href="staff.html">Staff</a>
+      <a href="testers.html">Testers</a>
+      <a href="leaderboards.html">Leaderboards</a>
+      <a href="reviews.html">Reviews</a>
+      <a href="profile.html">Player Profile</a>
+      <a href="tester-panel.html">Tester Panel</a>
+      <a href="owner.html">Owner Panel</a>
+      <a href="staff-application.html">Staff Applications</a>
+    </div>
+    <a href="#" class="discord-btn">
+      <span>🎮</span><span class="dbtn-label">Login with Discord</span>
+    </a>
+  </nav>
+</header>
+
+<main>
+  <div class="page-hero">
+    <div class="eyebrow"><span class="eyebrow-dot"></span> Community Guidelines</div>
+    <h1>The <span class="grad">Rulebook</span></h1>
+    <p>Everything that keeps testing fair, tiers accurate, and the community safe. Read this in full before applying for a rank test.</p>
+  </div>
+
+  <section>
+    <div class="rules-nav">
+      <a href="#general">General Conduct</a>
+      <a href="#testing">Testing Rules</a>
+      <a href="#tiers">Tier Integrity</a>
+      <a href="#discord">Discord Conduct</a>
+      <a href="#appeals">Appeals &amp; Retests</a>
+      <a href="#punishments">Punishments</a>
+    </div>
+
+    <div class="rule-block" id="general">
+      <div class="rule-head">
+        <div class="rule-icon">📋</div>
+        <div>
+          <span class="rule-num mono">SECTION 01</span>
+          <h2>General Conduct</h2>
+        </div>
+      </div>
+      <ul class="rule-list">
+        <li><strong>Respect everyone.</strong> Harassment, hate speech, and targeted insults toward staff, testers, or members are never allowed.</li>
+        <li><strong>No cheating.</strong> Any client modification that grants an unfair combat advantage — reach, kill-aura, auto-clickers with pattern automation, hitboxes, or similar — results in an immediate tier ban.</li>
+        <li><strong>One account per player.</strong> Testing on alternate accounts to bypass a punishment or manipulate placement is prohibited.</li>
+        <li><strong>No account sharing.</strong> Your tier is tied to your skill. Letting someone else test on your behalf voids the result.</li>
+        <li><strong>Follow staff instructions.</strong> Testers and moderators have final say during a test session — arguing mid-test can end it early.</li>
+      </ul>
+    </div>
+
+    <div class="rule-block" id="testing">
+      <div class="rule-head">
+        <div class="rule-icon">🧪</div>
+        <div>
+          <span class="rule-num mono">SECTION 02</span>
+          <h2>Testing Rules</h2>
+        </div>
+      </div>
+      <ul class="rule-list">
+        <li><strong>Book through the correct channel.</strong> Tests are only valid when scheduled and conducted by an official tester listed on the Testers page.</li>
+        <li><strong>Pick your gamemode.</strong> You may only be tested in a gamemode you have selected in advance — BedWars, Fireball Fight, Sumo, Nodebuff, Boxing, BUHC, or Bridges.</li>
+        <li><strong>Stable connection required.</strong> Excessive lag or disconnects during a test may void the result at the tester's discretion.</li>
+        <li><strong>No coaching mid-test.</strong> Friends or spectators may not call out opponent movement, cooldowns, or strategy during your test.</li>
+        <li><strong>Recording is mandatory.</strong> All tests are recorded by the tester for review and dispute purposes.</li>
+        <li><strong>Cooldown between attempts.</strong> A failed test requires a minimum wait period before a retest can be booked — see Appeals &amp; Retests below.</li>
+      </ul>
+      <div class="tier-note">
+        <span class="tag">NOTE</span>
+        <span>Your tier is gamemode-specific. A Sumo tier does not carry over to Bridges or BedWars.</span>
+      </div>
+    </div>
+
+    <div class="rule-block" id="tiers">
+      <div class="rule-head">
+        <div class="rule-icon">⬡</div>
+        <div>
+          <span class="rule-num mono">SECTION 03</span>
+          <h2>Tier Integrity</h2>
+        </div>
+      </div>
+      <ul class="rule-list">
+        <li><strong>Fourteen ranks, five tiers.</strong> The ladder runs D-, D, D+, C-, C, C+, B-, B, B+, A-, A, A+, S-, S from lowest to highest.</li>
+        <li><strong>Tiers are earned, not gifted.</strong> No rank may be assigned without a recorded test, regardless of reputation or prior results elsewhere.</li>
+        <li><strong>Public leaderboard.</strong> Every ranked player's current tier is visible on the Leaderboards page — tier changes are logged, not silently edited.</li>
+        <li><strong>Boosting is banned.</strong> Deliberately losing to inflate an opponent's result, or arranging a scripted outcome, voids both players' tiers.</li>
+        <li><strong>Inactivity decay.</strong> Tiers left untested for an extended period may be flagged for a mandatory retest to stay on the public leaderboard.</li>
+      </ul>
+    </div>
+
+    <div class="rule-block" id="discord">
+      <div class="rule-head">
+        <div class="rule-icon">💬</div>
+        <div>
+          <span class="rule-num mono">SECTION 04</span>
+          <h2>Discord Conduct</h2>
+        </div>
+      </div>
+      <ul class="rule-list">
+        <li><strong>Keep channels on-topic.</strong> Use the correct channel for test requests, tier disputes, and general chat.</li>
+        <li><strong>No self-promotion.</strong> Advertising other servers, Discords, or channels without staff approval is not permitted.</li>
+        <li><strong>NSFW and illegal content is banned outright,</strong> with zero exceptions and no warning period.</li>
+        <li><strong>Impersonation is not tolerated.</strong> Do not imitate staff, testers, or other members, in name or avatar.</li>
+        <li><strong>Ticket etiquette.</strong> Open one ticket per issue and wait for a response before pinging staff again.</li>
+      </ul>
+    </div>
+
+    <div class="rule-block" id="appeals">
+      <div class="rule-head">
+        <div class="rule-icon">🔁</div>
+        <div>
+          <span class="rule-num mono">SECTION 05</span>
+          <h2>Appeals &amp; Retests</h2>
+        </div>
+      </div>
+      <ul class="rule-list">
+        <li><strong>Disputing a result.</strong> Open a ticket within 48 hours of your test with the recording reference if you believe the outcome was incorrect.</li>
+        <li><strong>Retest cooldown.</strong> A standard failed test requires a wait period before rebooking; repeated fast rebooking may be denied by staff.</li>
+        <li><strong>Ban appeals.</strong> Players punished for cheating may appeal once, no earlier than the period stated in their punishment notice.</li>
+        <li><strong>Staff decisions are final</strong> once an appeal has been reviewed by two or more staff members.</li>
+      </ul>
+    </div>
+
+    <div class="rule-block" id="punishments">
+      <div class="rule-head">
+        <div class="rule-icon">⚠️</div>
+        <div>
+          <span class="rule-num mono">SECTION 06</span>
+          <h2>Punishments</h2>
+        </div>
+      </div>
+      <div class="severity-grid">
+        <div class="severity-card">
+          <span class="lvl low">Low</span>
+          <p>Off-topic spam, minor disrespect, or a first-time testing rule slip. Typically a verbal warning or short mute.</p>
+        </div>
+        <div class="severity-card">
+          <span class="lvl mid">Mid</span>
+          <p>Repeated warnings, boosting attempts, or coaching during a test. Results in a tier reset and a temporary testing ban.</p>
+        </div>
+        <div class="severity-card">
+          <span class="lvl high">High</span>
+          <p>Cheating, account sharing, or targeted harassment. Results in a permanent tier ban and Discord ban with no appeal window.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="index.html" class="brand">
+          <div class="brand-mark"><img src="assets/logo.png" alt="Asian Tier List logo"></div>
+          <span>ASIAN<em> TIER</em> LIST</span>
+        </a>
+        <p>The competitive ranking authority for 1.8 PvP. Tested, ranked, and recognized across seven gamemodes.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Platform</h4>
+        <ul>
+          <li><a href="leaderboards.html">Leaderboards</a></li>
+          <li><a href="rules.html">Rules</a></li>
+          <li><a href="announcements.html">Announcements</a></li>
+          <li><a href="reviews.html">Reviews</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Community</h4>
+        <ul>
+          <li><a href="staff.html">Staff</a></li>
+          <li><a href="testers.html">Testers</a></li>
+          <li><a href="staff-application.html">Staff Applications</a></li>
+          <li><a href="profile.html">Player Profile</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Access</h4>
+        <ul>
+          <li><a href="tester-panel.html">Tester Panel</a></li>
+          <li><a href="owner.html">Owner Panel</a></li>
+          <li><a href="#">Login with Discord</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Asian Tier List and s1ztx, All Rights Reserved.</span>
+      <span class="mono">v1.8.8 · SEASON 1</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const navToggle = document.getElementById('navToggle');
+  const navLinks = document.getElementById('navLinks');
+  navToggle.addEventListener('click', () => navLinks.classList.toggle('open'));
+</script>
+
+</body>
+</html>
