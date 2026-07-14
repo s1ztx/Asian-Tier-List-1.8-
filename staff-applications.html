@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Staff Applications — Asian Tier List [1.8+]</title>
+<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+<main>
+  <section class="page-hero">
+    <div class="container">
+      <div class="eyebrow">Join the team</div>
+      <h1 class="h-title" style="font-size:clamp(32px,5vw,52px);">Staff Applications</h1>
+      <p class="h-sub" style="max-width:640px;">We're looking for level-headed, active members to help run testing, moderation, and community operations. Read the requirements below before applying.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container grid-2">
+      <div class="glass card">
+        <div class="eyebrow">Requirements</div>
+        <h3 class="mt-8">Before you apply</h3>
+        <ul class="mt-16" style="display:flex; flex-direction:column; gap:10px;">
+          <li class="text-sm" style="color:var(--text-1);">• 30+ days as a verified member of the Discord server</li>
+          <li class="text-sm" style="color:var(--text-1);">• No active moderation strikes in the last 60 days</li>
+          <li class="text-sm" style="color:var(--text-1);">• Comfortable communicating in written and voice chat</li>
+          <li class="text-sm" style="color:var(--text-1);">• Available at least 4 hours a week for the role</li>
+          <li class="text-sm" style="color:var(--text-1);">• Solid understanding of the tier system and current rules</li>
+        </ul>
+      </div>
+      <div class="glass card">
+        <div class="eyebrow">Responsibilities</div>
+        <h3 class="mt-8">What the role involves</h3>
+        <ul class="mt-16" style="display:flex; flex-direction:column; gap:10px;">
+          <li class="text-sm" style="color:var(--text-1);">• Enforcing server rules fairly and consistently</li>
+          <li class="text-sm" style="color:var(--text-1);">• Assisting members with questions about testing and tiers</li>
+          <li class="text-sm" style="color:var(--text-1);">• Escalating disputes to Managers rather than resolving publicly</li>
+          <li class="text-sm" style="color:var(--text-1);">• Representing the platform professionally at all times</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="glass card" style="max-width:720px; margin:0 auto;">
+        <div class="eyebrow">Application</div>
+        <h3 class="mt-8">Staff application form</h3>
+        <div id="appGate"></div>
+        <form id="appForm" class="mt-16">
+          <div class="field"><label for="af1">Discord username</label><input class="input" id="af1" required></div>
+          <div class="field"><label for="af2">Age</label><input class="input" type="number" min="13" id="af2" required></div>
+          <div class="field"><label for="af3">Timezone</label><input class="input" id="af3" placeholder="e.g. GMT+8" required></div>
+          <div class="field"><label for="af4">Position applying for</label>
+            <select class="select" id="af4">
+              <option>Trial Moderator</option><option>Moderator</option><option>Senior Moderator</option><option>Administrator</option>
+            </select>
+          </div>
+          <div class="field"><label for="af5">Why do you want to join staff?</label><textarea class="textarea" id="af5" required></textarea></div>
+          <div class="field"><label for="af6">Relevant experience (moderation, testing, community work)</label><textarea class="textarea" id="af6"></textarea></div>
+
+          <div class="eyebrow mt-24" style="margin-bottom:12px;">Scenario questions</div>
+          <div class="field"><label for="af7">A member is accusing a Tester of unfair grading in public chat. What do you do?</label><textarea class="textarea" id="af7" required></textarea></div>
+          <div class="field"><label for="af8">You witness a fellow staff member breaking server rules. How do you handle it?</label><textarea class="textarea" id="af8" required></textarea></div>
+
+          <div class="eyebrow mt-24" style="margin-bottom:12px;">Terms &amp; conditions</div>
+          <label class="checkbox-row mt-8"><input type="checkbox" id="tc1" required><span>I have read and agree to the Staff Application Terms &amp; Conditions.</span></label>
+          <label class="checkbox-row mt-16"><input type="checkbox" id="tc2" required><span>I understand submitting an application does not guarantee acceptance.</span></label>
+
+          <button class="btn btn-primary btn-block mt-24" type="submit" id="submitAppBtn">Submit Application</button>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/session.js"></script>
+<script src="assets/js/nav.js"></script>
+<script src="assets/js/backgrounds.js"></script>
+<script>
+  ATL_mountBackground('staff-applications');
+  const session = ATL_initShell('staff-applications.html');
+  const gate = document.getElementById('appGate');
+  const form = document.getElementById('appForm');
+
+  if(!session.authenticated){
+    gate.innerHTML = `<div class="glass card mt-16" style="border-color:rgba(230,57,70,.3);"><p class="text-sm" style="color:var(--red-300); margin:0;">You need to login with Discord before submitting an application.</p></div>`;
+    form.querySelectorAll('input,textarea,select,button').forEach(el=> el.disabled = true);
+  }
+
+  form.addEventListener('submit', (e)=>{
+    e.preventDefault();
+    if(!document.getElementById('tc1').checked || !document.getElementById('tc2').checked){
+      ATL_toast('Please accept both terms checkboxes.', 'error'); return;
+    }
+    const apps = ATL_SESSION.loadStore('staff_applications', []);
+    apps.push({
+      username: document.getElementById('af1').value,
+      position: document.getElementById('af4').value,
+      submitted: new Date().toISOString().slice(0,10),
+      status: 'pending'
+    });
+    ATL_SESSION.saveStore('staff_applications', apps);
+    ATL_toast('Application submitted. Staff will review it soon.', 'success');
+    form.reset();
+  });
+</script>
+</body>
+</html>
