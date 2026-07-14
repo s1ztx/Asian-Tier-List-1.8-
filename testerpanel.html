@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tester Panel — Asian Tier List [1.8+]</title>
+<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+<main>
+  <section class="page-hero" style="padding-bottom:24px;">
+    <div class="container">
+      <div class="eyebrow">Testing operations</div>
+      <h1 class="h-title" style="font-size:clamp(30px,4.6vw,44px);">Tester Panel</h1>
+      <p class="h-sub">Manage incoming test requests and log tier results. Visible to Tester rank and above.</p>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0;">
+    <div class="container" id="panelRoot"></div>
+  </section>
+</main>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/session.js"></script>
+<script src="assets/js/nav.js"></script>
+<script src="assets/js/backgrounds.js"></script>
+<script>
+  ATL_mountBackground('tester-panel');
+  const session = ATL_initShell('tester-panel.html');
+  const root = document.getElementById('panelRoot');
+
+  if(!ATL_DATA.hasAtLeast(session.role, 'Tester')){
+    root.innerHTML = `
+      <div class="glass empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+        <h3>Tester access required</h3>
+        <p>This panel is restricted to members holding the Tester role or higher. ${session.authenticated ? "Your current role is "+session.role+"." : "Login with Discord to check your role."}</p>
+        ${!session.authenticated ? '<button class="btn btn-primary mt-16" id="tpLogin">Login with Discord</button>' : ''}
+      </div>`;
+    const btn = document.getElementById('tpLogin');
+    if(btn) btn.addEventListener('click', ATL_SESSION.loginWithDiscord);
+  } else {
+    root.innerHTML = `
+    <div class="panel-shell">
+      <nav class="glass panel-nav">
+        <div class="panel-nav-group">
+          <h5>Overview</h5>
+          <div class="panel-tab active" data-view="dashboard">Dashboard</div>
+        </div>
+        <div class="panel-nav-group">
+          <h5>Testing</h5>
+          <div class="panel-tab" data-view="requests">Test Requests</div>
+          <div class="panel-tab" data-view="submit">Submit Tier Result</div>
+        </div>
+        <div class="panel-nav-group">
+          <h5>My assignment</h5>
+          <div class="panel-tab" data-view="profile">My Certification</div>
+        </div>
+      </nav>
+      <div>
+        <div class="panel-view active" id="view-dashboard">
+          <div class="grid-4" id="tpStats"></div>
+          <div class="glass card mt-24">
+            <div class="eyebrow">Quick actions</div>
+            <div class="mt-16" style="display:flex; gap:12px; flex-wrap:wrap;">
+              <button class="btn btn-secondary btn-sm" data-goto="requests" style="text-transform:none;">Review requests</button>
+              <button class="btn btn-secondary btn-sm" data-goto="submit" style="text-transform:none;">Log a tier result</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-view" id="view-requests">
+          <div class="table-wrap glass" id="requestsWrap"></div>
+        </div>
+
+        <div class="panel-view" id="view-submit">
+          <div class="glass card" style="max-width:560px;">
+            <div class="eyebrow">Log result</div>
+            <h3 class="mt-8">Submit a tier result</h3>
+            <div class="field mt-16"><label>Player Discord username</label><input class="input" id="subPlayer" placeholder="e.g. kairo_ace"></div>
+            <div class="field"><label>Gamemode</label><select class="select" id="subGm">${ATL_DATA.GAMEMODES.map(g=>`<option value="${g.id}">${g.label}</option>`).join('')}</select></div>
+            <div class="field"><label>Tier</label><select class="select" id="subTier">${ATL_DATA.TIERS.map(t=>`<option value="${t.id}">${t.id} — ${t.desc}</option>`).join('')}</select></div>
+            <button class="btn btn-primary btn-block" id="submitTier">Log Tier Result</button>
+          </div>
+        </div>
+
+        <div class="panel-view" id="view-profile">
+          <div class="glass card">
+            <div class="eyebrow">Certification</div>
+            <h3 class="mt-8">${session.user.display}'s testing certification</h3>
+            <div class="mt-16">${ATL_roleBadge(session.role)}</div>
+            <p class="text-sm text-muted mt-16">Gamemode certifications are assigned by the Owner Panel. This account isn't linked to a tester roster entry yet in this demo session.</p>
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+    root.querySelectorAll('.panel-tab, [data-goto]').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        const target = el.dataset.view || el.dataset.goto;
+        root.querySelectorAll('.panel-tab').forEach(t=>t.classList.toggle('active', t.dataset.view===target));
+        root.querySelectorAll('.panel-view').forEach(v=>v.classList.toggle('active', v.id==='view-'+target));
+      });
+    });
+
+    const requests = ATL_SESSION.loadStore('test_requests', []);
+    const pending = requests.filter(r=>r.status==='pending');
+    document.getElementById('tpStats').innerHTML = [
+      [pending.length, 'Pending requests'],
+      [requests.length, 'Total requests'],
+      [ATL_SESSION.loadStore('tier_log', []).length, 'Tiers logged'],
+      [session.role, 'Your rank']
+    ].map(([v,l])=>`<div class="glass stat-card"><div class="s-val" style="font-size:22px;">${v}</div><div class="s-label">${l}</div></div>`).join('');
+
+    const reqWrap = document.getElementById('requestsWrap');
+    if(requests.length === 0){
+      reqWrap.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 4h16v16H4z"/></svg><h3>No test requests</h3><p>Nothing in the queue right now.</p></div>`;
+    } else {
+      reqWrap.innerHTML = `<table class="dt"><thead><tr><th>Player</th><th>Gamemode</th><th>Note</th><th>Status</th><th>Date</th></tr></thead>
+      <tbody>${requests.slice().reverse().map(r=>`<tr><td>${r.user}</td><td>${(ATL_DATA.GAMEMODES.find(g=>g.id===r.gamemode)||{label:r.gamemode}).label}</td><td class="text-muted">${r.note||'—'}</td><td><span class="pill ${r.status==='pending'?'pill-gold':'pill-teal'}">${r.status}</span></td><td class="mono text-muted">${r.date}</td></tr>`).join('')}</tbody></table>`;
+    }
+
+    document.getElementById('submitTier').addEventListener('click', ()=>{
+      const player = document.getElementById('subPlayer').value.trim();
+      if(!player){ ATL_toast('Enter a player username.', 'error'); return; }
+      const gm = document.getElementById('subGm').value;
+      const tier = document.getElementById('subTier').value;
+      const log = ATL_SESSION.loadStore('tier_log', []);
+      log.push({ player, gamemode:gm, tier, tester:session.user.display, date:new Date().toISOString().slice(0,10) });
+      ATL_SESSION.saveStore('tier_log', log);
+      const board = ATL_SESSION.loadStore('leaderboard_'+gm, []);
+      const existingIdx = board.findIndex(b=>b.player===player);
+      const entry = { player, tier, tester:session.user.display, date:new Date().toISOString().slice(0,10) };
+      if(existingIdx>=0) board[existingIdx]=entry; else board.push(entry);
+      ATL_SESSION.saveStore('leaderboard_'+gm, board);
+      document.getElementById('subPlayer').value='';
+      ATL_toast(`Logged ${player} as ${tier} in ${gm}.`, 'success');
+    });
+  }
+</script>
+</body>
+</html>
