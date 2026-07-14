@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Connecting Discord — Asian Tier List [1.8+]</title>
+<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+<main>
+  <section style="min-height:80vh; display:flex; align-items:center;">
+    <div class="container" style="max-width:560px;">
+      <div class="glass card" style="text-align:center;">
+        <div class="eyebrow" style="justify-content:center;">Discord OAuth2</div>
+        <h2 class="mt-8">Finishing sign-in…</h2>
+        <p class="text-sm text-muted mt-16" id="cbMessage">Reading the authorization response from Discord.</p>
+        <div class="mt-24">
+          <a href="index.html" class="btn btn-ghost">Return to Home</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<script>
+  // This static frontend can receive the ?code=... from Discord, but
+  // exchanging it for an access token requires the client secret and
+  // must happen on a server. This page is a placeholder for that
+  // backend redirect target: once a backend is connected, it should
+  // read `code` below, exchange it, create a session, then send the
+  // user back here (or straight to profile.html) already signed in.
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('code');
+  const error = params.get('error');
+  const msg = document.getElementById('cbMessage');
+  if(error){
+    msg.textContent = 'Discord returned an error: ' + error + '. You can close this tab and try again.';
+  } else if(code){
+    msg.textContent = 'Authorization code received. This static demo has no backend to exchange it yet — connect the token-exchange endpoint to complete sign-in automatically.';
+  } else {
+    msg.textContent = 'No authorization code was found in the URL. Start the login flow again from the Home page.';
+  }
+</script>
+</body>
+</html>
