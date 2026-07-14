@@ -3,1072 +3,137 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Asian Tier List [1.8+] — Home</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --void:#0a0d14;
-    --panel:#12151f;
-    --panel-hi:#181c29;
-    --red:#e8384f;
-    --red-glow:#ff4d63;
-    --blue:#3e7cb1;
-    --blue-glow:#5aa3d8;
-    --ink:#f5f7fa;
-    --muted:#8b93a7;
-    --border:rgba(245,247,250,0.08);
-    --glass:rgba(18,21,31,0.55);
-  }
-
-  *{margin:0;padding:0;box-sizing:border-box;}
-
-  html{scroll-behavior:smooth;}
-
-  body{
-    background:var(--void);
-    color:var(--ink);
-    font-family:'Inter',sans-serif;
-    overflow-x:hidden;
-    position:relative;
-  }
-
-  ::selection{background:var(--red);color:var(--ink);}
-
-  a{color:inherit;text-decoration:none;}
-
-  h1,h2,h3,.display{
-    font-family:'Orbitron',sans-serif;
-    letter-spacing:0.02em;
-  }
-
-  .mono{font-family:'JetBrains Mono',monospace;}
-
-  /* ============ BACKGROUND LAYERS ============ */
-  .bg-layer{
-    position:fixed;
-    inset:0;
-    z-index:0;
-    pointer-events:none;
-    overflow:hidden;
-  }
-
-  .aurora{
-    position:absolute;
-    inset:-20%;
-    background:
-      radial-gradient(circle at 20% 20%, rgba(232,56,79,0.18), transparent 45%),
-      radial-gradient(circle at 80% 30%, rgba(62,124,177,0.20), transparent 50%),
-      radial-gradient(circle at 50% 80%, rgba(232,56,79,0.12), transparent 50%);
-    animation: auroraShift 18s ease-in-out infinite alternate;
-    filter:blur(10px);
-  }
-
-  @keyframes auroraShift{
-    0%{ transform: translate(0,0) rotate(0deg) scale(1); }
-    50%{ transform: translate(-3%, 2%) rotate(6deg) scale(1.08); }
-    100%{ transform: translate(2%,-3%) rotate(-4deg) scale(1.04); }
-  }
-
-  .hex-grid{
-    position:absolute;
-    inset:0;
-    background-image:
-      repeating-linear-gradient(60deg, rgba(245,247,250,0.035) 0, rgba(245,247,250,0.035) 1px, transparent 1px, transparent 60px),
-      repeating-linear-gradient(-60deg, rgba(245,247,250,0.035) 0, rgba(245,247,250,0.035) 1px, transparent 1px, transparent 60px),
-      repeating-linear-gradient(0deg, rgba(245,247,250,0.025) 0, rgba(245,247,250,0.025) 1px, transparent 1px, transparent 104px);
-    mask-image: radial-gradient(ellipse 80% 60% at 50% 20%, black 30%, transparent 75%);
-    opacity:0.8;
-  }
-
-  .beams{
-    position:absolute;
-    inset:0;
-    overflow:hidden;
-  }
-  .beam{
-    position:absolute;
-    width:2px;
-    height:140%;
-    top:-20%;
-    background:linear-gradient(to bottom, transparent, rgba(232,56,79,0.5), transparent);
-    transform-origin:top center;
-    animation: beamSweep 9s ease-in-out infinite;
-    opacity:0;
-  }
-  .beam:nth-child(1){ left:12%; animation-delay:0s; background:linear-gradient(to bottom, transparent, rgba(232,56,79,0.45), transparent);}
-  .beam:nth-child(2){ left:38%; animation-delay:2.4s; background:linear-gradient(to bottom, transparent, rgba(62,124,177,0.45), transparent);}
-  .beam:nth-child(3){ left:64%; animation-delay:4.8s; background:linear-gradient(to bottom, transparent, rgba(232,56,79,0.35), transparent);}
-  .beam:nth-child(4){ left:86%; animation-delay:7s; background:linear-gradient(to bottom, transparent, rgba(62,124,177,0.35), transparent);}
-
-  @keyframes beamSweep{
-    0%{ opacity:0; transform:rotate(8deg) translateY(-10%);}
-    15%{ opacity:0.8;}
-    50%{ opacity:0.4; transform:rotate(-6deg) translateY(4%);}
-    85%{ opacity:0.7;}
-    100%{ opacity:0; transform:rotate(8deg) translateY(-10%);}
-  }
-
-  .particles{
-    position:absolute;
-    inset:0;
-  }
-  .particle{
-    position:absolute;
-    width:3px;
-    height:3px;
-    border-radius:50%;
-    background:var(--ink);
-    opacity:0.5;
-    animation: floatUp linear infinite;
-  }
-  @keyframes floatUp{
-    0%{ transform:translateY(110vh) translateX(0); opacity:0;}
-    10%{ opacity:0.6;}
-    90%{ opacity:0.4;}
-    100%{ transform:translateY(-10vh) translateX(30px); opacity:0;}
-  }
-
-  /* ============ NAVIGATION ============ */
-  header{
-    position:sticky;
-    top:0;
-    z-index:100;
-    background:rgba(10,13,20,0.72);
-    backdrop-filter:blur(18px);
-    -webkit-backdrop-filter:blur(18px);
-    border-bottom:1px solid var(--border);
-  }
-
-  nav{
-    max-width:1400px;
-    margin:0 auto;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:16px 32px;
-    gap:24px;
-  }
-
-  .brand{
-    display:flex;
-    align-items:center;
-    gap:12px;
-    font-family:'Orbitron',sans-serif;
-    font-weight:800;
-    font-size:1.15rem;
-    white-space:nowrap;
-  }
-
-  .brand-mark{
-    width:40px;height:40px;
-    border-radius:8px;
-    overflow:hidden;
-    display:flex;align-items:center;justify-content:center;
-    box-shadow:0 0 20px rgba(232,56,79,0.4);
-    flex-shrink:0;
-  }
-  .brand-mark img{
-    width:100%;height:100%;
-    object-fit:cover;
-  }
-
-  .brand span{
-    background:linear-gradient(90deg, var(--ink), var(--muted));
-    -webkit-background-clip:text;
-    background-clip:text;
-    color:transparent;
-  }
-
-  .brand em{
-    font-style:normal;
-    color:var(--red);
-  }
-
-  .nav-links{
-    display:flex;
-    align-items:center;
-    gap:4px;
-    flex-wrap:wrap;
-    font-size:0.82rem;
-    font-weight:600;
-    letter-spacing:0.02em;
-  }
-
-  .nav-links a{
-    padding:8px 14px;
-    border-radius:8px;
-    color:var(--muted);
-    transition:all 0.25s ease;
-    position:relative;
-  }
-
-  .nav-links a:hover{
-    color:var(--ink);
-    background:rgba(245,247,250,0.06);
-  }
-
-  .nav-links a.active{
-    color:var(--ink);
-  }
-
-  .nav-links a.active::after{
-    content:'';
-    position:absolute;
-    bottom:2px;
-    left:14px;
-    right:14px;
-    height:2px;
-    background:linear-gradient(90deg, var(--red), var(--blue));
-    border-radius:2px;
-  }
-
-  .discord-btn{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    padding:10px 20px;
-    background:linear-gradient(135deg, var(--blue), #2f5f87);
-    border-radius:10px;
-    font-weight:700;
-    font-size:0.85rem;
-    white-space:nowrap;
-    border:1px solid rgba(255,255,255,0.12);
-    transition:all 0.25s ease;
-    box-shadow:0 4px 18px rgba(62,124,177,0.25);
-  }
-
-  .discord-btn:hover{
-    transform:translateY(-2px);
-    box-shadow:0 8px 24px rgba(62,124,177,0.4);
-  }
-
-  .nav-toggle{
-    display:none;
-    flex-direction:column;
-    gap:5px;
-    cursor:pointer;
-    background:none;
-    border:none;
-  }
-  .nav-toggle span{
-    width:24px;height:2px;background:var(--ink);border-radius:2px;
-  }
-
-  /* ============ HERO ============ */
-  main{
-    position:relative;
-    z-index:1;
-  }
-
-  .hero{
-    min-height:92vh;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-    padding:80px 24px 60px;
-    position:relative;
-  }
-
-  .eyebrow{
-    display:inline-flex;
-    align-items:center;
-    gap:10px;
-    padding:8px 18px;
-    border:1px solid var(--border);
-    background:var(--glass);
-    backdrop-filter:blur(10px);
-    border-radius:100px;
-    font-size:0.78rem;
-    font-weight:600;
-    letter-spacing:0.08em;
-    text-transform:uppercase;
-    color:var(--muted);
-    margin-bottom:32px;
-    animation: fadeDown 0.8s ease both;
-  }
-
-  .eyebrow-dot{
-    width:7px;height:7px;border-radius:50%;
-    background:var(--red);
-    box-shadow:0 0 10px var(--red-glow);
-    animation:pulse 1.6s ease-in-out infinite;
-  }
-
-  @keyframes pulse{
-    0%,100%{ opacity:1; transform:scale(1);}
-    50%{ opacity:0.5; transform:scale(0.8);}
-  }
-
-  .hero h1{
-    font-size:clamp(2.6rem, 7vw, 5.5rem);
-    font-weight:900;
-    line-height:1.05;
-    max-width:1100px;
-    animation: fadeUp 0.9s ease 0.1s both;
-  }
-
-  .hero h1 .grad{
-    background:linear-gradient(120deg, var(--red) 10%, var(--red-glow) 35%, var(--blue-glow) 65%, var(--blue) 90%);
-    -webkit-background-clip:text;
-    background-clip:text;
-    color:transparent;
-    background-size:200% auto;
-    animation: gradMove 6s ease-in-out infinite;
-  }
-
-  @keyframes gradMove{
-    0%,100%{background-position:0% center;}
-    50%{background-position:100% center;}
-  }
-
-  .hero p.lead{
-    margin-top:26px;
-    max-width:640px;
-    color:var(--muted);
-    font-size:1.08rem;
-    line-height:1.7;
-    animation: fadeUp 0.9s ease 0.25s both;
-  }
-
-  .hero-cta{
-    display:flex;
-    gap:16px;
-    margin-top:44px;
-    flex-wrap:wrap;
-    justify-content:center;
-    animation: fadeUp 0.9s ease 0.4s both;
-  }
-
-  .btn{
-    padding:15px 32px;
-    border-radius:12px;
-    font-weight:700;
-    font-size:0.95rem;
-    letter-spacing:0.01em;
-    transition:all 0.3s ease;
-    display:inline-flex;
-    align-items:center;
-    gap:10px;
-    cursor:pointer;
-    border:1px solid transparent;
-  }
-
-  .btn-primary{
-    background:linear-gradient(135deg, var(--red), #c22b40);
-    box-shadow:0 8px 30px rgba(232,56,79,0.35);
-  }
-  .btn-primary:hover{
-    transform:translateY(-3px);
-    box-shadow:0 14px 40px rgba(232,56,79,0.5);
-  }
-
-  .btn-ghost{
-    background:var(--glass);
-    border:1px solid var(--border);
-    backdrop-filter:blur(10px);
-  }
-  .btn-ghost:hover{
-    border-color:rgba(245,247,250,0.25);
-    transform:translateY(-3px);
-  }
-
-  @keyframes fadeUp{
-    from{ opacity:0; transform:translateY(24px);}
-    to{ opacity:1; transform:translateY(0);}
-  }
-  @keyframes fadeDown{
-    from{ opacity:0; transform:translateY(-16px);}
-    to{ opacity:1; transform:translateY(0);}
-  }
-
-  .scroll-cue{
-    position:absolute;
-    bottom:28px;
-    left:50%;
-    transform:translateX(-50%);
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:8px;
-    color:var(--muted);
-    font-size:0.7rem;
-    letter-spacing:0.15em;
-    text-transform:uppercase;
-    animation: fadeUp 1s ease 0.6s both;
-  }
-  .scroll-cue .line{
-    width:1px;height:36px;
-    background:linear-gradient(to bottom, var(--muted), transparent);
-    animation: scrollDown 2s ease-in-out infinite;
-  }
-  @keyframes scrollDown{
-    0%{transform:scaleY(0); transform-origin:top;}
-    50%{transform:scaleY(1); transform-origin:top;}
-    50.1%{transform-origin:bottom;}
-    100%{transform:scaleY(0); transform-origin:bottom;}
-  }
-
-  /* ============ SECTION SHARED ============ */
-  section{
-    padding:120px 24px;
-    position:relative;
-    max-width:1400px;
-    margin:0 auto;
-  }
-
-  .section-head{
-    text-align:center;
-    max-width:700px;
-    margin:0 auto 64px;
-  }
-
-  .section-tag{
-    font-size:0.78rem;
-    font-weight:700;
-    letter-spacing:0.15em;
-    text-transform:uppercase;
-    color:var(--red);
-    margin-bottom:14px;
-    display:block;
-  }
-
-  .section-head h2{
-    font-size:clamp(1.8rem, 4vw, 2.6rem);
-    font-weight:800;
-    margin-bottom:16px;
-  }
-
-  .section-head p{
-    color:var(--muted);
-    line-height:1.7;
-    font-size:1.02rem;
-  }
-
-  /* ============ GAMEMODES ============ */
-  .gm-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
-    gap:20px;
-  }
-
-  .gm-card{
-    background:var(--glass);
-    border:1px solid var(--border);
-    backdrop-filter:blur(16px);
-    border-radius:16px;
-    padding:32px 24px;
-    position:relative;
-    overflow:hidden;
-    transition:all 0.4s ease;
-    cursor:pointer;
-  }
-
-  .gm-card::before{
-    content:'';
-    position:absolute;
-    inset:0;
-    background:radial-gradient(circle at 30% 0%, rgba(232,56,79,0.15), transparent 60%);
-    opacity:0;
-    transition:opacity 0.4s ease;
-  }
-
-  .gm-card:hover{
-    transform:translateY(-8px);
-    border-color:rgba(232,56,79,0.35);
-    box-shadow:0 20px 50px rgba(0,0,0,0.4);
-  }
-  .gm-card:hover::before{opacity:1;}
-
-  .gm-num{
-    font-family:'JetBrains Mono',monospace;
-    font-size:0.75rem;
-    color:var(--muted);
-    margin-bottom:18px;
-    display:block;
-  }
-
-  .gm-icon{
-    width:52px;height:52px;
-    border-radius:12px;
-    background:linear-gradient(135deg, rgba(232,56,79,0.2), rgba(62,124,177,0.2));
-    border:1px solid var(--border);
-    display:flex;align-items:center;justify-content:center;
-    margin-bottom:20px;
-    font-size:1.4rem;
-  }
-
-  .gm-card h3{
-    font-size:1.15rem;
-    font-weight:700;
-    margin-bottom:10px;
-    position:relative;
-  }
-
-  .gm-card p{
-    color:var(--muted);
-    font-size:0.88rem;
-    line-height:1.6;
-    position:relative;
-  }
-
-  /* ============ TIER LADDER (SIGNATURE) ============ */
-  .ladder-wrap{
-    position:relative;
-    background:var(--glass);
-    border:1px solid var(--border);
-    backdrop-filter:blur(16px);
-    border-radius:24px;
-    padding:64px 32px;
-    overflow:hidden;
-  }
-
-  .ladder-wrap::before{
-    content:'';
-    position:absolute;
-    inset:0;
-    background:
-      linear-gradient(180deg, rgba(232,56,79,0.06), transparent 40%),
-      linear-gradient(0deg, rgba(62,124,177,0.06), transparent 40%);
-    pointer-events:none;
-  }
-
-  .ladder{
-    display:flex;
-    align-items:flex-end;
-    justify-content:center;
-    gap:clamp(4px, 1.2vw, 14px);
-    position:relative;
-    z-index:1;
-    flex-wrap:nowrap;
-    overflow-x:auto;
-    padding-bottom:20px;
-  }
-
-  .ladder::-webkit-scrollbar{height:6px;}
-  .ladder::-webkit-scrollbar-thumb{background:var(--border);border-radius:6px;}
-
-  .rung{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:10px;
-    flex-shrink:0;
-    animation: rungRise 0.7s ease both;
-  }
-
-  .rung:nth-child(1){animation-delay:0.05s;}
-  .rung:nth-child(2){animation-delay:0.1s;}
-  .rung:nth-child(3){animation-delay:0.15s;}
-  .rung:nth-child(4){animation-delay:0.2s;}
-  .rung:nth-child(5){animation-delay:0.25s;}
-  .rung:nth-child(6){animation-delay:0.3s;}
-  .rung:nth-child(7){animation-delay:0.35s;}
-  .rung:nth-child(8){animation-delay:0.4s;}
-  .rung:nth-child(9){animation-delay:0.45s;}
-  .rung:nth-child(10){animation-delay:0.5s;}
-
-  @keyframes rungRise{
-    from{ opacity:0; transform:translateY(30px);}
-    to{ opacity:1; transform:translateY(0);}
-  }
-
-  .hex-badge{
-    width:56px;height:56px;
-    clip-path:polygon(50% 0%, 95% 25%, 95% 75%, 50% 100%, 5% 75%, 5% 25%);
-    display:flex;align-items:center;justify-content:center;
-    font-family:'JetBrains Mono',monospace;
-    font-weight:700;
-    font-size:0.8rem;
-    position:relative;
-    transition:transform 0.3s ease;
-  }
-
-  .rung:hover .hex-badge{ transform:scale(1.15) translateY(-4px); }
-
-  .rung-bar{
-    width:40px;
-    border-radius:6px 6px 0 0;
-  }
-
-  .rung-label{
-    font-size:0.65rem;
-    color:var(--muted);
-    letter-spacing:0.05em;
-  }
-
-  /* Height + color progression: S highest/brightest red, D- lowest/blue */
-  .rung[data-h="1"] .rung-bar{height:170px;}
-  .rung[data-h="2"] .rung-bar{height:156px;}
-  .rung[data-h="3"] .rung-bar{height:142px;}
-  .rung[data-h="4"] .rung-bar{height:128px;}
-  .rung[data-h="5"] .rung-bar{height:114px;}
-  .rung[data-h="6"] .rung-bar{height:100px;}
-  .rung[data-h="7"] .rung-bar{height:86px;}
-  .rung[data-h="8"] .rung-bar{height:72px;}
-  .rung[data-h="9"] .rung-bar{height:58px;}
-  .rung[data-h="10"] .rung-bar{height:44px;}
-  .rung[data-h="11"] .rung-bar{height:36px;}
-  .rung[data-h="12"] .rung-bar{height:28px;}
-  .rung[data-h="13"] .rung-bar{height:22px;}
-  .rung[data-h="14"] .rung-bar{height:16px;}
-
-  .rung:nth-child(11){animation-delay:0.55s;}
-  .rung:nth-child(12){animation-delay:0.6s;}
-  .rung:nth-child(13){animation-delay:0.65s;}
-  .rung:nth-child(14){animation-delay:0.7s;}
-
-  .t-ht1 .hex-badge{background:linear-gradient(135deg,#ff5b73,#e8384f);box-shadow:0 0 24px rgba(232,56,79,0.6);}
-  .t-ht1 .rung-bar{background:linear-gradient(180deg,#ff5b73,#e8384f);}
-  .t-lt10 .hex-badge{background:linear-gradient(135deg,#5aa3d8,#2f5f87);box-shadow:0 0 24px rgba(62,124,177,0.5);}
-  .t-lt10 .rung-bar{background:linear-gradient(180deg,#5aa3d8,#2f5f87);}
-
-  .hex-badge.tier-s{font-size:0.85rem;}
-  .hex-badge.tier-small{font-size:0.7rem;}
-
-  .ladder-caption{
-    text-align:center;
-    margin-top:36px;
-    color:var(--muted);
-    font-size:0.88rem;
-    position:relative;
-    z-index:1;
-  }
-
-  /* ============ DISCORD PREVIEW ============ */
-  .discord-preview{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:48px;
-    align-items:center;
-  }
-
-  .dp-card{
-    background:var(--glass);
-    border:1px solid var(--border);
-    backdrop-filter:blur(16px);
-    border-radius:20px;
-    padding:36px;
-  }
-
-  .dp-profile{
-    display:flex;
-    align-items:center;
-    gap:16px;
-    padding-bottom:24px;
-    border-bottom:1px solid var(--border);
-    margin-bottom:24px;
-  }
-
-  .dp-avatar{
-    width:64px;height:64px;
-    border-radius:50%;
-    background:linear-gradient(135deg, var(--blue), var(--red));
-    display:flex;align-items:center;justify-content:center;
-    font-family:'Orbitron',sans-serif;
-    font-weight:800;
-    font-size:1.2rem;
-    border:2px solid rgba(255,255,255,0.15);
-    position:relative;
-  }
-
-  .dp-status{
-    position:absolute;
-    bottom:0;right:0;
-    width:16px;height:16px;
-    border-radius:50%;
-    background:#3ba55d;
-    border:3px solid var(--panel);
-  }
-
-  .dp-name{font-weight:700;font-size:1.05rem;}
-  .dp-tag{color:var(--muted);font-size:0.85rem;margin-top:2px;}
-
-  .dp-badges{
-    display:flex;
-    gap:8px;
-    flex-wrap:wrap;
-    margin-bottom:24px;
-  }
-
-  .dp-badge{
-    padding:6px 14px;
-    border-radius:100px;
-    font-size:0.75rem;
-    font-weight:700;
-    border:1px solid var(--border);
-  }
-  .dp-badge.owner{background:rgba(232,56,79,0.15);color:#ff8a97;border-color:rgba(232,56,79,0.3);}
-  .dp-badge.tier{background:rgba(62,124,177,0.15);color:#9cc7e6;border-color:rgba(62,124,177,0.3);}
-  .dp-badge.member{background:rgba(245,247,250,0.06);color:var(--muted);}
-
-  .dp-list{list-style:none;}
-  .dp-list li{
-    display:flex;
-    justify-content:space-between;
-    padding:10px 0;
-    border-bottom:1px solid var(--border);
-    font-size:0.88rem;
-  }
-  .dp-list li:last-child{border-bottom:none;}
-  .dp-list span:first-child{color:var(--muted);}
-
-  .discord-copy h2{margin-bottom:20px;}
-  .discord-copy p{color:var(--muted);line-height:1.75;margin-bottom:28px;font-size:1.02rem;}
-
-  .view-tags{
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-    margin-bottom:32px;
-  }
-  .view-tag{
-    padding:8px 16px;
-    border-radius:8px;
-    background:var(--glass);
-    border:1px solid var(--border);
-    font-size:0.8rem;
-    font-weight:600;
-    color:var(--muted);
-  }
-
-  /* ============ FOOTER ============ */
-  footer{
-    border-top:1px solid var(--border);
-    padding:64px 24px 32px;
-    position:relative;
-    z-index:1;
-  }
-
-  .footer-inner{
-    max-width:1400px;
-    margin:0 auto;
-  }
-
-  .footer-grid{
-    display:grid;
-    grid-template-columns:1.4fr 1fr 1fr 1fr;
-    gap:48px;
-    margin-bottom:48px;
-  }
-
-  .footer-brand p{
-    color:var(--muted);
-    font-size:0.9rem;
-    line-height:1.7;
-    margin-top:16px;
-    max-width:280px;
-  }
-
-  .footer-col h4{
-    font-size:0.85rem;
-    letter-spacing:0.08em;
-    text-transform:uppercase;
-    margin-bottom:18px;
-    color:var(--ink);
-  }
-
-  .footer-col ul{list-style:none;}
-  .footer-col li{margin-bottom:12px;}
-  .footer-col a{
-    color:var(--muted);
-    font-size:0.9rem;
-    transition:color 0.2s ease;
-  }
-  .footer-col a:hover{color:var(--red-glow);}
-
-  .footer-bottom{
-    padding-top:28px;
-    border-top:1px solid var(--border);
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    flex-wrap:wrap;
-    gap:12px;
-    color:var(--muted);
-    font-size:0.82rem;
-  }
-
-  /* ============ RESPONSIVE ============ */
-  @media (max-width: 900px){
-    .discord-preview{grid-template-columns:1fr;}
-    .footer-grid{grid-template-columns:1fr 1fr;}
-  }
-
-  @media (max-width: 768px){
-    .nav-links{
-      position:absolute;
-      top:100%;left:0;right:0;
-      background:rgba(10,13,20,0.98);
-      backdrop-filter:blur(20px);
-      flex-direction:column;
-      align-items:stretch;
-      padding:16px;
-      border-bottom:1px solid var(--border);
-      display:none;
-    }
-    .nav-links.open{display:flex;}
-    .nav-links a{padding:14px;}
-    .nav-toggle{display:flex;}
-    .discord-btn span.dbtn-label{display:none;}
-    section{padding:80px 20px;}
-    .footer-grid{grid-template-columns:1fr;gap:32px;}
-  }
-
-  @media (prefers-reduced-motion: reduce){
-    *{animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important;}
-  }
-
-  a:focus-visible, button:focus-visible{
-    outline:2px solid var(--red-glow);
-    outline-offset:3px;
-  }
-</style>
+<title>Asian Tier List [1.8+] — Competitive Minecraft PvP Rankings</title>
+<meta name="description" content="The official Asian Tier List for Minecraft 1.8 PvP. Get tested, get ranked, climb the leaderboards across BedWars, Sumo, Nodebuff, Boxing, BUHC and Bridges.">
+<link rel="stylesheet" href="assets/css/main.css">
 </head>
 <body>
 
-<div class="bg-layer">
-  <div class="aurora"></div>
-  <div class="hex-grid"></div>
-  <div class="beams">
-    <div class="beam"></div>
-    <div class="beam"></div>
-    <div class="beam"></div>
-    <div class="beam"></div>
-  </div>
-  <div class="particles" id="particles"></div>
-</div>
-
-<header>
-  <nav>
-    <a href="index.html" class="brand">
-      <div class="brand-mark"><img src="assets/logo.png" alt="Asian Tier List logo"></div>
-      <span>ASIAN<em> TIER</em> LIST</span>
-    </a>
-
-    <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
-      <span></span><span></span><span></span>
-    </button>
-
-    <div class="nav-links" id="navLinks">
-      <a href="index.html" class="active">Home</a>
-      <a href="rules.html">Rules</a>
-      <a href="announcements.html">Announcements</a>
-      <a href="staff.html">Staff</a>
-      <a href="testers.html">Testers</a>
-      <a href="leaderboards.html">Leaderboards</a>
-      <a href="reviews.html">Reviews</a>
-      <a href="profile.html">Player Profile</a>
-      <a href="tester-panel.html">Tester Panel</a>
-      <a href="owner.html">Owner Panel</a>
-      <a href="staff-application.html">Staff Applications</a>
-    </div>
-
-    <a href="#" class="discord-btn">
-      <span>🎮</span><span class="dbtn-label">Login with Discord</span>
-    </a>
-  </nav>
-</header>
-
 <main>
 
-  <section class="hero">
-    <div class="eyebrow"><span class="eyebrow-dot"></span> 1.8.8 COMPETITIVE PVP RANKING</div>
-    <h1>Prove your skill.<br><span class="grad">Earn your tier.</span></h1>
-    <p class="lead">Asian Tier List [1.8+] is the community-run ranking authority for competitive 1.8 PvP — tested, ranked, and recognized across seven gamemodes.</p>
-    <div class="hero-cta">
-      <a href="leaderboards.html" class="btn btn-primary">View Leaderboards →</a>
-      <a href="staff-application.html" class="btn btn-ghost">Apply as Tester</a>
-    </div>
-    <div class="scroll-cue"><span>Scroll</span><div class="line"></div></div>
-  </section>
+  <!-- HERO -->
+  <section class="page-hero">
+    <div class="container">
+      <div class="eyebrow">SEASON 4 · 1.8 PVP · ASIA SERVER GROUP</div>
+      <h1 style="font-size:clamp(38px,6.4vw,74px); line-height:1.02; margin:16px 0 18px; max-width:960px;">
+        Prove your rank.<br><span style="background:linear-gradient(90deg,#e63946,#3a86ff); -webkit-background-clip:text; background-clip:text; color:transparent;">Earn your tier.</span>
+      </h1>
+      <p class="h-sub" style="font-size:17px; max-width:560px;">
+        Asian Tier List is the region's competitive ranking authority for Minecraft 1.8 combat. Get tested by verified staff across seven gamemodes and take your placement to the leaderboard.
+      </p>
+      <div class="mt-24" style="display:flex; gap:14px; flex-wrap:wrap;">
+        <a href="testers.html" class="btn btn-primary">Request a Test</a>
+        <a href="leaderboards.html" class="btn btn-ghost">View Leaderboards</a>
+      </div>
 
-  <section id="gamemodes">
-    <div class="section-head">
-      <span class="section-tag">Ranked Gamemodes</span>
-      <h2>Seven ways to climb</h2>
-      <p>Every gamemode is tested and ranked independently. Your tier reflects your skill in that specific arena.</p>
-    </div>
-    <div class="gm-grid">
-      <div class="gm-card">
-        <span class="gm-num mono">01</span>
-        <div class="gm-icon">🛏️</div>
-        <h3>BedWars</h3>
-        <p>Resource control, bed defense, and end-game closing power.</p>
-      </div>
-      <div class="gm-card">
-        <span class="gm-num mono">02</span>
-        <div class="gm-icon">🔥</div>
-        <h3>Fireball Fight</h3>
-        <p>Knockback prediction and fireball spacing at range.</p>
-      </div>
-      <div class="gm-card">
-        <span class="gm-num mono">03</span>
-        <div class="gm-icon">⚔️</div>
-        <h3>Sumo</h3>
-        <p>Pure knockback combat with zero fall damage.</p>
-      </div>
-      <div class="gm-card">
-        <span class="gm-num mono">04</span>
-        <div class="gm-icon">🗡️</div>
-        <h3>Nodebuff</h3>
-        <p>Raw combo and hit-tracking without regeneration.</p>
-      </div>
-      <div class="gm-card">
-        <span class="gm-num mono">05</span>
-        <div class="gm-icon">🥊</div>
-        <h3>Boxing</h3>
-        <p>Fist-only precision and spacing control.</p>
-      </div>
-      <div class="gm-card">
-        <span class="gm-num mono">06</span>
-        <div class="gm-icon">🛡️</div>
-        <h3>BUHC</h3>
-        <p>Build UHC — resource gathering under combat pressure.</p>
-      </div>
-      <div class="gm-card">
-        <span class="gm-num mono">07</span>
-        <div class="gm-icon">🌉</div>
-        <h3>Bridges</h3>
-        <p>Speed bridging and offense under a timer.</p>
+      <div class="mt-32 glass card" style="padding:26px; display:flex; flex-wrap:wrap; gap:28px; align-items:center;">
+        <span class="eyebrow" style="min-width:120px;">Tier scale</span>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;" id="tierStrip"></div>
       </div>
     </div>
   </section>
 
-  <section id="tiers">
-    <div class="section-head">
-      <span class="section-tag">The Ladder</span>
-      <h2>S to D-</h2>
-      <p>Fourteen ranks across five tiers. Each rung represents a verified skill bracket, tested live by our staff.</p>
-    </div>
-    <div class="ladder-wrap">
-      <div class="ladder">
-        <div class="rung t-ht1" data-h="1"><div class="hex-badge tier-s">S</div><div class="rung-bar"></div><div class="rung-label mono">01</div></div>
-        <div class="rung" data-h="2"><div class="hex-badge tier-s" style="background:linear-gradient(135deg,#f0576b,#dd3348);">S-</div><div class="rung-bar" style="background:linear-gradient(180deg,#f0576b,#dd3348);"></div><div class="rung-label mono">02</div></div>
-        <div class="rung" data-h="3"><div class="hex-badge tier-small" style="background:linear-gradient(135deg,#e35a70,#cf3648);">A+</div><div class="rung-bar" style="background:linear-gradient(180deg,#e35a70,#cf3648);"></div><div class="rung-label mono">03</div></div>
-        <div class="rung" data-h="4"><div class="hex-badge" style="background:linear-gradient(135deg,#d15f74,#b64058);">A</div><div class="rung-bar" style="background:linear-gradient(180deg,#d15f74,#b64058);"></div><div class="rung-label mono">04</div></div>
-        <div class="rung" data-h="5"><div class="hex-badge tier-small" style="background:linear-gradient(135deg,#b96579,#9c4761);">A-</div><div class="rung-bar" style="background:linear-gradient(180deg,#b96579,#9c4761);"></div><div class="rung-label mono">05</div></div>
-        <div class="rung" data-h="6"><div class="hex-badge tier-small" style="background:linear-gradient(135deg,#9f6a89,#7d4f74);">B+</div><div class="rung-bar" style="background:linear-gradient(180deg,#9f6a89,#7d4f74);"></div><div class="rung-label mono">06</div></div>
-        <div class="rung" data-h="7"><div class="hex-badge" style="background:linear-gradient(135deg,#8570a0,#63578d);">B</div><div class="rung-bar" style="background:linear-gradient(180deg,#8570a0,#63578d);"></div><div class="rung-label mono">07</div></div>
-        <div class="rung" data-h="8"><div class="hex-badge tier-small" style="background:linear-gradient(135deg,#6b78ac,#4a63a3);">B-</div><div class="rung-bar" style="background:linear-gradient(180deg,#6b78ac,#4a63a3);"></div><div class="rung-label mono">08</div></div>
-        <div class="rung" data-h="9"><div class="hex-badge tier-small" style="background:linear-gradient(135deg,#557eb8,#3d6ea8);">C+</div><div class="rung-bar" style="background:linear-gradient(180deg,#557eb8,#3d6ea8);"></div><div class="rung-label mono">09</div></div>
-        <div class="rung" data-h="10"><div class="hex-badge" style="background:linear-gradient(135deg,#4783c2,#356aa0);">C</div><div class="rung-bar" style="background:linear-gradient(180deg,#4783c2,#356aa0);"></div><div class="rung-label mono">10</div></div>
-        <div class="rung" data-h="11"><div class="hex-badge tier-small" style="background:linear-gradient(135deg,#4287c8,#2f6499);">C-</div><div class="rung-bar" style="background:linear-gradient(180deg,#4287c8,#2f6499);"></div><div class="rung-label mono">11</div></div>
-        <div class="rung" data-h="12"><div class="hex-badge tier-small" style="background:linear-gradient(135deg,#3b90d4,#285a8b);">D+</div><div class="rung-bar" style="background:linear-gradient(180deg,#3b90d4,#285a8b);"></div><div class="rung-label mono">12</div></div>
-        <div class="rung" data-h="13"><div class="hex-badge" style="background:linear-gradient(135deg,#309ce3,#1c4b76);">D</div><div class="rung-bar" style="background:linear-gradient(180deg,#309ce3,#1c4b76);"></div><div class="rung-label mono">13</div></div>
-        <div class="rung t-lt10" data-h="14"><div class="hex-badge tier-small">D-</div><div class="rung-bar"></div><div class="rung-label mono">14</div></div>
+  <!-- STATS -->
+  <section class="section">
+    <div class="container grid-4" id="homeStats"></div>
+  </section>
+
+  <!-- GAMEMODES -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">Seven ways to prove it</div>
+          <h2 class="h-title">Ranked gamemodes</h2>
+        </div>
+        <p class="h-sub">Every gamemode is tiered and tracked independently — your overall tier reflects your strongest disciplines.</p>
       </div>
-      <p class="ladder-caption">Rank plates scale with tier weight — S sits at the top of the ladder, D- at the base.</p>
+      <div class="grid-4" id="gamemodeGrid"></div>
     </div>
   </section>
 
-  <section id="discord">
-    <div class="discord-preview">
-      <div class="discord-copy">
-        <span class="section-tag">Discord Integration</span>
-        <h2>Your rank, synced to Discord</h2>
-        <p>Sign in with Discord to unlock your player profile, tier badges, and role-based access across the site. Your Discord nickname and roles sync automatically.</p>
-        <div class="view-tags">
-          <span class="view-tag">👑 Owner View</span>
-          <span class="view-tag">🧪 Tester View</span>
-          <span class="view-tag">👤 Member View</span>
-          <span class="view-tag">👁 Guest View</span>
+  <!-- HOW IT WORKS -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">The process</div>
+          <h2 class="h-title">How placement works</h2>
         </div>
-        <a href="#" class="btn btn-primary">Login with Discord</a>
       </div>
-      <div class="dp-card">
-        <div class="dp-profile">
-          <div class="dp-avatar">S1<div class="dp-status"></div></div>
-          <div>
-            <div class="dp-name">s1ztx</div>
-            <div class="dp-tag mono">@s1ztx · Owner</div>
-          </div>
+      <div class="grid-3">
+        <div class="glass card card-hover">
+          <div class="pill pill-blue">Step 1</div>
+          <h3 class="mt-16" style="font-size:19px;">Request a test</h3>
+          <p class="text-sm text-muted">Head to the Testers page and submit a test request for the gamemode you want ranked.</p>
         </div>
-        <div class="dp-badges">
-          <span class="dp-badge owner">OWNER</span>
-          <span class="dp-badge tier">S · BEDWARS</span>
-          <span class="dp-badge member">VERIFIED</span>
+        <div class="glass card card-hover">
+          <div class="pill pill-red">Step 2</div>
+          <h3 class="mt-16" style="font-size:19px;">Get evaluated</h3>
+          <p class="text-sm text-muted">A verified Tester plays against you and scores your mechanics, movement, and decision-making.</p>
         </div>
-        <ul class="dp-list">
-          <li><span>Server Nickname</span><span>s1ztx</span></li>
-          <li><span>Highest Tier</span><span class="mono">S</span></li>
-          <li><span>Gamemodes Ranked</span><span class="mono">7 / 7</span></li>
-          <li><span>Discord Roles</span><span class="mono">4 active</span></li>
-        </ul>
+        <div class="glass card card-hover">
+          <div class="pill pill-gold">Step 3</div>
+          <h3 class="mt-16" style="font-size:19px;">Receive your tier</h3>
+          <p class="text-sm text-muted">Your result is logged to your profile and reflected instantly on the gamemode leaderboard.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section">
+    <div class="container">
+      <div class="glass card" style="padding:40px; display:flex; align-items:center; justify-content:space-between; gap:24px; flex-wrap:wrap;">
+        <div>
+          <div class="eyebrow">Join the server</div>
+          <h2 class="h-title" style="font-size:28px;">Link your Discord to get tiered</h2>
+          <p class="h-sub">Your profile, roles, and tier history all sync from your Discord identity once you connect.</p>
+        </div>
+        <button class="btn btn-primary" id="ctaLogin">Login with Discord</button>
       </div>
     </div>
   </section>
 
 </main>
 
-<footer>
-  <div class="footer-inner">
-    <div class="footer-grid">
-      <div class="footer-brand">
-        <a href="index.html" class="brand">
-          <div class="brand-mark"><img src="assets/logo.png" alt="Asian Tier List logo"></div>
-          <span>ASIAN<em> TIER</em> LIST</span>
-        </a>
-        <p>The competitive ranking authority for 1.8 PvP. Tested, ranked, and recognized across seven gamemodes.</p>
-      </div>
-      <div class="footer-col">
-        <h4>Platform</h4>
-        <ul>
-          <li><a href="leaderboards.html">Leaderboards</a></li>
-          <li><a href="rules.html">Rules</a></li>
-          <li><a href="announcements.html">Announcements</a></li>
-          <li><a href="reviews.html">Reviews</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h4>Community</h4>
-        <ul>
-          <li><a href="staff.html">Staff</a></li>
-          <li><a href="testers.html">Testers</a></li>
-          <li><a href="staff-application.html">Staff Applications</a></li>
-          <li><a href="profile.html">Player Profile</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h4>Access</h4>
-        <ul>
-          <li><a href="tester-panel.html">Tester Panel</a></li>
-          <li><a href="owner.html">Owner Panel</a></li>
-          <li><a href="#">Login with Discord</a></li>
-        </ul>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <span>© 2026 Asian Tier List and s1ztx, All Rights Reserved.</span>
-      <span class="mono">v1.8.8 · SEASON 1</span>
-    </div>
-  </div>
-</footer>
-
+<script src="assets/js/data.js"></script>
+<script src="assets/js/session.js"></script>
+<script src="assets/js/nav.js"></script>
+<script src="assets/js/backgrounds.js"></script>
 <script>
-  // Mobile nav toggle
-  const navToggle = document.getElementById('navToggle');
-  const navLinks = document.getElementById('navLinks');
-  navToggle.addEventListener('click', () => navLinks.classList.toggle('open'));
+  ATL_mountBackground('home');
+  ATL_initShell('index.html');
 
-  // Ambient particles
-  const particleField = document.getElementById('particles');
-  const count = window.innerWidth < 768 ? 18 : 36;
-  for(let i=0;i<count;i++){
-    const p = document.createElement('div');
-    p.className = 'particle';
-    const size = 2 + Math.random()*2;
-    p.style.width = size+'px';
-    p.style.height = size+'px';
-    p.style.left = Math.random()*100+'%';
-    p.style.animationDuration = (10 + Math.random()*14)+'s';
-    p.style.animationDelay = (Math.random()*14)+'s';
-    p.style.background = Math.random() > 0.5 ? 'rgba(232,56,79,0.7)' : 'rgba(62,124,177,0.7)';
-    particleField.appendChild(p);
-  }
+  document.getElementById('tierStrip').innerHTML = ATL_DATA.TIERS.slice(0,8).map(t=>`
+    <div style="text-align:center;">${ATL_hex(t.id,'sm')}<div class="text-sm text-muted mt-8" style="font-family:var(--f-mono); font-size:11px;">${t.id}</div></div>
+  `).join('');
+
+  document.getElementById('homeStats').innerHTML = [
+    ['7','Ranked gamemodes'],
+    ['14','Official tiers, S to D-'],
+    ['24/7','Live leaderboard sync'],
+    ['1.8','Combat version']
+  ].map(([v,l])=>`<div class="glass stat-card"><div class="s-val">${v}</div><div class="s-label">${l}</div></div>`).join('');
+
+  const gmIcons = {
+    bed: '<path d="M3 18v-6a3 3 0 0 1 3-3h12a3 3 0 0 1 3 3v6"/><path d="M3 18h18"/><path d="M7 9V6a1 1 0 0 1 1-1h3v4"/>',
+    fireball: '<circle cx="12" cy="12" r="7"/><path d="M12 5v-3M8 6l-1-2M16 6l1-2"/>',
+    sumo: '<circle cx="12" cy="7" r="3"/><path d="M6 21c0-4 3-7 6-7s6 3 6 7"/>',
+    sword: '<path d="M14.5 3.5 21 10l-3 3-6.5-6.5z"/><path d="M11 10 3 18v3h3l8-8"/>',
+    glove: '<path d="M7 12V6a2 2 0 0 1 4 0v4M11 10V5a2 2 0 0 1 4 0v5M15 10V7a2 2 0 0 1 4 0v7a6 6 0 0 1-6 6H10a5 5 0 0 1-5-5v-3l3-2"/>',
+    heart: '<path d="M12 21s-7-4.6-9.5-9C.9 8.6 2.6 5 6 5c2 0 3.5 1.2 4 2 0.5-.8 2-2 4-2 3.4 0 5.1 3.6 3.5 7-2.5 4.4-9.5 9-9.5 9z"/>',
+    bridge: '<path d="M2 16c2-4 6-6 10-6s8 2 10 6"/><path d="M4 20V12M20 20V12M12 20v-6"/>'
+  };
+  document.getElementById('gamemodeGrid').innerHTML = ATL_DATA.GAMEMODES.map(g=>`
+    <a href="leaderboards.html" class="glass card card-hover" style="text-align:center;">
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--blue-400)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 12px;">${gmIcons[g.icon]}</svg>
+      <div style="font-family:var(--f-sub); font-weight:700; font-size:15px; color:var(--text-0);">${g.label}</div>
+      <div class="text-sm text-muted mt-8">View leaderboard →</div>
+    </a>
+  `).join('');
+
+  document.getElementById('ctaLogin').addEventListener('click', ATL_SESSION.loginWithDiscord);
 </script>
-
 </body>
 </html>
