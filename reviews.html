@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reviews — Asian Tier List [1.8+]</title>
+<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+<main>
+  <section class="page-hero">
+    <div class="container">
+      <div class="eyebrow">Community feedback</div>
+      <h1 class="h-title" style="font-size:clamp(32px,5vw,52px);">Reviews</h1>
+      <p class="h-sub">What members think of testing, the platform, and the community. Signed-in members can leave one review each.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container" style="display:grid; grid-template-columns:1fr 340px; gap:28px; align-items:flex-start;">
+      <div id="reviewList" style="display:flex; flex-direction:column; gap:16px;"></div>
+
+      <div class="glass card" id="reviewComposer" style="position:sticky; top:calc(var(--nav-h)+20px);"></div>
+    </div>
+  </section>
+</main>
+
+<div class="modal-backdrop" id="confirmDelete">
+  <div class="glass modal">
+    <h3>Delete your review?</h3>
+    <p class="text-sm text-muted">This can't be undone. You can always write a new one later.</p>
+    <div style="display:flex; gap:10px; margin-top:18px;">
+      <button class="btn btn-ghost btn-block" id="cancelDelete">Cancel</button>
+      <button class="btn btn-primary btn-block" id="confirmDeleteBtn">Delete</button>
+    </div>
+  </div>
+</div>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/session.js"></script>
+<script src="assets/js/nav.js"></script>
+<script src="assets/js/backgrounds.js"></script>
+<script>
+  ATL_mountBackground('reviews');
+  const session = ATL_initShell('reviews.html');
+  const listEl = document.getElementById('reviewList');
+  const composer = document.getElementById('reviewComposer');
+
+  function loadReviews(){ return ATL_SESSION.loadStore('reviews', []); }
+  function saveReviews(r){ ATL_SESSION.saveStore('reviews', r); }
+
+  function starRow(n){
+    return `<div class="mono" style="color:var(--gold-500); letter-spacing:2px;">${'★'.repeat(n)}${'☆'.repeat(5-n)}</div>`;
+  }
+
+  function renderList(){
+    const reviews = loadReviews();
+    if(reviews.length === 0){
+      listEl.innerHTML = `
+        <div class="glass empty-state">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 17.3 6.2 20l1.1-6.5L2.5 9l6.5-1L12 2l3 6 6.5 1-4.8 4.5 1.1 6.5z"/></svg>
+          <h3>No reviews yet</h3>
+          <p>Be the first signed-in member to share your experience with testing and the platform.</p>
+        </div>`;
+    } else {
+      listEl.innerHTML = reviews.slice().reverse().map(r=>`
+        <div class="glass card">
+          <div class="flex-between" style="align-items:flex-start;">
+            <div style="display:flex; gap:10px; align-items:center;">
+              <img src="${r.avatar || `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(r.username)}&backgroundColor=141a29`}" style="width:36px;height:36px;border-radius:50%;">
+              <div>
+                <div style="font-family:var(--f-sub); font-weight:700; color:var(--text-0);">${r.display}</div>
+                <span class="text-sm text-muted mono">${r.date}</span>
+              </div>
+            </div>
+            ${starRow(r.rating)}
+          </div>
+          <p class="text-sm mt-16" style="color:var(--text-1);">${r.body}</p>
+        </div>
+      `).join('');
+    }
+  }
+
+  function renderComposer(){
+    if(!session.authenticated){
+      composer.innerHTML = `
+        <div class="eyebrow">Members only</div>
+        <h3 class="mt-8">Sign in to review</h3>
+        <p class="text-sm text-muted">Guests can read reviews, but only signed-in Discord members can post one.</p>
+        <button class="btn btn-primary btn-block mt-16" id="composerLogin">Login with Discord</button>`;
+      document.getElementById('composerLogin').addEventListener('click', ATL_SESSION.loginWithDiscord);
+      return;
+    }
+    const reviews = loadReviews();
+    const mine = reviews.find(r=>r.userId===session.user.id);
+    if(mine){
+      composer.innerHTML = `
+        <div class="eyebrow">Your review</div>
+        <h3 class="mt-8">You've already reviewed</h3>
+        ${starRow(mine.rating)}
+        <p class="text-sm text-muted mt-8">"${mine.body}"</p>
+        <div style="display:flex; gap:10px; margin-top:16px;">
+          <button class="btn btn-ghost btn-block" id="editReview">Edit Review</button>
+          <button class="btn btn-outline-red btn-block" id="deleteReview">Delete Review</button>
+        </div>`;
+      document.getElementById('editReview').addEventListener('click', ()=> openForm(mine));
+      document.getElementById('deleteReview').addEventListener('click', ()=>{
+        document.getElementById('confirmDelete').classList.add('open');
+        document.getElementById('confirmDeleteBtn').onclick = ()=>{
+          saveReviews(loadReviews().filter(r=>r.userId!==session.user.id));
+          document.getElementById('confirmDelete').classList.remove('open');
+          renderComposer(); renderList();
+          ATL_toast('Review deleted.', 'success');
+        };
+      });
+    } else {
+      openForm(null);
+    }
+  }
+
+  function openForm(existing){
+    composer.innerHTML = `
+      <div class="eyebrow">${existing?'Edit your review':'Leave a review'}</div>
+      <h3 class="mt-8">${existing?'Update your thoughts':'Share your experience'}</h3>
+      <div class="field mt-16">
+        <label>Rating</label>
+        <select class="select" id="ratingSelect">
+          ${[5,4,3,2,1].map(n=>`<option value="${n}" ${existing&&existing.rating===n?'selected':''}>${n} star${n>1?'s':''}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field">
+        <label>Review</label>
+        <textarea class="textarea" id="bodyInput" placeholder="How was your testing experience?">${existing?existing.body:''}</textarea>
+      </div>
+      <button class="btn btn-primary btn-block" id="saveReview">${existing?'Save changes':'Post Review'}</button>
+      ${existing?'<button class="btn btn-ghost btn-block mt-8" id="cancelEdit">Cancel</button>':''}
+    `;
+    const cancelBtn = document.getElementById('cancelEdit');
+    if(cancelBtn) cancelBtn.addEventListener('click', renderComposer);
+    document.getElementById('saveReview').addEventListener('click', ()=>{
+      const body = document.getElementById('bodyInput').value.trim();
+      if(!body){ ATL_toast('Write something before posting.', 'error'); return; }
+      const rating = parseInt(document.getElementById('ratingSelect').value,10);
+      let reviews = loadReviews().filter(r=>r.userId!==session.user.id);
+      reviews.push({ userId:session.user.id, username:session.user.username, display:session.user.display, avatar:null, rating, body, date:new Date().toISOString().slice(0,10) });
+      saveReviews(reviews);
+      renderComposer(); renderList();
+      ATL_toast(existing?'Review updated.':'Review posted.', 'success');
+    });
+  }
+
+  document.getElementById('cancelDelete').addEventListener('click', ()=> document.getElementById('confirmDelete').classList.remove('open'));
+
+  renderList(); renderComposer();
+</script>
+</body>
+</html>
