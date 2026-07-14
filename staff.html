@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Asian Tier List [1.8+] — Staff</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --void:#0a0d14;
+    --panel:#12151f;
+    --panel-hi:#181c29;
+    --red:#e8384f;
+    --red-glow:#ff4d63;
+    --blue:#3e7cb1;
+    --blue-glow:#5aa3d8;
+    --gold:#e8b84a;
+    --ink:#f5f7fa;
+    --muted:#8b93a7;
+    --border:rgba(245,247,250,0.08);
+    --glass:rgba(18,21,31,0.55);
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--void);color:var(--ink);font-family:'Inter',sans-serif;overflow-x:hidden;position:relative;}
+  ::selection{background:var(--red);color:var(--ink);}
+  a{color:inherit;text-decoration:none;}
+  h1,h2,h3,.display{font-family:'Orbitron',sans-serif;letter-spacing:0.02em;}
+  .mono{font-family:'JetBrains Mono',monospace;}
+
+  /* ============ BACKGROUND — LUXURY SPOTLIGHT + GLASS PANELS ============ */
+  .bg-layer{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+
+  .spot{
+    position:absolute;
+    border-radius:50%;
+    filter:blur(60px);
+    animation: spotSway ease-in-out infinite;
+  }
+  .spot1{
+    width:600px;height:600px;
+    top:-10%;left:10%;
+    background:radial-gradient(circle, rgba(232,56,79,0.22), transparent 70%);
+    animation-duration:14s;
+  }
+  .spot2{
+    width:500px;height:500px;
+    top:30%;right:5%;
+    background:radial-gradient(circle, rgba(62,124,177,0.20), transparent 70%);
+    animation-duration:18s;
+    animation-delay:2s;
+  }
+  .spot3{
+    width:450px;height:450px;
+    bottom:-10%;left:35%;
+    background:radial-gradient(circle, rgba(232,184,74,0.12), transparent 70%);
+    animation-duration:16s;
+    animation-delay:4s;
+  }
+  @keyframes spotSway{
+    0%,100%{ transform:translate(0,0) scale(1);}
+    50%{ transform:translate(4%,-3%) scale(1.1);}
+  }
+
+  .light-beam-v{
+    position:absolute;
+    top:0;bottom:0;
+    width:180px;
+    background:linear-gradient(180deg, rgba(245,247,250,0.05), transparent 60%);
+    transform:skewX(-8deg);
+    animation: beamPulse 5s ease-in-out infinite;
+  }
+  @keyframes beamPulse{
+    0%,100%{ opacity:0.3;}
+    50%{ opacity:0.7;}
+  }
+
+  .panel-shard{
+    position:absolute;
+    border:1px solid rgba(245,247,250,0.05);
+    background:rgba(245,247,250,0.015);
+    border-radius:16px;
+    animation: shardFloat ease-in-out infinite;
+  }
+  @keyframes shardFloat{
+    0%,100%{ transform:translateY(0) rotate(0deg);}
+    50%{ transform:translateY(-20px) rotate(2deg);}
+  }
+
+  /* ============ NAVIGATION (shared) ============ */
+  header{position:sticky;top:0;z-index:100;background:rgba(10,13,20,0.72);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--border);}
+  nav{max-width:1400px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:16px 32px;gap:24px;}
+  .brand{display:flex;align-items:center;gap:12px;font-family:'Orbitron',sans-serif;font-weight:800;font-size:1.15rem;white-space:nowrap;}
+  .brand-mark{width:40px;height:40px;border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;box-shadow:0 0 20px rgba(232,56,79,0.4);flex-shrink:0;}
+  .brand-mark img{width:100%;height:100%;object-fit:cover;}
+  .brand span{background:linear-gradient(90deg, var(--ink), var(--muted));-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .brand em{font-style:normal;color:var(--red);}
+  .nav-links{display:flex;align-items:center;gap:4px;flex-wrap:wrap;font-size:0.82rem;font-weight:600;letter-spacing:0.02em;}
+  .nav-links a{padding:8px 14px;border-radius:8px;color:var(--muted);transition:all 0.25s ease;position:relative;}
+  .nav-links a:hover{color:var(--ink);background:rgba(245,247,250,0.06);}
+  .nav-links a.active{color:var(--ink);}
+  .nav-links a.active::after{content:'';position:absolute;bottom:2px;left:14px;right:14px;height:2px;background:linear-gradient(90deg, var(--red), var(--blue));border-radius:2px;}
+  .discord-btn{display:flex;align-items:center;gap:8px;padding:10px 20px;background:linear-gradient(135deg, var(--blue), #2f5f87);border-radius:10px;font-weight:700;font-size:0.85rem;white-space:nowrap;border:1px solid rgba(255,255,255,0.12);transition:all 0.25s ease;box-shadow:0 4px 18px rgba(62,124,177,0.25);}
+  .discord-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(62,124,177,0.4);}
+  .nav-toggle{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;}
+  .nav-toggle span{width:24px;height:2px;background:var(--ink);border-radius:2px;}
+
+  /* ============ PAGE HERO ============ */
+  main{position:relative;z-index:1;}
+  .page-hero{padding:100px 24px 50px;text-align:center;max-width:900px;margin:0 auto;}
+  .eyebrow{display:inline-flex;align-items:center;gap:10px;padding:8px 18px;border:1px solid var(--border);background:var(--glass);backdrop-filter:blur(10px);border-radius:100px;font-size:0.78rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:28px;}
+  .eyebrow-dot{width:7px;height:7px;border-radius:50%;background:var(--gold);box-shadow:0 0 10px var(--gold);animation:pulse 1.6s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.5;transform:scale(0.8);}}
+  .page-hero h1{font-size:clamp(2.2rem, 5.5vw, 3.6rem);font-weight:900;line-height:1.1;}
+  .page-hero h1 .grad{background:linear-gradient(120deg, var(--gold), var(--red-glow));-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .page-hero p{margin-top:20px;color:var(--muted);font-size:1.05rem;line-height:1.7;}
+
+  section{padding:0 24px 100px;position:relative;max-width:1300px;margin:0 auto;}
+
+  /* ============ FOUNDER SPOTLIGHT ============ */
+  .founder-spotlight{
+    background:var(--glass);
+    border:1px solid rgba(232,184,74,0.25);
+    backdrop-filter:blur(18px);
+    border-radius:24px;
+    padding:48px;
+    display:flex;
+    align-items:center;
+    gap:40px;
+    margin-bottom:24px;
+    position:relative;
+    overflow:hidden;
+  }
+  .founder-spotlight::before{
+    content:'';
+    position:absolute;inset:0;
+    background:radial-gradient(circle at 15% 20%, rgba(232,184,74,0.14), transparent 55%);
+  }
+  .staff-avatar{
+    width:110px;height:110px;
+    border-radius:24px;
+    background:linear-gradient(135deg, var(--gold), #b8863a);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Orbitron',sans-serif;
+    font-weight:800;
+    font-size:2.2rem;
+    flex-shrink:0;
+    border:2px solid rgba(255,255,255,0.15);
+    position:relative;
+    z-index:1;
+  }
+  .founder-info{position:relative;z-index:1;}
+  .role-tag{
+    display:inline-block;
+    padding:6px 16px;
+    border-radius:100px;
+    font-size:0.75rem;
+    font-weight:700;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    margin-bottom:14px;
+  }
+  .role-tag.founder{background:rgba(232,184,74,0.18);color:var(--gold);border:1px solid rgba(232,184,74,0.35);}
+  .founder-info h2{font-size:1.7rem;font-weight:800;margin-bottom:8px;}
+  .founder-info p{color:var(--muted);font-size:0.95rem;line-height:1.6;max-width:500px;}
+
+  /* ============ STAFF GRID ============ */
+  .staff-tier-label{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    margin:56px 0 28px;
+  }
+  .staff-tier-label h3{
+    font-size:1rem;
+    font-weight:700;
+    color:var(--muted);
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    white-space:nowrap;
+  }
+  .staff-tier-label .rule{
+    flex:1;
+    height:1px;
+    background:linear-gradient(90deg, var(--border), transparent);
+  }
+
+  .staff-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));
+    gap:22px;
+  }
+
+  .staff-card{
+    background:var(--glass);
+    border:1px solid var(--border);
+    backdrop-filter:blur(16px);
+    border-radius:20px;
+    padding:32px;
+    text-align:center;
+    position:relative;
+    transition:all 0.4s ease;
+    overflow:hidden;
+  }
+
+  .staff-card::before{
+    content:'';
+    position:absolute;
+    inset:0;
+    background:radial-gradient(circle at 50% 0%, rgba(62,124,177,0.1), transparent 60%);
+    opacity:0;
+    transition:opacity 0.4s ease;
+  }
+
+  .staff-card:hover{
+    transform:translateY(-6px);
+    border-color:rgba(62,124,177,0.3);
+    box-shadow:0 20px 50px rgba(0,0,0,0.35);
+  }
+  .staff-card:hover::before{opacity:1;}
+
+  .staff-card .staff-avatar{
+    margin:0 auto 20px;
+    width:80px;height:80px;
+    font-size:1.6rem;
+    border-radius:20px;
+    position:relative;
+    z-index:1;
+  }
+  .staff-card.moderator .staff-avatar{background:linear-gradient(135deg, var(--blue-glow), var(--blue));}
+  .staff-card.trial .staff-avatar{background:linear-gradient(135deg, #7d8ba8, #5a6785);}
+  .staff-card.owner .staff-avatar{background:linear-gradient(135deg, var(--red-glow), var(--red));}
+
+  .staff-card h3{font-size:1.15rem;font-weight:800;margin-bottom:8px;position:relative;z-index:1;}
+
+  .role-tag.owner{background:rgba(232,56,79,0.15);color:#ff8a97;border:1px solid rgba(232,56,79,0.3);}
+  .role-tag.moderator{background:rgba(62,124,177,0.15);color:#9cc7e6;border:1px solid rgba(62,124,177,0.3);}
+  .role-tag.trial{background:rgba(245,247,250,0.06);color:var(--muted);border:1px solid var(--border);}
+
+  .staff-card p{color:var(--muted);font-size:0.87rem;line-height:1.6;margin-top:14px;position:relative;z-index:1;}
+
+  .staff-badges{
+    display:flex;
+    gap:8px;
+    justify-content:center;
+    flex-wrap:wrap;
+    margin-top:16px;
+    position:relative;
+    z-index:1;
+  }
+  .mini-badge{
+    padding:5px 12px;
+    border-radius:100px;
+    background:rgba(245,247,250,0.04);
+    border:1px solid var(--border);
+    font-size:0.7rem;
+    font-family:'JetBrains Mono',monospace;
+    color:var(--muted);
+  }
+
+  /* ============ FOOTER (shared) ============ */
+  footer{border-top:1px solid var(--border);padding:64px 24px 32px;position:relative;z-index:1;}
+  .footer-inner{max-width:1400px;margin:0 auto;}
+  .footer-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:48px;margin-bottom:48px;}
+  .footer-brand p{color:var(--muted);font-size:0.9rem;line-height:1.7;margin-top:16px;max-width:280px;}
+  .footer-col h4{font-size:0.85rem;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:18px;color:var(--ink);}
+  .footer-col ul{list-style:none;}
+  .footer-col li{margin-bottom:12px;}
+  .footer-col a{color:var(--muted);font-size:0.9rem;transition:color 0.2s ease;}
+  .footer-col a:hover{color:var(--red-glow);}
+  .footer-bottom{padding-top:28px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;color:var(--muted);font-size:0.82rem;}
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 900px){ .footer-grid{grid-template-columns:1fr 1fr;} }
+  @media (max-width: 700px){
+    .founder-spotlight{flex-direction:column;text-align:center;padding:36px 28px;}
+    .founder-info p{max-width:100%;}
+  }
+  @media (max-width: 768px){
+    .nav-links{position:absolute;top:100%;left:0;right:0;background:rgba(10,13,20,0.98);backdrop-filter:blur(20px);flex-direction:column;align-items:stretch;padding:16px;border-bottom:1px solid var(--border);display:none;}
+    .nav-links.open{display:flex;}
+    .nav-links a{padding:14px;}
+    .nav-toggle{display:flex;}
+    .discord-btn span.dbtn-label{display:none;}
+    .footer-grid{grid-template-columns:1fr;gap:32px;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.01ms !important;animation-iteration-count:1 !important;transition-duration:0.01ms !important;}
+  }
+  a:focus-visible, button:focus-visible{outline:2px solid var(--red-glow);outline-offset:3px;}
+</style>
+</head>
+<body>
+
+<div class="bg-layer">
+  <div class="spot spot1"></div>
+  <div class="spot spot2"></div>
+  <div class="spot spot3"></div>
+  <div class="light-beam-v" style="left:15%;"></div>
+  <div class="light-beam-v" style="left:60%;animation-delay:1.5s;"></div>
+  <div class="panel-shard" style="width:140px;height:180px;top:12%;right:8%;animation-duration:9s;"></div>
+  <div class="panel-shard" style="width:100px;height:130px;bottom:15%;left:6%;animation-duration:11s;animation-delay:1s;"></div>
+</div>
+
+<header>
+  <nav>
+    <a href="index.html" class="brand">
+      <div class="brand-mark"><img src="assets/logo.png" alt="Asian Tier List logo"></div>
+      <span>ASIAN<em> TIER</em> LIST</span>
+    </a>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="nav-links" id="navLinks">
+      <a href="index.html">Home</a>
+      <a href="rules.html">Rules</a>
+      <a href="announcements.html">Announcements</a>
+      <a href="staff.html" class="active">Staff</a>
+      <a href="testers.html">Testers</a>
+      <a href="leaderboards.html">Leaderboards</a>
+      <a href="reviews.html">Reviews</a>
+      <a href="profile.html">Player Profile</a>
+      <a href="tester-panel.html">Tester Panel</a>
+      <a href="owner.html">Owner Panel</a>
+      <a href="staff-application.html">Staff Applications</a>
+    </div>
+    <a href="#" class="discord-btn">
+      <span>🎮</span><span class="dbtn-label">Login with Discord</span>
+    </a>
+  </nav>
+</header>
+
+<main>
+  <div class="page-hero">
+    <div class="eyebrow"><span class="eyebrow-dot"></span> The People Behind It</div>
+    <h1>Meet the <span class="grad">Staff Team</span></h1>
+    <p>The founder, owner, and moderation team keeping tests fair and the ladder honest.</p>
+  </div>
+
+  <section>
+    <div id="staffRenderTarget">
+      <!-- Populated by renderStaffRoster() below, sourced from the roster the Owner Panel manages -->
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="index.html" class="brand">
+          <div class="brand-mark"><img src="assets/logo.png" alt="Asian Tier List logo"></div>
+          <span>ASIAN<em> TIER</em> LIST</span>
+        </a>
+        <p>The competitive ranking authority for 1.8 PvP. Tested, ranked, and recognized across seven gamemodes.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Platform</h4>
+        <ul>
+          <li><a href="leaderboards.html">Leaderboards</a></li>
+          <li><a href="rules.html">Rules</a></li>
+          <li><a href="announcements.html">Announcements</a></li>
+          <li><a href="reviews.html">Reviews</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Community</h4>
+        <ul>
+          <li><a href="staff.html">Staff</a></li>
+          <li><a href="testers.html">Testers</a></li>
+          <li><a href="staff-application.html">Staff Applications</a></li>
+          <li><a href="profile.html">Player Profile</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Access</h4>
+        <ul>
+          <li><a href="tester-panel.html">Tester Panel</a></li>
+          <li><a href="owner.html">Owner Panel</a></li>
+          <li><a href="#">Login with Discord</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Asian Tier List and s1ztx, All Rights Reserved.</span>
+      <span class="mono">v1.8.8 · SEASON 1</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const navToggle = document.getElementById('navToggle');
+  const navLinks = document.getElementById('navLinks');
+  navToggle.addEventListener('click', () => navLinks.classList.toggle('open'));
+
+  /* ============================================================
+     SHARED STAFF ROSTER
+     Source of truth: localStorage key "atl_staff_roster".
+     The Owner Panel (owner.html) writes to this same key when
+     the owner adds, edits, or removes a staff member — this page
+     just reads and renders it. No backend yet: this is a frontend
+     stand-in so the two pages agree on one data source. Swap the
+     load/save functions for real API calls once a backend exists.
+  ============================================================ */
+  const ROSTER_KEY = 'atl_staff_roster';
+
+  const defaultRoster = [
+    { username: 'Shizeen',       role: 'Founder',         bio: 'Founded Asian Tier List [1.8+] and set the original vision for a fair, community-driven ranking system across 1.8 PvP gamemodes.' },
+    { username: 's1ztx',         role: 'Owner',           bio: 'Runs day-to-day operations, development, and platform decisions for the community.' },
+    { username: 'Krup',          role: 'Trial Moderator',       bio: 'New to the moderation team, currently under evaluation for a full promotion.' },
+    { username: '! KULP PLAYZ',  role: 'Trial Moderator', bio: 'New to the moderation team, currently under evaluation for a full promotion.' }
+  ];
+
+  function loadRoster(){
+    try{
+      const raw = localStorage.getItem(ROSTER_KEY);
+      if(!raw){
+        localStorage.setItem(ROSTER_KEY, JSON.stringify(defaultRoster));
+        return defaultRoster;
+      }
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) && parsed.length ? parsed : defaultRoster;
+    }catch(e){
+      console.error('Could not read staff roster, falling back to defaults', e);
+      return defaultRoster;
+    }
+  }
+
+  function initials(name){
+    const clean = name.replace(/[^a-zA-Z0-9]/g, '');
+    if(!clean) return '?';
+    return clean.length > 1 ? (clean[0] + clean[1]).toUpperCase() : clean[0].toUpperCase();
+  }
+
+  const roleMeta = {
+    'Founder':         { avatarClass: 'founder',   tagClass: 'founder',   label: 'Founder' },
+    'Owner':           { avatarClass: 'owner',     tagClass: 'owner',     label: 'Owner' },
+    'Moderator':       { avatarClass: 'moderator', tagClass: 'moderator', label: 'Moderator' },
+    'Trial Moderator': { avatarClass: 'trial',     tagClass: 'trial',     label: 'Trial Moderator' }
+  };
+
+  const roleOrder = ['Founder', 'Owner', 'Moderator', 'Trial Moderator'];
+  const tierGroupLabel = { 'Owner': 'Leadership', 'Moderator': 'Moderation', 'Trial Moderator': 'Moderation' };
+
+  function renderStaffRoster(){
+    const roster = loadRoster();
+    const target = document.getElementById('staffRenderTarget');
+    target.innerHTML = '';
+
+    // Founder gets the big spotlight treatment, one per roster (first match wins)
+    const founder = roster.find(s => s.role === 'Founder');
+    if(founder){
+      const meta = roleMeta[founder.role] || roleMeta['Owner'];
+      const spotlight = document.createElement('div');
+      spotlight.className = 'founder-spotlight';
+      spotlight.innerHTML = `
+        <div class="staff-avatar">${initials(founder.username)}</div>
+        <div class="founder-info">
+          <span class="role-tag ${meta.tagClass}">${meta.label}</span>
+          <h2>${founder.username}</h2>
+          <p>${founder.bio || ''}</p>
+        </div>`;
+      target.appendChild(spotlight);
+    }
+
+    // Group everyone else by tier label (Leadership / Moderation), preserving role order
+    const groups = {};
+    roleOrder.forEach(role => {
+      if(role === 'Founder') return;
+      const members = roster.filter(s => s.role === role);
+      if(!members.length) return;
+      const groupName = tierGroupLabel[role] || role;
+      if(!groups[groupName]) groups[groupName] = [];
+      groups[groupName].push(...members);
+    });
+
+    Object.entries(groups).forEach(([groupName, members]) => {
+      const labelEl = document.createElement('div');
+      labelEl.className = 'staff-tier-label';
+      labelEl.innerHTML = `<h3>${groupName}</h3><div class="rule"></div>`;
+      target.appendChild(labelEl);
+
+      const gridEl = document.createElement('div');
+      gridEl.className = 'staff-grid';
+      members.forEach(member => {
+        const meta = roleMeta[member.role] || roleMeta['Moderator'];
+        const card = document.createElement('div');
+        card.className = `staff-card ${meta.avatarClass}`;
+        card.innerHTML = `
+          <div class="staff-avatar">${initials(member.username)}</div>
+          <h3>${member.username}</h3>
+          <span class="role-tag ${meta.tagClass}">${meta.label}</span>
+          <p>${member.bio || ''}</p>
+          <div class="staff-badges"><span class="mini-badge">${meta.label.toUpperCase()}</span></div>`;
+        gridEl.appendChild(card);
+      });
+      target.appendChild(gridEl);
+    });
+
+    if(!roster.length){
+      target.innerHTML = `
+        <div class="empty-state" style="text-align:center;padding:80px 32px;background:var(--glass);border:1px solid var(--border);border-radius:24px;">
+          <h3 style="font-size:1.2rem;font-weight:800;margin-bottom:10px;">No staff added yet</h3>
+          <p style="color:var(--muted);">The Owner Panel hasn't added any staff members to the roster.</p>
+        </div>`;
+    }
+  }
+
+  renderStaffRoster();
+
+  // If the Owner Panel updates the roster in another tab, reflect it live here
+  window.addEventListener('storage', (e) => {
+    if(e.key === ROSTER_KEY) renderStaffRoster();
+  });
+</script>
+
+</body>
+</html>
