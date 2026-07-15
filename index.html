@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Asian Tier List [1.8+] — Competitive Minecraft PvP Rankings</title>
+<meta name="description" content="The official Asian Tier List for Minecraft 1.8 PvP. Get tested, get ranked, climb the leaderboards across BedWars, Sumo, Nodebuff, Boxing, BUHC and Bridges.">
+<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+
+<main>
+
+  <!-- HERO -->
+  <section class="page-hero">
+    <div class="container">
+      <div class="eyebrow">SEASON 4 · 1.8 PVP · ASIA SERVER GROUP</div>
+      <h1 style="font-size:clamp(38px,6.4vw,74px); line-height:1.02; margin:16px 0 18px; max-width:960px;">
+        Prove your rank.<br><span style="background:linear-gradient(90deg,#e63946,#3a86ff); -webkit-background-clip:text; background-clip:text; color:transparent;">Earn your tier.</span>
+      </h1>
+      <p class="h-sub" style="font-size:17px; max-width:560px;">
+        Asian Tier List is the region's competitive ranking authority for Minecraft 1.8 combat. Get tested by verified staff across seven gamemodes and take your placement to the leaderboard.
+      </p>
+      <div class="mt-24" style="display:flex; gap:14px; flex-wrap:wrap;">
+        <a href="testers.html" class="btn btn-primary">Request a Test</a>
+        <a href="leaderboards.html" class="btn btn-ghost">View Leaderboards</a>
+      </div>
+
+      <div class="mt-32 glass card" style="padding:26px; display:flex; flex-wrap:wrap; gap:28px; align-items:center;">
+        <span class="eyebrow" style="min-width:120px;">Tier scale</span>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;" id="tierStrip"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section class="section">
+    <div class="container grid-4" id="homeStats"></div>
+  </section>
+
+  <!-- GAMEMODES -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">Seven ways to prove it</div>
+          <h2 class="h-title">Ranked gamemodes</h2>
+        </div>
+        <p class="h-sub">Every gamemode is tiered and tracked independently — your overall tier reflects your strongest disciplines.</p>
+      </div>
+      <div class="grid-4" id="gamemodeGrid"></div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">The process</div>
+          <h2 class="h-title">How placement works</h2>
+        </div>
+      </div>
+      <div class="grid-3">
+        <div class="glass card card-hover">
+          <div class="pill pill-blue">Step 1</div>
+          <h3 class="mt-16" style="font-size:19px;">Request a test</h3>
+          <p class="text-sm text-muted">Head to the Testers page and submit a test request for the gamemode you want ranked.</p>
+        </div>
+        <div class="glass card card-hover">
+          <div class="pill pill-red">Step 2</div>
+          <h3 class="mt-16" style="font-size:19px;">Get evaluated</h3>
+          <p class="text-sm text-muted">A verified Tester plays against you and scores your mechanics, movement, and decision-making.</p>
+        </div>
+        <div class="glass card card-hover">
+          <div class="pill pill-gold">Step 3</div>
+          <h3 class="mt-16" style="font-size:19px;">Receive your tier</h3>
+          <p class="text-sm text-muted">Your result is logged to your profile and reflected instantly on the gamemode leaderboard.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section" id="discordCtaSection">
+    <div class="container">
+      <div class="glass card" style="padding:40px; display:flex; align-items:center; justify-content:space-between; gap:24px; flex-wrap:wrap;">
+        <div>
+          <div class="eyebrow">Join the server</div>
+          <h2 class="h-title" style="font-size:28px;">Link your Discord to get tiered</h2>
+          <p class="h-sub">Your profile, roles, and tier history all sync from your Discord identity once you connect.</p>
+        </div>
+        <button class="btn btn-primary" id="ctaLogin">Login with Discord</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/session.js"></script>
+<script src="assets/js/nav.js"></script>
+<script src="assets/js/backgrounds.js"></script>
+<script>
+  ATL_mountBackground('home');
+  const session = ATL_initShell('index.html');
+  if(session.authenticated){
+    document.getElementById('discordCtaSection').classList.add('hidden');
+  }
+
+  document.getElementById('tierStrip').innerHTML = ATL_DATA.TIERS.slice(0,8).map(t=>`
+    <div style="text-align:center;">${ATL_hex(t.id,'sm')}<div class="text-sm text-muted mt-8" style="font-family:var(--f-mono); font-size:11px;">${t.id}</div></div>
+  `).join('');
+
+  document.getElementById('homeStats').innerHTML = [
+    ['7','Ranked gamemodes'],
+    ['14','Official tiers, S to D-'],
+    ['24/7','Live leaderboard sync'],
+    ['1.8','Combat version']
+  ].map(([v,l])=>`<div class="glass stat-card"><div class="s-val">${v}</div><div class="s-label">${l}</div></div>`).join('');
+
+  const gmIcons = {
+    bed: '<path d="M3 18v-6a3 3 0 0 1 3-3h12a3 3 0 0 1 3 3v6"/><path d="M3 18h18"/><path d="M7 9V6a1 1 0 0 1 1-1h3v4"/>',
+    fireball: '<circle cx="12" cy="12" r="7"/><path d="M12 5v-3M8 6l-1-2M16 6l1-2"/>',
+    sumo: '<circle cx="12" cy="7" r="3"/><path d="M6 21c0-4 3-7 6-7s6 3 6 7"/>',
+    sword: '<path d="M14.5 3.5 21 10l-3 3-6.5-6.5z"/><path d="M11 10 3 18v3h3l8-8"/>',
+    glove: '<path d="M7 12V6a2 2 0 0 1 4 0v4M11 10V5a2 2 0 0 1 4 0v5M15 10V7a2 2 0 0 1 4 0v7a6 6 0 0 1-6 6H10a5 5 0 0 1-5-5v-3l3-2"/>',
+    heart: '<path d="M12 21s-7-4.6-9.5-9C.9 8.6 2.6 5 6 5c2 0 3.5 1.2 4 2 0.5-.8 2-2 4-2 3.4 0 5.1 3.6 3.5 7-2.5 4.4-9.5 9-9.5 9z"/>',
+    bridge: '<path d="M2 16c2-4 6-6 10-6s8 2 10 6"/><path d="M4 20V12M20 20V12M12 20v-6"/>'
+  };
+  document.getElementById('gamemodeGrid').innerHTML = ATL_DATA.GAMEMODES.map(g=>`
+    <a href="leaderboards.html" class="glass card card-hover" style="text-align:center;">
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--blue-400)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 12px;">${gmIcons[g.icon]}</svg>
+      <div style="font-family:var(--f-sub); font-weight:700; font-size:15px; color:var(--text-0);">${g.label}</div>
+      <div class="text-sm text-muted mt-8">View leaderboard →</div>
+    </a>
+  `).join('');
+
+  document.getElementById('ctaLogin').addEventListener('click', ATL_SESSION.loginWithDiscord);
+</script>
+</body>
+</html>
