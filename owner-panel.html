@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Owner Panel — Asian Tier List [1.8+]</title>
+<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+<main>
+  <section class="page-hero" style="padding-bottom:24px;">
+    <div class="container">
+      <div class="eyebrow">Command center</div>
+      <h1 class="h-title" style="font-size:clamp(30px,4.6vw,44px);">Owner Panel</h1>
+      <p class="h-sub">Full control over staff, testers, content, and platform settings. Visible to Owner and Founder only.</p>
+    </div>
+  </section>
+  <section class="section" style="padding-top:0;">
+    <div class="container" id="panelRoot"></div>
+  </section>
+</main>
+
+<div class="modal-backdrop" id="formModal">
+  <div class="glass modal" id="formModalInner"></div>
+</div>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/session.js"></script>
+<script src="assets/js/nav.js"></script>
+<script src="assets/js/backgrounds.js"></script>
+<script>
+ATL_mountBackground('owner-panel');
+const session = ATL_initShell('owner-panel.html');
+const root = document.getElementById('panelRoot');
+
+if(!ATL_DATA.hasAtLeast(session.role, 'Owner')){
+  root.innerHTML = `
+    <div class="glass empty-state">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+      <h3>Owner access required</h3>
+      <p>This panel is restricted to Owner and Founder. ${session.authenticated ? "Your current role is "+session.role+"." : "Login with Discord to check your role."}</p>
+      ${!session.authenticated ? '<button class="btn btn-primary mt-16" id="opLogin">Login with Discord</button>' : ''}
+    </div>`;
+  const b = document.getElementById('opLogin'); if(b) b.addEventListener('click', ATL_SESSION.loginWithDiscord);
+} else {
+  buildPanel();
+}
+
+function audit(action, detail){
+  const log = ATL_SESSION.loadStore('audit_log', []);
+  log.push({ action, detail, actor: session.user.display, date: new Date().toLocaleString() });
+  ATL_SESSION.saveStore('audit_log', log);
+}
+function openModal(html){ document.getElementById('formModalInner').innerHTML = html; document.getElementById('formModal').classList.add('open'); }
+function closeModal(){ document.getElementById('formModal').classList.remove('open'); }
+document.getElementById('formModal').addEventListener('click', e=>{ if(e.target.id==='formModal') closeModal(); });
+
+function buildPanel(){
+  root.innerHTML = `
+  <div class="panel-shell">
+    <nav class="glass panel-nav">
+      <div class="panel-nav-group"><h5>Overview</h5>
+        <div class="panel-tab active" data-view="dashboard">Dashboard</div>
+        <div class="panel-tab" data-view="analytics">Analytics</div>
+        <div class="panel-tab" data-view="statistics">Statistics</div>
+      </div>
+      <div class="panel-nav-group"><h5>People</h5>
+        <div class="panel-tab" data-view="staff">Manage Staff</div>
+        <div class="panel-tab" data-view="staffApps">Staff Applications</div>
+        <div class="panel-tab" data-view="testers">Manage Testers</div>
+      </div>
+      <div class="panel-nav-group"><h5>Content</h5>
+        <div class="panel-tab" data-view="announcements">Announcements</div>
+        <div class="panel-tab" data-view="reviews">Reviews</div>
+        <div class="panel-tab" data-view="leaderboards">Leaderboards</div>
+        <div class="panel-tab" data-view="rules">Rules</div>
+      </div>
+      <div class="panel-nav-group"><h5>System</h5>
+        <div class="panel-tab" data-view="settings">Website Settings</div>
+        <div class="panel-tab" data-view="audit">Audit Logs</div>
+      </div>
+    </nav>
+    <div>
+      <div class="panel-view active" id="view-dashboard"></div>
+      <div class="panel-view" id="view-analytics"></div>
+      <div class="panel-view" id="view-statistics"></div>
+      <div class="panel-view" id="view-staff"></div>
+      <div class="panel-view" id="view-staffApps"></div>
+      <div class="panel-view" id="view-testers"></div>
+      <div class="panel-view" id="view-announcements"></div>
+      <div class="panel-view" id="view-reviews"></div>
+      <div class="panel-view" id="view-leaderboards"></div>
+      <div class="panel-view" id="view-rules"></div>
+      <div class="panel-view" id="view-settings"></div>
+      <div class="panel-view" id="view-audit"></div>
+    </div>
+  </div>`;
+
+  root.querySelectorAll('.panel-tab').forEach(t=> t.addEventListener('click', ()=>{
+    root.querySelectorAll('.panel-tab').forEach(x=>x.classList.toggle('active', x===t));
+    root.querySelectorAll('.panel-view').forEach(v=>v.classList.toggle('active', v.id==='view-'+t.dataset.view));
+    renderView(t.dataset.view);
+  }));
+
+  renderView('dashboard');
+}
+
+function counts(){
+  return {
+    staff: ATL_SESSION.loadStore('staff', []).length,
+    testers: ATL_SESSION.loadStore('testers', []).length,
+    announcements: ATL_SESSION.loadStore('announcements', []).length,
+    reviews: ATL_SESSION.loadStore('reviews', []).length,
+    requests: ATL_SESSION.loadStore('test_requests', []).length,
+    tiersLogged: ATL_SESSION.loadStore('tier_log', []).length,
+    audit: ATL_SESSION.loadStore('audit_log', []).length,
+  };
+}
+
+function renderView(view){
+  const c = counts();
+  if(view==='dashboard'){
+    document.getElementById('view-dashboard').innerHTML = `
+      <div class="grid-4">
+        <div class="glass stat-card"><div class="s-val">${c.staff}</div><div class="s-label">Staff members</div></div>
+        <div class="glass stat-card"><div class="s-val">${c.testers}</div><div class="s-label">Testers</div></div>
+        <div class="glass stat-card"><div class="s-val">${c.requests}</div><div class="s-label">Test requests</div></div>
+        <div class="glass stat-card"><div class="s-val">${c.tiersLogged}</div><div class="s-label">Tiers logged</div></div>
+      </div>
+      <div class="glass card mt-24">
+        <div class="eyebrow">Quick actions</div>
+        <div class="mt-16" style="display:flex; gap:12px; flex-wrap:wrap;">
+          <button class="btn btn-primary btn-sm" style="text-transform:none;" data-goto="staff">+ Add staff</button>
+          <button class="btn btn-secondary btn-sm" style="text-transform:none;" data-goto="testers">+ Add tester</button>
+          <button class="btn btn-ghost btn-sm" style="text-transform:none;" data-goto="announcements">+ Post announcement</button>
+          <button class="btn btn-ghost btn-sm" style="text-transform:none;" data-goto="settings">Website settings</button>
+        </div>
+      </div>
+      <div class="glass card mt-24">
+        <div class="eyebrow">Recent activity</div>
+        <div class="mt-16" id="dashRecent"></div>
+      </div>`;
+    const recent = ATL_SESSION.loadStore('audit_log', []).slice(-5).reverse();
+    document.getElementById('dashRecent').innerHTML = recent.length ? recent.map(a=>`<div class="rule-item" style="border-bottom:1px solid var(--hairline); padding:10px 0;"><span class="text-sm">${a.action} — <span class="text-muted">${a.detail}</span></span><span class="text-sm text-muted mono" style="margin-left:auto;">${a.date}</span></div>`).join('') : '<p class="text-sm text-muted">No actions logged yet this session.</p>';
+    document.getElementById('view-dashboard').querySelectorAll('[data-goto]').forEach(b=> b.addEventListener('click', ()=>{
+      const tab = root.querySelector(`.panel-tab[data-view="${b.dataset.goto}"]`); if(tab) tab.click();
+    }));
+  }
+
+  if(view==='analytics'){
+    document.getElementById('view-analytics').innerHTML = `
+      <div class="glass card">
+        <div class="eyebrow">Platform analytics</div>
+        <h3 class="mt-8">Requests by gamemode</h3>
+        <div class="mt-24" id="analyticsBars" style="display:flex; flex-direction:column; gap:12px;"></div>
+      </div>`;
+    const requests = ATL_SESSION.loadStore('test_requests', []);
+    const max = Math.max(1, ...ATL_DATA.GAMEMODES.map(g=> requests.filter(r=>r.gamemode===g.id).length));
+    document.getElementById('analyticsBars').innerHTML = ATL_DATA.GAMEMODES.map(g=>{
+      const n = requests.filter(r=>r.gamemode===g.id).length;
+      const pct = Math.round((n/max)*100);
+      return `<div>
+        <div class="flex-between text-sm"><span>${g.label}</span><span class="text-muted mono">${n}</span></div>
+        <div style="height:8px; border-radius:6px; background:var(--panel-3); margin-top:6px; overflow:hidden;">
+          <div style="height:100%; width:${pct}%; background:linear-gradient(90deg, var(--red-500), var(--blue-500));"></div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  if(view==='statistics'){
+    document.getElementById('view-statistics').innerHTML = `
+      <div class="grid-3">
+        <div class="glass stat-card"><div class="s-val">${c.announcements}</div><div class="s-label">Announcements posted</div></div>
+        <div class="glass stat-card"><div class="s-val">${c.reviews}</div><div class="s-label">Reviews submitted</div></div>
+        <div class="glass stat-card"><div class="s-val">${c.audit}</div><div class="s-label">Logged owner actions</div></div>
+      </div>
+      <div class="glass card mt-24">
+        <div class="eyebrow">Tier distribution</div>
+        <div class="mt-16" style="display:flex; gap:6px; flex-wrap:wrap;" id="tierDist"></div>
+      </div>`;
+    const log = ATL_SESSION.loadStore('tier_log', []);
+    document.getElementById('tierDist').innerHTML = ATL_DATA.TIERS.map(t=>{
+      const n = log.filter(l=>l.tier===t.id).length;
+      return `<div style="text-align:center;">${ATL_hex(t.id,'sm')}<div class="text-sm text-muted mono mt-8">${n}</div></div>`;
+    }).join('');
+  }
+
+  if(view==='staff') renderStaff();
+  if(view==='staffApps') renderStaffApplications();
+  if(view==='testers') renderTesters();
+  if(view==='announcements') renderAnnouncements();
+  if(view==='reviews') renderReviewsMod();
+  if(view==='leaderboards') renderLeaderboardsMod();
+  if(view==='rules') renderRulesMod();
+  if(view==='settings') renderSettings();
+  if(view==='audit') renderAudit();
+}
+
+/* ---------------- STAFF ---------------- */
+function renderStaff(){
+  const staff = ATL_SESSION.loadStore('staff', []);
+  const el = document.getElementById('view-staff');
+  el.innerHTML = `
+    <div class="flex-between mt-8" style="margin-bottom:16px;">
+      <h3 style="margin:0;">Manage Staff</h3>
+      <button class="btn btn-primary btn-sm" id="addStaffBtn" style="text-transform:none;">+ Add Staff</button>
+    </div>
+    <div class="table-wrap glass" id="staffTableWrap"></div>`;
+  const wrap = document.getElementById('staffTableWrap');
+  if(staff.length===0){
+    wrap.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg><h3>No staff yet</h3><p>Add your first staff member to populate the Staff page.</p></div>`;
+  } else {
+    wrap.innerHTML = `<table class="dt"><thead><tr><th>Member</th><th>Role</th><th>Added</th><th>Actions</th></tr></thead>
+    <tbody>${staff.map((s,i)=>`
+      <tr>
+        <td>${s.display||s.username}</td>
+        <td>${ATL_roleBadge(s.role)}</td>
+        <td class="mono text-muted">${s.added}</td>
+        <td style="display:flex; gap:6px; flex-wrap:wrap;">
+          <button class="btn btn-ghost btn-sm" data-edit="${i}" style="text-transform:none;">Edit</button>
+          <button class="btn btn-ghost btn-sm" data-promote="${i}" style="text-transform:none;">Promote</button>
+          <button class="btn btn-ghost btn-sm" data-demote="${i}" style="text-transform:none;">Demote</button>
+          <button class="btn btn-outline-red btn-sm" data-delete="${i}" style="text-transform:none;">Delete</button>
+        </td>
+      </tr>`).join('')}</tbody></table>`;
+  }
+
+  document.getElementById('addStaffBtn').addEventListener('click', ()=> staffForm());
+  wrap.querySelectorAll('[data-edit]').forEach(b=> b.addEventListener('click', ()=> staffForm(staff[+b.dataset.edit], +b.dataset.edit)));
+  wrap.querySelectorAll('[data-delete]').forEach(b=> b.addEventListener('click', ()=>{
+    const s = staff[+b.dataset.delete];
+    const updated = staff.filter((_,i)=>i!==+b.dataset.delete);
+    ATL_SESSION.saveStore('staff', updated);
+    audit('Deleted staff', s.display||s.username);
+    ATL_toast('Staff member removed.', 'success');
+    renderStaff();
+  }));
+  wrap.querySelectorAll('[data-promote]').forEach(b=> b.addEventListener('click', ()=> shiftRole(+b.dataset.promote, -1)));
+  wrap.querySelectorAll('[data-demote]').forEach(b=> b.addEventListener('click', ()=> shiftRole(+b.dataset.demote, 1)));
+
+  function shiftRole(idx, dir){
+    const s = staff[idx];
+    const roles = ATL_DATA.STAFF_ROLES; // index 0 = Founder (highest)
+    const newIdx = Math.min(roles.length-1, Math.max(0, roles.indexOf(s.role)+dir));
+    s.role = roles[newIdx];
+    ATL_SESSION.saveStore('staff', staff);
+    audit(dir<0?'Promoted staff':'Demoted staff', `${s.display||s.username} → ${s.role}`);
+    ATL_toast(`${s.display||s.username} is now ${s.role}.`, 'success');
+    renderStaff();
+  }
+
+  function staffForm(existing, idx){
+    openModal(`
+      <div class="modal-head"><h3>${existing?'Edit Staff':'Add Staff'}</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+      <div class="field"><label>Discord username</label><input class="input" id="fUsername" value="${existing?existing.username:''}" placeholder="e.g. moon_mod"></div>
+      <div class="field"><label>Display name</label><input class="input" id="fDisplay" value="${existing?existing.display||'':''}" placeholder="e.g. Moon"></div>
+      <div class="field"><label>Staff role</label><select class="select" id="fRole">${ATL_DATA.STAFF_ROLES.map(r=>`<option ${existing&&existing.role===r?'selected':''}>${r}</option>`).join('')}</select></div>
+      <div class="field"><label>Assign Discord role (server sync)</label><input class="input" id="fDiscordRole" value="${existing?existing.discordRole||existing.role:''}" placeholder="Discord role name to sync"><p class="hint">Written to the member's server roles once connected to the bot.</p></div>
+      <button class="btn btn-primary btn-block" id="saveStaff">${existing?'Save changes':'Add Staff'}</button>
+    `);
+    document.getElementById('saveStaff').addEventListener('click', ()=>{
+      const username = document.getElementById('fUsername').value.trim();
+      if(!username){ ATL_toast('Enter a Discord username.', 'error'); return; }
+      const entry = {
+        username, display: document.getElementById('fDisplay').value.trim() || username,
+        role: document.getElementById('fRole').value,
+        discordRole: document.getElementById('fDiscordRole').value.trim(),
+        added: existing ? existing.added : new Date().toISOString().slice(0,10)
+      };
+      let list = ATL_SESSION.loadStore('staff', []);
+      if(existing!=null && idx!=null) list[idx]=entry; else list.push(entry);
+      ATL_SESSION.saveStore('staff', list);
+      audit(existing?'Edited staff':'Added staff', entry.display);
+      closeModal(); ATL_toast(existing?'Staff updated.':'Staff added.', 'success');
+      renderStaff();
+    });
+  }
+}
+
+/* ---------------- TESTERS ---------------- */
+function renderTesters(){
+  const testers = ATL_SESSION.loadStore('testers', []);
+  const el = document.getElementById('view-testers');
+  el.innerHTML = `
+    <div class="flex-between" style="margin-bottom:16px;">
+      <h3 style="margin:0;">Manage Testers</h3>
+      <button class="btn btn-secondary btn-sm" id="addTesterBtn" style="text-transform:none;">+ Add Tester</button>
+    </div>
+    <div class="table-wrap glass" id="testerTableWrap"></div>`;
+  const wrap = document.getElementById('testerTableWrap');
+  if(testers.length===0){
+    wrap.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 2l3 6 6 1-4.5 4.5L18 20l-6-3-6 3 1.5-6.5L3 9l6-1z"/></svg><h3>No testers yet</h3><p>Add a tester and assign gamemodes to populate the Testers page.</p></div>`;
+  } else {
+    wrap.innerHTML = `<table class="dt"><thead><tr><th>Tester</th><th>Rank</th><th>Gamemodes</th><th>Actions</th></tr></thead>
+    <tbody>${testers.map((t,i)=>`
+      <tr>
+        <td>${t.display||t.username}</td>
+        <td>${ATL_roleBadge(t.rank)}</td>
+        <td>${(t.gamemodes||[]).map(gm=>`<span class="pill pill-teal">${(ATL_DATA.GAMEMODES.find(g=>g.id===gm)||{label:gm}).label}</span>`).join(' ')||'<span class="text-muted text-sm">None</span>'}</td>
+        <td style="display:flex; gap:6px; flex-wrap:wrap;">
+          <button class="btn btn-ghost btn-sm" data-edit="${i}" style="text-transform:none;">Edit / Assign</button>
+          <button class="btn btn-ghost btn-sm" data-promote="${i}" style="text-transform:none;">Promote</button>
+          <button class="btn btn-ghost btn-sm" data-demote="${i}" style="text-transform:none;">Demote</button>
+          <button class="btn btn-outline-red btn-sm" data-remove="${i}" style="text-transform:none;">Remove</button>
+        </td>
+      </tr>`).join('')}</tbody></table>`;
+  }
+  document.getElementById('addTesterBtn').addEventListener('click', ()=> testerForm());
+  wrap.querySelectorAll('[data-edit]').forEach(b=> b.addEventListener('click', ()=> testerForm(testers[+b.dataset.edit], +b.dataset.edit)));
+  wrap.querySelectorAll('[data-remove]').forEach(b=> b.addEventListener('click', ()=>{
+    const t = testers[+b.dataset.remove];
+    ATL_SESSION.saveStore('testers', testers.filter((_,i)=>i!==+b.dataset.remove));
+    audit('Removed tester', t.display||t.username);
+    ATL_toast('Tester removed.', 'success');
+    renderTesters();
+  }));
+  wrap.querySelectorAll('[data-promote]').forEach(b=> b.addEventListener('click', ()=> shiftRank(+b.dataset.promote,-1)));
+  wrap.querySelectorAll('[data-demote]').forEach(b=> b.addEventListener('click', ()=> shiftRank(+b.dataset.demote,1)));
+
+  function shiftRank(idx, dir){
+    const t = testers[idx];
+    const ranks = ATL_DATA.TESTER_RANKS; // 0 = Testing Manager (highest)
+    const newIdx = Math.min(ranks.length-1, Math.max(0, ranks.indexOf(t.rank)+dir));
+    t.rank = ranks[newIdx];
+    ATL_SESSION.saveStore('testers', testers);
+    audit(dir<0?'Promoted tester':'Demoted tester', `${t.display||t.username} → ${t.rank}`);
+    ATL_toast(`${t.display||t.username} is now ${t.rank}.`, 'success');
+    renderTesters();
+  }
+
+  function testerForm(existing, idx){
+    openModal(`
+      <div class="modal-head"><h3>${existing?'Edit Tester':'Add Tester'}</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+      <div class="field"><label>Discord username</label><input class="input" id="tUsername" value="${existing?existing.username:''}" placeholder="e.g. nyx_tests"></div>
+      <div class="field"><label>Display name</label><input class="input" id="tDisplay" value="${existing?existing.display||'':''}" placeholder="e.g. Nyx"></div>
+      <div class="field"><label>Tester rank</label><select class="select" id="tRank">${ATL_DATA.TESTER_RANKS.map(r=>`<option ${existing&&existing.rank===r?'selected':''}>${r}</option>`).join('')}</select></div>
+      <div class="field"><label>Assign gamemodes</label>
+        <div style="display:flex; flex-wrap:wrap; gap:8px;">
+          ${ATL_DATA.GAMEMODES.map(g=>`<label class="checkbox-row" style="background:var(--panel-2); padding:6px 10px; border-radius:var(--r-full); border:1px solid var(--glass-brd);">
+            <input type="checkbox" value="${g.id}" ${existing&&(existing.gamemodes||[]).includes(g.id)?'checked':''}> <span>${g.label}</span>
+          </label>`).join('')}
+        </div>
+      </div>
+      <button class="btn btn-secondary btn-block mt-16" id="saveTester">${existing?'Save changes':'Add Tester'}</button>
+    `);
+    document.getElementById('saveTester').addEventListener('click', ()=>{
+      const username = document.getElementById('tUsername').value.trim();
+      if(!usernam
