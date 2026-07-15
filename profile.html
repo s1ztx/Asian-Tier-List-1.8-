@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Player Profile — Asian Tier List [1.8+]</title>
+<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+<main>
+  <div id="profileRoot" class="container" style="padding-top:44px;"></div>
+</main>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/session.js"></script>
+<script src="assets/js/nav.js"></script>
+<script src="assets/js/backgrounds.js"></script>
+<script>
+  ATL_mountBackground('profile');
+  const session = ATL_initShell('profile.html');
+  const root = document.getElementById('profileRoot');
+
+  if(!session.authenticated){
+    root.innerHTML = `
+      <div class="glass empty-state" style="margin-top:40px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        <h3>You're not signed in</h3>
+        <p>Login with Discord to see your profile, tier history, and assigned tester.</p>
+        <button class="btn btn-primary mt-16" id="profileLogin">Login with Discord</button>
+      </div>`;
+    document.getElementById('profileLogin').addEventListener('click', ATL_SESSION.loginWithDiscord);
+  } else {
+    const u = session.user;
+    const avatar = u.avatar || `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(u.username)}&backgroundColor=141a29`;
+    const tierRecord = ATL_SESSION.loadStore('tier_'+u.id, null);
+
+    root.innerHTML = `
+      <div class="glass card" style="padding:0; overflow:hidden; margin-top:20px;">
+        <div style="height:150px; background:linear-gradient(120deg, rgba(230,57,70,.35), rgba(58,134,255,.35)), radial-gradient(circle at 20% 20%, rgba(255,255,255,.08), transparent 60%); position:relative;"></div>
+        <div style="padding:0 28px 26px;">
+          <div style="display:flex; align-items:flex-end; gap:18px; margin-top:-42px;">
+            <div style="position:relative;">
+              <img src="${avatar}" style="width:96px;height:96px;border-radius:50%;border:4px solid var(--panel);">
+              <span class="status-dot status-online" style="position:absolute; bottom:4px; right:4px;"></span>
+            </div>
+            <div style="padding-bottom:6px;">
+              <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                <h2 style="margin:0; font-size:22px;">${u.display}</h2>
+                ${u.verified?'<span class="role-badge role-verified">✓ Verified Member</span>':''}
+              </div>
+              <div class="text-sm text-muted mono">@${u.username} · ID ${u.id}</div>
+            </div>
+            <div style="margin-left:auto; padding-bottom:6px;">
+              <button class="btn btn-outline-red btn-sm" id="logoutBtn" style="text-transform:none;">Log out</button>
+            </div>
+          </div>
+          <div class="mt-16" style="display:flex; gap:8px; flex-wrap:wrap;">
+            ${u.roles.map(r=>ATL_roleBadge(r)).join('')}
+          </div>
+          <div class="grid-3 mt-24">
+            <div class="glass stat-card"><div class="s-label">Highest role</div><div class="s-val" style="font-size:20px;">${u.highestRole}</div></div>
+            <div class="glass stat-card"><div class="s-label">Server join date</div><div class="s-val" style="font-size:20px;">${u.joined}</div></div>
+            <div class="glass stat-card"><div class="s-label">Overall highest tier</div><div style="margin-top:6px;">${tierRecord ? ATL_hex(tierRecord.overall,'sm') : '<span class="text-muted text-sm">Not yet tested</span>'}</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-head mt-32">
+        <div><div class="eyebrow">Per gamemode</div><h2 class="h-title" style="font-size:24px;">Gamemode tiers</h2></div>
+      </div>
+      <div class="grid-4" id="gmTierGrid"></div>
+
+      <div class="section-head mt-32">
+        <div><div class="eyebrow">Assignment record</div><h2 class="h-title" style="font-size:24px;">Tier history</h2></div>
+      </div>
+      <div class="table-wrap glass" id="historyWrap"></div>
+    `;
+
+    const gmGrid = document.getElementById('gmTierGrid');
+    document.getElementById('logoutBtn').addEventListener('click', ATL_SESSION.logout);
+    gmGrid.innerHTML = ATL_DATA.GAMEMODES.map(g=>{
+      const t = tierRecord && tierRecord.gamemodes[g.id];
+      return `<div class="glass card" style="text-align:center;">
+        <div class="text-sm text-muted">${g.label}</div>
+        <div class="mt-16">${t ? ATL_hex(t,'sm') : '<span class="text-muted text-sm">—</span>'}</div>
+      </div>`;
+    }).join('');
+
+    const historyWrap = document.getElementById('historyWrap');
+    const history = (tierRecord && tierRecord.history) || [];
+    if(history.length === 0){
+      historyWrap.innerHTML = `<div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        <h3>No tier assignments yet</h3>
+        <p>Request a test to start building your tier history.</p>
+      </div>`;
+    } else {
+      historyWrap.innerHTML = `<table class="dt">
+        <thead><tr><th>Gamemode</th><th>Tier</th><th>Tester</th><th>Assigned</th></tr></thead>
+        <tbody>${history.map(h=>`<tr><td>${(ATL_DATA.GAMEMODES.find(x=>x.id===h.gamemode)||{label:h.gamemode}).label}</td><td>${ATL_hex(h.tier,'sm')}</td><td class="text-muted">${h.tester}</td><td class="mono text-muted">${h.date}</td></tr>`).join('')}</tbody>
+      </table>`;
+    }
+  }
+</script>
+</body>
+</html>
