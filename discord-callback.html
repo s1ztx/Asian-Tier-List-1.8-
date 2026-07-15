@@ -12,32 +12,37 @@
     <div class="container" style="max-width:560px;">
       <div class="glass card" style="text-align:center;">
         <div class="eyebrow" style="justify-content:center;">Discord OAuth2</div>
-        <h2 class="mt-8">Finishing sign-in…</h2>
-        <p class="text-sm text-muted mt-16" id="cbMessage">Reading the authorization response from Discord.</p>
+        <h2 class="mt-8" id="cbHeading">Finishing sign-in…</h2>
+        <p class="text-sm text-muted mt-16" id="cbMessage">Reading the session from the authentication service.</p>
         <div class="mt-24">
-          <a href="index.html" class="btn btn-ghost">Return to Home</a>
+          <a href="index.html" class="btn btn-ghost" id="cbHomeLink">Return to Home</a>
         </div>
       </div>
     </div>
   </section>
 </main>
+<script src="assets/js/session.js"></script>
 <script>
-  // This static frontend can receive the ?code=... from Discord, but
-  // exchanging it for an access token requires the client secret and
-  // must happen on a server. This page is a placeholder for that
-  // backend redirect target: once a backend is connected, it should
-  // read `code` below, exchange it, create a session, then send the
-  // user back here (or straight to profile.html) already signed in.
-  const params = new URLSearchParams(window.location.search);
-  const code = params.get('code');
-  const error = params.get('error');
+  const heading = document.getElementById('cbHeading');
   const msg = document.getElementById('cbMessage');
-  if(error){
-    msg.textContent = 'Discord returned an error: ' + error + '. You can close this tab and try again.';
-  } else if(code){
-    msg.textContent = 'Authorization code received. This static demo has no backend to exchange it yet — connect the token-exchange endpoint to complete sign-in automatically.';
+  const result = ATL_SESSION.consumeCallbackHash();
+
+  if(result.ok){
+    heading.textContent = `Welcome, ${result.session.user.display}`;
+    msg.textContent = `Signed in as ${result.session.role}. Redirecting to your profile…`;
+    setTimeout(()=>{ window.location.href = 'profile.html'; }, 900);
   } else {
-    msg.textContent = 'No authorization code was found in the URL. Start the login flow again from the Home page.';
+    const messages = {
+      access_denied: 'You declined the Discord authorization. You can close this tab or try again.',
+      missing_code: 'No authorization code was returned. Start the login flow again from the Home page.',
+      invalid_state: 'This sign-in attempt could not be verified (expired or reused link). Please try logging in again.',
+      token_exchange_failed: 'Discord rejected the token exchange. Check the Worker\'s Client ID/Secret configuration.',
+      identify_failed: 'Could not read your Discord identity. Please try again.',
+      no_session: 'No session was found in this link. Start the login flow again from the Home page.',
+      decode_failed: 'The session data was malformed. Please try logging in again.'
+    };
+    heading.textContent = 'Sign-in didn\'t complete';
+    msg.textContent = messages[result.error] || ('Something went wrong: ' + result.error);
   }
 </script>
 </body>
