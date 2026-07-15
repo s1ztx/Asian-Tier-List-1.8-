@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Staff Applications — Asian Tier List [1.8+]</title>
+<title>Applications — Asian Tier List [1.8+]</title>
 <link rel="stylesheet" href="assets/css/main.css">
 </head>
 <body>
@@ -11,66 +11,90 @@
   <section class="page-hero">
     <div class="container">
       <div class="eyebrow">Join the team</div>
-      <h1 class="h-title" style="font-size:clamp(32px,5vw,52px);">Staff Applications</h1>
-      <p class="h-sub" style="max-width:640px;">We're looking for level-headed, active members to help run testing, moderation, and community operations. Read the requirements below before applying.</p>
+      <h1 class="h-title" style="font-size:clamp(32px,5vw,52px);">Applications</h1>
+      <p class="h-sub" style="max-width:640px;">Two ways to get involved beyond playing: keep the community running as Staff, or evaluate players as a Tester. Pick a track to get started.</p>
     </div>
   </section>
 
-  <section class="section">
-    <div class="container grid-2">
-      <div class="glass card">
-        <div class="eyebrow">Requirements</div>
-        <h3 class="mt-8">Before you apply</h3>
-        <ul class="mt-16" style="display:flex; flex-direction:column; gap:10px;">
-          <li class="text-sm" style="color:var(--text-1);">• 30+ days as a verified member of the Discord server</li>
-          <li class="text-sm" style="color:var(--text-1);">• No active moderation strikes in the last 60 days</li>
-          <li class="text-sm" style="color:var(--text-1);">• Comfortable communicating in written and voice chat</li>
-          <li class="text-sm" style="color:var(--text-1);">• Available at least 4 hours a week for the role</li>
-          <li class="text-sm" style="color:var(--text-1);">• Solid understanding of the tier system and current rules</li>
-        </ul>
-      </div>
-      <div class="glass card">
-        <div class="eyebrow">Responsibilities</div>
-        <h3 class="mt-8">What the role involves</h3>
-        <ul class="mt-16" style="display:flex; flex-direction:column; gap:10px;">
-          <li class="text-sm" style="color:var(--text-1);">• Enforcing server rules fairly and consistently</li>
-          <li class="text-sm" style="color:var(--text-1);">• Assisting members with questions about testing and tiers</li>
-          <li class="text-sm" style="color:var(--text-1);">• Escalating disputes to Managers rather than resolving publicly</li>
-          <li class="text-sm" style="color:var(--text-1);">• Representing the platform professionally at all times</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <section class="section">
+  <section class="section" style="padding-top:0;">
     <div class="container">
-      <div class="glass card" style="max-width:720px; margin:0 auto;">
-        <div class="eyebrow">Application</div>
-        <h3 class="mt-8">Staff application form</h3>
-        <div id="appGate"></div>
-        <form id="appForm" class="mt-16">
-          <div class="field"><label for="af1">Discord username</label><input class="input" id="af1" required></div>
-          <div class="field"><label for="af2">Age</label><input class="input" type="number" min="13" id="af2" required></div>
-          <div class="field"><label for="af3">Timezone</label><input class="input" id="af3" placeholder="e.g. GMT+8" required></div>
-          <div class="field"><label for="af4">Position applying for</label>
-            <select class="select" id="af4">
-              <option>Trial Moderator</option><option>Moderator</option><option>Senior Moderator</option><option>Administrator</option>
-            </select>
-          </div>
-          <div class="field"><label for="af5">Why do you want to join staff?</label><textarea class="textarea" id="af5" required></textarea></div>
-          <div class="field"><label for="af6">Relevant experience (moderation, testing, community work)</label><textarea class="textarea" id="af6"></textarea></div>
 
-          <div class="eyebrow mt-24" style="margin-bottom:12px;">Scenario questions</div>
-          <div class="field"><label for="af7">A member is accusing a Tester of unfair grading in public chat. What do you do?</label><textarea class="textarea" id="af7" required></textarea></div>
-          <div class="field"><label for="af8">You witness a fellow staff member breaking server rules. How do you handle it?</label><textarea class="textarea" id="af8" required></textarea></div>
-
-          <div class="eyebrow mt-24" style="margin-bottom:12px;">Terms &amp; conditions</div>
-          <label class="checkbox-row mt-8"><input type="checkbox" id="tc1" required><span>I have read and agree to the Staff Application Terms &amp; Conditions.</span></label>
-          <label class="checkbox-row mt-16"><input type="checkbox" id="tc2" required><span>I understand submitting an application does not guarantee acceptance.</span></label>
-
-          <button class="btn btn-primary btn-block mt-24" type="submit" id="submitAppBtn">Submit Application</button>
-        </form>
+      <!-- STEP 1: TRACK SELECTION -->
+      <div id="stepSelect">
+        <div class="grid-2">
+          <button class="glass card card-hover" data-track="staff" style="text-align:left; cursor:pointer; border:none; width:100%;">
+            <div class="pill pill-red">Staff</div>
+            <h3 class="mt-16" style="font-size:21px;">Staff Application</h3>
+            <p class="text-sm text-muted">Moderate the server, help members, and keep the community running smoothly.</p>
+            <span class="text-sm" style="color:var(--red-300); font-family:var(--f-sub); font-weight:700;">Apply as Staff →</span>
+          </button>
+          <button class="glass card card-hover" data-track="tester" style="text-align:left; cursor:pointer; border:none; width:100%;">
+            <div class="pill pill-teal">Tester</div>
+            <h3 class="mt-16" style="font-size:21px;">Tier-Tester Application</h3>
+            <p class="text-sm text-muted">Evaluate candidates and issue official tiers in the gamemodes you're strongest in.</p>
+            <span class="text-sm" style="color:var(--teal-400); font-family:var(--f-sub); font-weight:700;">Apply as Tester →</span>
+          </button>
+        </div>
       </div>
+
+      <!-- STEP 2: LOGIN GATE -->
+      <div id="stepLoginGate" class="hidden" style="max-width:520px; margin:0 auto;">
+        <div class="glass card" style="text-align:center;">
+          <div class="eyebrow" style="justify-content:center;">Almost there</div>
+          <h3 class="mt-8" id="gateTitle">Login to continue</h3>
+          <p class="text-sm text-muted mt-8">You need to sign in with Discord before starting a <span id="gateTrackLabel"></span> application, so we can verify your account and membership.</p>
+          <button class="btn btn-primary mt-16" id="gateLoginBtn">Login with Discord</button>
+          <button class="btn btn-ghost btn-sm mt-16" id="gateBackBtn" style="text-transform:none;">← Choose a different track</button>
+        </div>
+      </div>
+
+      <!-- STEP 3: APPLICATION FORM -->
+      <div id="stepForm" class="hidden">
+        <button class="btn btn-ghost btn-sm mt-8" id="formBackBtn" style="text-transform:none; margin-bottom:24px;">← Choose a different track</button>
+
+        <div class="grid-2">
+          <div class="glass card">
+            <div class="eyebrow">Requirements</div>
+            <h3 class="mt-8">Before you apply</h3>
+            <ul class="mt-16" id="reqList" style="display:flex; flex-direction:column; gap:10px;"></ul>
+          </div>
+          <div class="glass card">
+            <div class="eyebrow">Responsibilities</div>
+            <h3 class="mt-8">What the role involves</h3>
+            <ul class="mt-16" id="respList" style="display:flex; flex-direction:column; gap:10px;"></ul>
+          </div>
+        </div>
+
+        <div class="glass card mt-32" style="max-width:720px; margin-left:auto; margin-right:auto;">
+          <div class="eyebrow" id="formEyebrow">Application</div>
+          <h3 class="mt-8" id="formTitle">Application form</h3>
+          <form id="appForm" class="mt-16">
+            <div class="field"><label for="af1">Discord username</label><input class="input" id="af1" required></div>
+            <div class="field"><label for="af2">Age</label><input class="input" type="number" min="13" id="af2" required></div>
+            <div class="field"><label for="af3">Timezone</label><input class="input" id="af3" placeholder="e.g. GMT+8" required></div>
+
+            <div class="field hidden" id="gamemodeField">
+              <label>Which gamemodes do you want to test in?</label>
+              <div style="display:flex; flex-wrap:wrap; gap:8px;" id="gmCheckboxes"></div>
+              <p class="hint">Pick at least one. You can be certified for more later.</p>
+            </div>
+
+            <div class="field"><label for="af5" id="whyLabel">Why do you want to join?</label><textarea class="textarea" id="af5" required></textarea></div>
+            <div class="field"><label for="af6" id="expLabel">Relevant experience</label><textarea class="textarea" id="af6"></textarea></div>
+
+            <div class="eyebrow mt-24" style="margin-bottom:12px;">Scenario questions</div>
+            <div class="field"><label id="scenario1Label" for="af7"></label><textarea class="textarea" id="af7" required></textarea></div>
+            <div class="field"><label id="scenario2Label" for="af8"></label><textarea class="textarea" id="af8" required></textarea></div>
+
+            <div class="eyebrow mt-24" style="margin-bottom:12px;">Terms &amp; conditions</div>
+            <label class="checkbox-row mt-8"><input type="checkbox" id="tc1" required><span>I have read and agree to the Staff Application Terms &amp; Conditions.</span></label>
+            <label class="checkbox-row mt-16"><input type="checkbox" id="tc2" required><span>I understand submitting an application does not guarantee acceptance.</span></label>
+
+            <button class="btn btn-primary btn-block mt-24" type="submit" id="submitAppBtn">Submit Application</button>
+          </form>
+        </div>
+      </div>
+
     </div>
   </section>
 </main>
@@ -82,29 +106,140 @@
 <script>
   ATL_mountBackground('staff-applications');
   const session = ATL_initShell('staff-applications.html');
-  const gate = document.getElementById('appGate');
-  const form = document.getElementById('appForm');
 
-  if(!session.authenticated){
-    gate.innerHTML = `<div class="glass card mt-16" style="border-color:rgba(230,57,70,.3);"><p class="text-sm" style="color:var(--red-300); margin:0;">You need to login with Discord before submitting an application.</p></div>`;
-    form.querySelectorAll('input,textarea,select,button').forEach(el=> el.disabled = true);
+  const TRACKS = {
+    staff: {
+      label: 'Staff',
+      formTitle: 'Staff application form',
+      requirements: [
+        '30+ days as a verified member of the Discord server',
+        'No active moderation strikes in the last 60 days',
+        'Comfortable communicating in written and voice chat',
+        'Available at least 4 hours a week for the role',
+        'Solid understanding of the tier system and current rules'
+      ],
+      responsibilities: [
+        'Enforcing server rules fairly and consistently',
+        'Assisting members with questions about testing and tiers',
+        'Escalating disputes to Managers rather than resolving publicly',
+        'Representing the platform professionally at all times'
+      ],
+      whyLabel: 'Why do you want to join staff?',
+      expLabel: 'Relevant experience (moderation, community work)',
+      scenarios: [
+        'A member is accusing a Tester of unfair grading in public chat. What do you do?',
+        'You witness a fellow staff member breaking server rules. How do you handle it?'
+      ],
+      showGamemodes: false
+    },
+    tester: {
+      label: 'Tier-Tester',
+      formTitle: 'Tier-Tester application form',
+      requirements: [
+        '14+ days as a verified member of the Discord server',
+        'No active moderation strikes',
+        'Demonstrated skill in at least one gamemode you want to test',
+        'Solid understanding of the official tier scale and testing rules',
+        'Available to run test sessions on a regular basis'
+      ],
+      responsibilities: [
+        'Evaluating candidates fairly using only the official tier scale',
+        'Logging tier results promptly with accurate assignment dates',
+        'Staying current on meta or rule changes for your certified gamemodes',
+        'Escalating disputed results rather than resolving them unilaterally'
+      ],
+      whyLabel: 'Why do you want to become a tester?',
+      expLabel: 'Your combat experience in the gamemodes selected above',
+      scenarios: [
+        "You're testing a candidate in Sumo and they disconnect mid-match claiming lag. How do you proceed?",
+        "Two testers disagree on whether a candidate's Bridges run deserves A or A-. How do you handle the discrepancy?"
+      ],
+      showGamemodes: true
+    }
+  };
+
+  let currentTrack = null;
+  const stepSelect = document.getElementById('stepSelect');
+  const stepLoginGate = document.getElementById('stepLoginGate');
+  const stepForm = document.getElementById('stepForm');
+
+  function show(step){
+    stepSelect.classList.toggle('hidden', step!=='select');
+    stepLoginGate.classList.toggle('hidden', step!=='login');
+    stepForm.classList.toggle('hidden', step!=='form');
+    window.scrollTo({ top: 0, behavior:'smooth' });
   }
 
+  document.querySelectorAll('[data-track]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      currentTrack = btn.dataset.track;
+      if(!session.authenticated){
+        document.getElementById('gateTrackLabel').textContent = TRACKS[currentTrack].label;
+        document.getElementById('gateTitle').textContent = `Login to apply for ${TRACKS[currentTrack].label}`;
+        show('login');
+      } else {
+        openForm(currentTrack);
+      }
+    });
+  });
+
+  document.getElementById('gateBackBtn').addEventListener('click', ()=> show('select'));
+  document.getElementById('formBackBtn').addEventListener('click', ()=> show('select'));
+  document.getElementById('gateLoginBtn').addEventListener('click', ATL_SESSION.loginWithDiscord);
+
+  function openForm(track){
+    const t = TRACKS[track];
+    document.getElementById('formEyebrow').textContent = t.label + ' application';
+    document.getElementById('formTitle').textContent = t.formTitle;
+    document.getElementById('reqList').innerHTML = t.requirements.map(r=>`<li class="text-sm" style="color:var(--text-1);">• ${r}</li>`).join('');
+    document.getElementById('respList').innerHTML = t.responsibilities.map(r=>`<li class="text-sm" style="color:var(--text-1);">• ${r}</li>`).join('');
+    document.getElementById('whyLabel').textContent = t.whyLabel;
+    document.getElementById('expLabel').textContent = t.expLabel;
+    document.getElementById('scenario1Label').textContent = t.scenarios[0];
+    document.getElementById('scenario2Label').textContent = t.scenarios[1];
+
+    const gmField = document.getElementById('gamemodeField');
+    gmField.classList.toggle('hidden', !t.showGamemodes);
+    if(t.showGamemodes){
+      document.getElementById('gmCheckboxes').innerHTML = ATL_DATA.GAMEMODES.map(g=>`
+        <label class="checkbox-row" style="background:var(--panel-2); padding:6px 10px; border-radius:var(--r-full); border:1px solid var(--glass-brd);">
+          <input type="checkbox" value="${g.id}" class="gmCheck"> <span>${g.label}</span>
+        </label>`).join('');
+    }
+
+    if(session.authenticated){
+      document.getElementById('af1').value = session.user.username;
+    }
+
+    show('form');
+  }
+
+  const form = document.getElementById('appForm');
   form.addEventListener('submit', (e)=>{
     e.preventDefault();
     if(!document.getElementById('tc1').checked || !document.getElementById('tc2').checked){
       ATL_toast('Please accept both terms checkboxes.', 'error'); return;
     }
-    const apps = ATL_SESSION.loadStore('staff_applications', []);
+    const t = TRACKS[currentTrack];
+    let gamemodes = [];
+    if(t.showGamemodes){
+      gamemodes = Array.from(document.querySelectorAll('.gmCheck:checked')).map(c=>c.value);
+      if(gamemodes.length === 0){ ATL_toast('Select at least one gamemode.', 'error'); return; }
+    }
+    const apps = ATL_SESSION.loadStore('applications', []);
     apps.push({
+      track: currentTrack,
       username: document.getElementById('af1').value,
-      position: document.getElementById('af4').value,
+      age: document.getElementById('af2').value,
+      timezone: document.getElementById('af3').value,
+      gamemodes,
       submitted: new Date().toISOString().slice(0,10),
       status: 'pending'
     });
-    ATL_SESSION.saveStore('staff_applications', apps);
-    ATL_toast('Application submitted. Staff will review it soon.', 'success');
+    ATL_SESSION.saveStore('applications', apps);
+    ATL_toast(`${t.label} application submitted. Staff will review it soon.`, 'success');
     form.reset();
+    show('select');
   });
 </script>
 </body>
