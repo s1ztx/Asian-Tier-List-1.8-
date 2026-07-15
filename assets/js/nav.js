@@ -148,7 +148,7 @@ window.ATL_initShell = function(activePage){
         <a href="rules.html">Rules</a><a href="leaderboards.html">Leaderboards</a><a href="announcements.html">Announcements</a><a href="reviews.html">Reviews</a>
       </div>
       <div class="footer-col"><h4>Community</h4>
-        <a href="staff.html">Staff</a><a href="testers.html">Testers</a><a href="staff-applications.html">Staff Applications</a><a href="profile.html">Player Profile</a>
+        <a href="staff.html">Staff</a><a href="testers.html">Testers</a><a href="staff-applications.html">Applications</a><a href="profile.html">Player Profile</a>
       </div>
       <div class="footer-col"><h4>Account</h4>
         <a href="#" id="footerDiscordLink">Discord Server</a><a href="tester-panel.html">Tester Panel</a><a href="owner-panel.html">Owner Panel</a>
