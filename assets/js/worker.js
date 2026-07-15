@@ -122,7 +122,14 @@ async function handleCallback(request, env) {
   if (memberResp.ok) member = await memberResp.json();
 
   // 4) map Discord role IDs -> our internal role names
-  const roleMap = JSON.parse(env.ROLE_MAP || '{}');
+  const DEFAULT_ROLE_MAP = JSON.stringify({
+    '1523608986878742598': 'Founder',
+    '1519008236794024168': 'Owner',
+    '1520418461950672936': 'Testing Manager',
+    '1520418192885809362': 'Senior Tester',
+    '1520417914275102770': 'Tester'
+  });
+  const roleMap = JSON.parse(env.ROLE_MAP || DEFAULT_ROLE_MAP);
   const HIERARCHY = ['Guest', 'Member', 'Tester', 'Testing Manager', 'Senior Tester', 'Owner', 'Founder'];
   let matchedRoles = [];
   if (member && Array.isArray(member.roles)) {
