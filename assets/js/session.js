@@ -13,7 +13,7 @@
 window.ATL_SESSION = (function(){
   // Set this to your deployed Worker's URL once it's live, e.g.
   // 'https://atl-oauth.yoursubdomain.workers.dev'
-  const OAUTH_WORKER_URL = 'https://atl-oauth.YOUR-SUBDOMAIN.workers.dev';
+  const OAUTH_WORKER_URL = 'https://atl-oauth.rekhaahlawat25.workers.dev';
   const STORAGE_KEY = 'atl_session_v1';
   const STORE_PREFIX = 'atl_store_';
 
