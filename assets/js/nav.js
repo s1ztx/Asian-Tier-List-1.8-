@@ -47,7 +47,7 @@ const NAV_ITEMS = [
   { href:'profile.html', label:'Player Profile' },
   { href:'tester-panel.html', label:'Tester Panel', minRole:'Tester' },
   { href:'owner-panel.html', label:'Owner Panel', minRole:'Owner' },
-  { href:'staff-applications.html', label:'Staff Applications' },
+  { href:'staff-applications.html', label:'Applications' },
 ];
 
 function discordIconSvg(){
