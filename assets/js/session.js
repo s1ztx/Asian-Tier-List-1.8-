@@ -11,26 +11,14 @@
       role-gated UI can be reviewed before OAuth is wired up.
    ============================================================ */
 window.ATL_SESSION = (function(){
-  const DISCORD_CLIENT_ID = '1518971939073429708';
+  // Set this to your deployed Worker's URL once it's live, e.g.
+  // 'https://atl-oauth.yoursubdomain.workers.dev'
+  const OAUTH_WORKER_URL = 'https://atl-oauth.YOUR-SUBDOMAIN.workers.dev';
   const STORAGE_KEY = 'atl_session_v1';
   const STORE_PREFIX = 'atl_store_';
 
-  function getRedirectUri(){
-    return window.location.origin + window.location.pathname.replace(/[^/]+$/, '') + 'discord-callback.html';
-  }
-
-  function buildAuthorizeUrl(){
-    const params = new URLSearchParams({
-      client_id: DISCORD_CLIENT_ID,
-      redirect_uri: getRedirectUri(),
-      response_type: 'code',
-      scope: 'identify guilds guilds.members.read'
-    });
-    return 'https://discord.com/oauth2/authorize?' + params.toString();
-  }
-
   function loginWithDiscord(){
-    window.location.href = buildAuthorizeUrl();
+    window.location.href = OAUTH_WORKER_URL + '/login';
   }
 
   function get(){
@@ -41,6 +29,27 @@ window.ATL_SESSION = (function(){
   function clear(){ localStorage.removeItem(STORAGE_KEY); }
 
   function logout(){ clear(); window.location.href = 'index.html'; }
+
+  // Called once on discord-callback.html to read the session the
+  // Worker appended as a URL hash (never a query string, so it never
+  // hits server logs or gets forwarded via Referer), store it, and
+  // clean the URL. Returns { ok:true } or { ok:false, error }.
+  function consumeCallbackHash(){
+    const hash = window.location.hash.replace(/^#/, '');
+    const params = new URLSearchParams(hash);
+    const errorParam = params.get('atl_error');
+    const sessionParam = params.get('atl_session');
+    history.replaceState(null, '', window.location.pathname);
+    if(errorParam) return { ok:false, error: errorParam };
+    if(!sessionParam) return { ok:false, error: 'no_session' };
+    try{
+      const b64 = sessionParam.replace(/-/g,'+').replace(/_/g,'/');
+      const json = decodeURIComponent(escape(atob(b64)));
+      const session = JSON.parse(json);
+      set(session);
+      return { ok:true, session };
+    }catch(e){ return { ok:false, error:'decode_failed' }; }
+  }
 
   // ---- Developer Preview (design-review only, clearly labeled) ----
   const PREVIEW_USERS = {
@@ -76,5 +85,5 @@ window.ATL_SESSION = (function(){
   }
   function saveStore(key, value){ localStorage.setItem(STORE_PREFIX+key, JSON.stringify(value)); }
 
-  return { buildAuthorizeUrl, loginWithDiscord, current, logout, setPreviewRole, PREVIEW_USERS, loadStore, saveStore, getRedirectUri };
+  return { loginWithDiscord, current, logout, setPreviewRole, PREVIEW_USERS, loadStore, saveStore, consumeCallbackHash };
 })();
