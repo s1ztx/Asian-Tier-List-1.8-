@@ -28,7 +28,7 @@
 <script src="assets/js/session.js"></script>
 <script src="assets/js/nav.js"></script>
 <script src="assets/js/backgrounds.js"></script>
-<script>
+<script type="module">
 ATL_mountBackground('owner-panel');
 const session = ATL_initShell('owner-panel.html');
 const root = document.getElementById('panelRoot');
@@ -46,10 +46,10 @@ if(!ATL_DATA.hasAtLeast(session.role, 'Owner')){
   buildPanel();
 }
 
-function audit(action, detail){
-  const log = ATL_SESSION.loadStore('audit_log', []);
+async function audit(action, detail){
+  const log = await ATL_SESSION.loadStore('audit_log', []);
   log.push({ action, detail, actor: session.user.display, date: new Date().toLocaleString() });
-  ATL_SESSION.saveStore('audit_log', log);
+  await ATL_SESSION.saveStore('audit_log', log);
 }
 function openModal(html){ document.getElementById('formModalInner').innerHTML = html; document.getElementById('formModal').classList.add('open'); }
 function closeModal(){ document.getElementById('formModal').classList.remove('open'); }
@@ -105,22 +105,29 @@ function buildPanel(){
   renderView('dashboard');
 }
 
-function counts(){
-  const apps = ATL_SESSION.loadStore('applications', []);
+async function counts(){
+  const apps = await ATL_SESSION.loadStore('applications', []);
+  const staff = await ATL_SESSION.loadStore('staff', []);
+  const testers = await ATL_SESSION.loadStore('testers', []);
+  const announcements = await ATL_SESSION.loadStore('announcements', []);
+  const reviews = await ATL_SESSION.loadStore('reviews', []);
+  const requests = await ATL_SESSION.loadStore('test_requests', []);
+  const tierLog = await ATL_SESSION.loadStore('tier_log', []);
+  const auditLog = await ATL_SESSION.loadStore('audit_log', []);
   return {
-    staff: ATL_SESSION.loadStore('staff', []).length,
-    testers: ATL_SESSION.loadStore('testers', []).length,
-    announcements: ATL_SESSION.loadStore('announcements', []).length,
-    reviews: ATL_SESSION.loadStore('reviews', []).length,
-    requests: ATL_SESSION.loadStore('test_requests', []).length,
-    tiersLogged: ATL_SESSION.loadStore('tier_log', []).length,
-    audit: ATL_SESSION.loadStore('audit_log', []).length,
+    staff: staff.length,
+    testers: testers.length,
+    announcements: announcements.length,
+    reviews: reviews.length,
+    requests: requests.length,
+    tiersLogged: tierLog.length,
+    audit: auditLog.length,
     pendingStaffApps: apps.filter(a=>a.track==='staff' && a.status==='pending').length,
   };
 }
 
-function renderView(view){
-  const c = counts();
+async function renderView(view){
+  const c = await counts();
   if(view==='dashboard'){
     document.getElementById('view-dashboard').innerHTML = `
       <div class="grid-4">
@@ -143,7 +150,8 @@ function renderView(view){
         <div class="eyebrow">Recent activity</div>
         <div class="mt-16" id="dashRecent"></div>
       </div>`;
-    const recent = ATL_SESSION.loadStore('audit_log', []).slice(-5).reverse();
+    const fullAudit = await ATL_SESSION.loadStore('audit_log', []);
+    const recent = fullAudit.slice(-5).reverse();
     document.getElementById('dashRecent').innerHTML = recent.length ? recent.map(a=>`<div class="rule-item" style="border-bottom:1px solid var(--hairline); padding:10px 0;"><span class="text-sm">${a.action} — <span class="text-muted">${a.detail}</span></span><span class="text-sm text-muted mono" style="margin-left:auto;">${a.date}</span></div>`).join('') : '<p class="text-sm text-muted">No actions logged yet this session.</p>';
     document.getElementById('view-dashboard').querySelectorAll('[data-goto]').forEach(b=> b.addEventListener('click', ()=>{
       const tab = root.querySelector(`.panel-tab[data-view="${b.dataset.goto}"]`); if(tab) tab.click();
@@ -157,7 +165,7 @@ function renderView(view){
         <h3 class="mt-8">Requests by gamemode</h3>
         <div class="mt-24" id="analyticsBars" style="display:flex; flex-direction:column; gap:12px;"></div>
       </div>`;
-    const requests = ATL_SESSION.loadStore('test_requests', []);
+    const requests = await ATL_SESSION.loadStore('test_requests', []);
     const max = Math.max(1, ...ATL_DATA.GAMEMODES.map(g=> requests.filter(r=>r.gamemode===g.id).length));
     document.getElementById('analyticsBars').innerHTML = ATL_DATA.GAMEMODES.map(g=>{
       const n = requests.filter(r=>r.gamemode===g.id).length;
@@ -182,7 +190,7 @@ function renderView(view){
         <div class="eyebrow">Tier distribution</div>
         <div class="mt-16" style="display:flex; gap:6px; flex-wrap:wrap;" id="tierDist"></div>
       </div>`;
-    const log = ATL_SESSION.loadStore('tier_log', []);
+    const log = await ATL_SESSION.loadStore('tier_log', []);
     document.getElementById('tierDist').innerHTML = ATL_DATA.TIERS.map(t=>{
       const n = log.filter(l=>l.tier===t.id).length;
       return `<div style="text-align:center;">${ATL_hex(t.id,'sm')}<div class="text-sm text-muted mono mt-8">${n}</div></div>`;
@@ -201,8 +209,8 @@ function renderView(view){
 }
 
 /* ---------------- STAFF ---------------- */
-function renderStaff(){
-  const staff = ATL_SESSION.loadStore('staff', []);
+async function renderStaff(){
+  const staff = await ATL_SESSION.loadStore('staff', []);
   const el = document.getElementById('view-staff');
   el.innerHTML = `
     <div class="flex-between mt-8" style="margin-bottom:16px;">
@@ -231,24 +239,24 @@ function renderStaff(){
 
   document.getElementById('addStaffBtn').addEventListener('click', ()=> staffForm());
   wrap.querySelectorAll('[data-edit]').forEach(b=> b.addEventListener('click', ()=> staffForm(staff[+b.dataset.edit], +b.dataset.edit)));
-  wrap.querySelectorAll('[data-delete]').forEach(b=> b.addEventListener('click', ()=>{
+  wrap.querySelectorAll('[data-delete]').forEach(b=> b.addEventListener('click', async ()=>{
     const s = staff[+b.dataset.delete];
     const updated = staff.filter((_,i)=>i!==+b.dataset.delete);
-    ATL_SESSION.saveStore('staff', updated);
-    audit('Deleted staff', s.display||s.username);
+    await ATL_SESSION.saveStore('staff', updated);
+    await audit('Deleted staff', s.display||s.username);
     ATL_toast('Staff member removed.', 'success');
     renderStaff();
   }));
   wrap.querySelectorAll('[data-promote]').forEach(b=> b.addEventListener('click', ()=> shiftRole(+b.dataset.promote, -1)));
   wrap.querySelectorAll('[data-demote]').forEach(b=> b.addEventListener('click', ()=> shiftRole(+b.dataset.demote, 1)));
 
-  function shiftRole(idx, dir){
+  async function shiftRole(idx, dir){
     const s = staff[idx];
     const roles = ATL_DATA.STAFF_ROLES; // index 0 = Founder (highest)
     const newIdx = Math.min(roles.length-1, Math.max(0, roles.indexOf(s.role)+dir));
     s.role = roles[newIdx];
-    ATL_SESSION.saveStore('staff', staff);
-    audit(dir<0?'Promoted staff':'Demoted staff', `${s.display||s.username} → ${s.role}`);
+    await ATL_SESSION.saveStore('staff', staff);
+    await audit(dir<0?'Promoted staff':'Demoted staff', `${s.display||s.username} → ${s.role}`);
     ATL_toast(`${s.display||s.username} is now ${s.role}.`, 'success');
     renderStaff();
   }
@@ -262,7 +270,7 @@ function renderStaff(){
       <div class="field"><label>Assign Discord role (server sync)</label><input class="input" id="fDiscordRole" value="${existing?existing.discordRole||existing.role:''}" placeholder="Discord role name to sync"><p class="hint">Written to the member's server roles once connected to the bot.</p></div>
       <button class="btn btn-primary btn-block" id="saveStaff">${existing?'Save changes':'Add Staff'}</button>
     `);
-    document.getElementById('saveStaff').addEventListener('click', ()=>{
+    document.getElementById('saveStaff').addEventListener('click', async ()=>{
       const username = document.getElementById('fUsername').value.trim();
       if(!username){ ATL_toast('Enter a Discord username.', 'error'); return; }
       const entry = {
@@ -271,10 +279,10 @@ function renderStaff(){
         discordRole: document.getElementById('fDiscordRole').value.trim(),
         added: existing ? existing.added : new Date().toISOString().slice(0,10)
       };
-      let list = ATL_SESSION.loadStore('staff', []);
+      let list = await ATL_SESSION.loadStore('staff', []);
       if(existing!=null && idx!=null) list[idx]=entry; else list.push(entry);
-      ATL_SESSION.saveStore('staff', list);
-      audit(existing?'Edited staff':'Added staff', entry.display);
+      await ATL_SESSION.saveStore('staff', list);
+      await audit(existing?'Edited staff':'Added staff', entry.display);
       closeModal(); ATL_toast(existing?'Staff updated.':'Staff added.', 'success');
       renderStaff();
     });
@@ -282,8 +290,8 @@ function renderStaff(){
 }
 
 /* ---------------- STAFF APPLICATIONS (review) ---------------- */
-function renderStaffApplications(){
-  const all = ATL_SESSION.loadStore('applications', []);
+async function renderStaffApplications(){
+  const all = await ATL_SESSION.loadStore('applications', []);
   const apps = all.map((a,i)=>({ ...a, _idx: i })).filter(a=>a.track==='staff');
   const el = document.getElementById('view-staffApps');
   el.innerHTML = `<div class="table-wrap glass" id="staffAppsWrap"></div>`;
@@ -326,11 +334,11 @@ function renderStaffApplications(){
     const a = all[idx];
     approveStaffApplication(a, idx, all);
   }));
-  wrap.querySelectorAll('[data-reject]').forEach(b=> b.addEventListener('click', ()=>{
+  wrap.querySelectorAll('[data-reject]').forEach(b=> b.addEventListener('click', async ()=>{
     const idx = +b.dataset.reject;
     all[idx].status = 'rejected';
-    ATL_SESSION.saveStore('applications', all);
-    audit('Rejected staff application', all[idx].username);
+    await ATL_SESSION.saveStore('applications', all);
+    await audit('Rejected staff application', all[idx].username);
     ATL_toast('Application rejected.', 'success');
     renderStaffApplications();
   }));
@@ -345,14 +353,14 @@ function approveStaffApplication(app, idx, all){
     </div>
     <button class="btn btn-primary btn-block" id="confirmApproveStaff">Approve &amp; Add to Staff</button>
   `);
-  document.getElementById('confirmApproveStaff').addEventListener('click', ()=>{
+  document.getElementById('confirmApproveStaff').addEventListener('click', async ()=>{
     const role = document.getElementById('approveRole').value;
-    const staff = ATL_SESSION.loadStore('staff', []);
+    const staff = await ATL_SESSION.loadStore('staff', []);
     staff.push({ username: app.username, display: app.username, role, discordRole: role, added: new Date().toISOString().slice(0,10) });
-    ATL_SESSION.saveStore('staff', staff);
+    await ATL_SESSION.saveStore('staff', staff);
     all[idx].status = 'approved';
-    ATL_SESSION.saveStore('applications', all);
-    audit('Approved staff application', `${app.username} → ${role}`);
+    await ATL_SESSION.saveStore('applications', all);
+    await audit('Approved staff application', `${app.username} → ${role}`);
     closeModal();
     ATL_toast(`${app.username} added to Staff as ${role}.`, 'success');
     renderStaffApplications();
@@ -360,8 +368,8 @@ function approveStaffApplication(app, idx, all){
 }
 
 /* ---------------- TESTERS ---------------- */
-function renderTesters(){
-  const testers = ATL_SESSION.loadStore('testers', []);
+async function renderTesters(){
+  const testers = await ATL_SESSION.loadStore('testers', []);
   const el = document.getElementById('view-testers');
   el.innerHTML = `
     <div class="flex-between" style="margin-bottom:16px;">
@@ -389,23 +397,23 @@ function renderTesters(){
   }
   document.getElementById('addTesterBtn').addEventListener('click', ()=> testerForm());
   wrap.querySelectorAll('[data-edit]').forEach(b=> b.addEventListener('click', ()=> testerForm(testers[+b.dataset.edit], +b.dataset.edit)));
-  wrap.querySelectorAll('[data-remove]').forEach(b=> b.addEventListener('click', ()=>{
+  wrap.querySelectorAll('[data-remove]').forEach(b=> b.addEventListener('click', async ()=>{
     const t = testers[+b.dataset.remove];
-    ATL_SESSION.saveStore('testers', testers.filter((_,i)=>i!==+b.dataset.remove));
-    audit('Removed tester', t.display||t.username);
+    await ATL_SESSION.saveStore('testers', testers.filter((_,i)=>i!==+b.dataset.remove));
+    await audit('Removed tester', t.display||t.username);
     ATL_toast('Tester removed.', 'success');
     renderTesters();
   }));
   wrap.querySelectorAll('[data-promote]').forEach(b=> b.addEventListener('click', ()=> shiftRank(+b.dataset.promote,-1)));
   wrap.querySelectorAll('[data-demote]').forEach(b=> b.addEventListener('click', ()=> shiftRank(+b.dataset.demote,1)));
 
-  function shiftRank(idx, dir){
+  async function shiftRank(idx, dir){
     const t = testers[idx];
     const ranks = ATL_DATA.TESTER_RANKS; // 0 = Testing Manager (highest)
     const newIdx = Math.min(ranks.length-1, Math.max(0, ranks.indexOf(t.rank)+dir));
     t.rank = ranks[newIdx];
-    ATL_SESSION.saveStore('testers', testers);
-    audit(dir<0?'Promoted tester':'Demoted tester', `${t.display||t.username} → ${t.rank}`);
+    await ATL_SESSION.saveStore('testers', testers);
+    await audit(dir<0?'Promoted tester':'Demoted tester', `${t.display||t.username} → ${t.rank}`);
     ATL_toast(`${t.display||t.username} is now ${t.rank}.`, 'success');
     renderTesters();
   }
@@ -425,15 +433,15 @@ function renderTesters(){
       </div>
       <button class="btn btn-secondary btn-block mt-16" id="saveTester">${existing?'Save changes':'Add Tester'}</button>
     `);
-    document.getElementById('saveTester').addEventListener('click', ()=>{
+    document.getElementById('saveTester').addEventListener('click', async ()=>{
       const username = document.getElementById('tUsername').value.trim();
       if(!username){ ATL_toast('Enter a Discord username.', 'error'); return; }
       const gamemodes = Array.from(document.querySelectorAll('#formModalInner input[type=checkbox]:checked')).map(c=>c.value);
       const entry = { username, display: document.getElementById('tDisplay').value.trim()||username, rank: document.getElementById('tRank').value, gamemodes };
-      let list = ATL_SESSION.loadStore('testers', []);
+      let list = await ATL_SESSION.loadStore('testers', []);
       if(existing!=null && idx!=null) list[idx]=entry; else list.push(entry);
-      ATL_SESSION.saveStore('testers', list);
-      audit(existing?'Edited tester':'Added tester', entry.display);
+      await ATL_SESSION.saveStore('testers', list);
+      await audit(existing?'Edited tester':'Added tester', entry.display);
       closeModal(); ATL_toast(existing?'Tester updated.':'Tester added.', 'success');
       renderTesters();
     });
@@ -441,8 +449,8 @@ function renderTesters(){
 }
 
 /* ---------------- ANNOUNCEMENTS ---------------- */
-function renderAnnouncements(){
-  const items = ATL_SESSION.loadStore('announcements', []);
+async function renderAnnouncements(){
+  const items = await ATL_SESSION.loadStore('announcements', []);
   const el = document.getElementById('view-announcements');
   el.innerHTML = `
     <div class="glass card">
@@ -458,38 +466,38 @@ function renderAnnouncements(){
     const i = items.length-1-ri;
     return `<div class="glass card"><div class="flex-between"><div><span class="pill pill-blue">${a.tag}</span><h4 class="mt-8">${a.title}</h4></div><button class="btn btn-outline-red btn-sm" data-del="${i}" style="text-transform:none;">Delete</button></div><p class="text-sm text-muted">${a.body}</p></div>`;
   }).join('') : '<p class="text-sm text-muted">No announcements posted yet.</p>';
-  list.querySelectorAll('[data-del]').forEach(b=> b.addEventListener('click', ()=>{
+  list.querySelectorAll('[data-del]').forEach(b=> b.addEventListener('click', async ()=>{
     const updated = items.filter((_,i)=>i!==+b.dataset.del);
-    ATL_SESSION.saveStore('announcements', updated);
-    audit('Deleted announcement', items[+b.dataset.del].title);
+    await ATL_SESSION.saveStore('announcements', updated);
+    await audit('Deleted announcement', items[+b.dataset.del].title);
     ATL_toast('Announcement deleted.', 'success');
     renderAnnouncements();
   }));
-  document.getElementById('postAnn').addEventListener('click', ()=>{
+  document.getElementById('postAnn').addEventListener('click', async ()=>{
     const title = document.getElementById('aTitle').value.trim();
     const body = document.getElementById('aBody').value.trim();
     if(!title||!body){ ATL_toast('Fill in a title and body.', 'error'); return; }
     items.push({ title, body, tag: document.getElementById('aTag').value, author: session.user.display, date: new Date().toISOString().slice(0,10) });
-    ATL_SESSION.saveStore('announcements', items);
-    audit('Posted announcement', title);
+    await ATL_SESSION.saveStore('announcements', items);
+    await audit('Posted announcement', title);
     ATL_toast('Announcement published.', 'success');
     renderAnnouncements();
   });
 }
 
 /* ---------------- REVIEWS MODERATION ---------------- */
-function renderReviewsMod(){
-  const reviews = ATL_SESSION.loadStore('reviews', []);
+async function renderReviewsMod(){
+  const reviews = await ATL_SESSION.loadStore('reviews', []);
   const el = document.getElementById('view-reviews');
   el.innerHTML = `<div class="table-wrap glass" id="revWrap"></div>`;
   const wrap = document.getElementById('revWrap');
   wrap.innerHTML = reviews.length ? `<table class="dt"><thead><tr><th>Member</th><th>Rating</th><th>Review</th><th>Date</th><th></th></tr></thead>
   <tbody>${reviews.map((r,i)=>`<tr><td>${r.display}</td><td class="mono">${r.rating}★</td><td class="text-muted" style="max-width:260px;">${r.body}</td><td class="mono text-muted">${r.date}</td><td><button class="btn btn-outline-red btn-sm" data-del="${i}" style="text-transform:none;">Remove</button></td></tr>`).join('')}</tbody></table>`
   : `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 17.3 6.2 20l1.1-6.5L2.5 9l6.5-1L12 2l3 6 6.5 1-4.8 4.5 1.1 6.5z"/></svg><h3>No reviews to moderate</h3><p>Reviews submitted by members will appear here.</p></div>`;
-  wrap.querySelectorAll('[data-del]').forEach(b=> b.addEventListener('click', ()=>{
+  wrap.querySelectorAll('[data-del]').forEach(b=> b.addEventListener('click', async ()=>{
     const removed = reviews[+b.dataset.del];
-    ATL_SESSION.saveStore('reviews', reviews.filter((_,i)=>i!==+b.dataset.del));
-    audit('Removed review', removed.display);
+    await ATL_SESSION.saveStore('reviews', reviews.filter((_,i)=>i!==+b.dataset.del));
+    await audit('Removed review', removed.display);
     ATL_toast('Review removed.', 'success');
     renderReviewsMod();
   }));
@@ -500,18 +508,18 @@ function renderLeaderboardsMod(){
   const el = document.getElementById('view-leaderboards');
   el.innerHTML = `<div id="lbGmTabs" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;"></div><div class="table-wrap glass" id="lbModWrap"></div>`;
   let active = ATL_DATA.GAMEMODES[0].id;
-  function draw(){
+  async function draw(){
     document.getElementById('lbGmTabs').innerHTML = ATL_DATA.GAMEMODES.map(g=>`<button class="btn ${g.id===active?'btn-secondary':'btn-ghost'} btn-sm" data-gm="${g.id}" style="text-transform:none;">${g.label}</button>`).join('');
     document.querySelectorAll('#lbGmTabs [data-gm]').forEach(b=> b.addEventListener('click', ()=>{ active=b.dataset.gm; draw(); }));
-    const board = ATL_SESSION.loadStore('leaderboard_'+active, []);
+    const board = await ATL_SESSION.loadStore('leaderboard_'+active, []);
     const wrap = document.getElementById('lbModWrap');
     wrap.innerHTML = board.length ? `<table class="dt"><thead><tr><th>Player</th><th>Tier</th><th>Tester</th><th>Date</th><th></th></tr></thead>
       <tbody>${board.map((p,i)=>`<tr><td>${p.player}</td><td>${ATL_hex(p.tier,'sm')}</td><td class="text-muted">${p.tester}</td><td class="mono text-muted">${p.date}</td><td><button class="btn btn-outline-red btn-sm" data-del="${i}" style="text-transform:none;">Remove</button></td></tr>`).join('')}</tbody></table>`
       : `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 20V10M12 20V4M20 20v-7"/></svg><h3>Empty board</h3><p>No entries logged for ${ATL_DATA.GAMEMODES.find(g=>g.id===active).label} yet.</p></div>`;
-    wrap.querySelectorAll('[data-del]').forEach(b=> b.addEventListener('click', ()=>{
+    wrap.querySelectorAll('[data-del]').forEach(b=> b.addEventListener('click', async ()=>{
       const updated = board.filter((_,i)=>i!==+b.dataset.del);
-      ATL_SESSION.saveStore('leaderboard_'+active, updated);
-      audit('Removed leaderboard entry', active);
+      await ATL_SESSION.saveStore('leaderboard_'+active, updated);
+      await audit('Removed leaderboard entry', active);
       ATL_toast('Entry removed.', 'success');
       draw();
     }));
@@ -531,8 +539,8 @@ function renderRulesMod(){
 }
 
 /* ---------------- SETTINGS ---------------- */
-function renderSettings(){
-  const s = ATL_SESSION.loadStore('website_settings', { siteName:'Asian Tier List', maintenance:false, registrationOpen:true });
+async function renderSettings(){
+  const s = await ATL_SESSION.loadStore('website_settings', { siteName:'Asian Tier List', maintenance:false, registrationOpen:true });
   document.getElementById('view-settings').innerHTML = `
     <div class="glass card" style="max-width:520px;">
       <div class="eyebrow">Website settings</div>
@@ -541,17 +549,18 @@ function renderSettings(){
       <div class="field checkbox-row"><input type="checkbox" id="stReg" ${s.registrationOpen?'checked':''}><span>Allow new test requests</span></div>
       <button class="btn btn-primary" id="saveSettings">Save Settings</button>
     </div>`;
-  document.getElementById('saveSettings').addEventListener('click', ()=>{
+  document.getElementById('saveSettings').addEventListener('click', async ()=>{
     const updated = { siteName: document.getElementById('stSiteName').value.trim()||'Asian Tier List', maintenance: document.getElementById('stMaint').checked, registrationOpen: document.getElementById('stReg').checked };
-    ATL_SESSION.saveStore('website_settings', updated);
-    audit('Updated website settings', JSON.stringify(updated));
+    await ATL_SESSION.saveStore('website_settings', updated);
+    await audit('Updated website settings', JSON.stringify(updated));
     ATL_toast('Settings saved.', 'success');
   });
 }
 
 /* ---------------- AUDIT LOG ---------------- */
-function renderAudit(){
-  const log = ATL_SESSION.loadStore('audit_log', []).slice().reverse();
+async function renderAudit(){
+  const raw = await ATL_SESSION.loadStore('audit_log', []);
+  const log = raw.slice().reverse();
   document.getElementById('view-audit').innerHTML = `<div class="table-wrap glass">${log.length ? `<table class="dt"><thead><tr><th>Action</th><th>Detail</th><th>Actor</th><th>When</th></tr></thead><tbody>${log.map(a=>`<tr><td>${a.action}</td><td class="text-muted">${a.detail}</td><td>${a.actor}</td><td class="mono text-muted">${a.date}</td></tr>`).join('')}</tbody></table>` : `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 12h18M3 6h18M3 18h18"/></svg><h3>No actions logged</h3><p>Every change you make in this panel is recorded here.</p></div>`}</div>`;
 }
 </script>
