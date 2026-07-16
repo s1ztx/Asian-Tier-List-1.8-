@@ -28,7 +28,7 @@
 <script src="assets/js/session.js"></script>
 <script src="assets/js/nav.js"></script>
 <script src="assets/js/backgrounds.js"></script>
-<script>
+<script type="module">
   ATL_mountBackground('leaderboards');
   ATL_initShell('leaderboards.html');
 
@@ -36,13 +36,14 @@
   const tableWrap = document.getElementById('lbTableWrap');
   let active = ATL_DATA.GAMEMODES[0].id;
 
-  function render(){
+  async function render(){
     tabsEl.innerHTML = ATL_DATA.GAMEMODES.map(g=>`
       <button class="btn ${g.id===active?'btn-secondary':'btn-ghost'} btn-sm" data-gm="${g.id}" style="text-transform:none;">${g.label}</button>
     `).join('');
     tabsEl.querySelectorAll('[data-gm]').forEach(b=> b.addEventListener('click', ()=>{ active=b.dataset.gm; render(); }));
 
-    const board = ATL_SESSION.loadStore('leaderboard_'+active, []);
+    tableWrap.innerHTML = `<div class="empty-state"><p class="text-sm text-muted">Loading…</p></div>`;
+    const board = await ATL_SESSION.loadStore('leaderboard_'+active, []);
     if(board.length === 0){
       tableWrap.innerHTML = `
         <div class="empty-state">
