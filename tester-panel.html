@@ -21,6 +21,10 @@
   </section>
 </main>
 
+<div class="modal-backdrop" id="formModal">
+  <div class="glass modal" id="formModalInner"></div>
+</div>
+
 <script src="assets/js/data.js"></script>
 <script src="assets/js/session.js"></script>
 <script src="assets/js/nav.js"></script>
@@ -29,6 +33,17 @@
   ATL_mountBackground('tester-panel');
   const session = ATL_initShell('tester-panel.html');
   const root = document.getElementById('panelRoot');
+  const canReviewApps = ATL_DATA.hasAtLeast(session.role, 'Testing Manager');
+
+  function openModal(html){ document.getElementById('formModalInner').innerHTML = html; document.getElementById('formModal').classList.add('open'); }
+  function closeModal(){ document.getElementById('formModal').classList.remove('open'); }
+  document.getElementById('formModal').addEventListener('click', e=>{ if(e.target.id==='formModal') closeModal(); });
+
+  function audit(action, detail){
+    const log = ATL_SESSION.loadStore('audit_log', []);
+    log.push({ action, detail, actor: session.user ? session.user.display : 'Unknown', date: new Date().toLocaleString() });
+    ATL_SESSION.saveStore('audit_log', log);
+  }
 
   if(!ATL_DATA.hasAtLeast(session.role, 'Tester')){
     root.innerHTML = `
@@ -53,6 +68,11 @@
           <div class="panel-tab" data-view="requests">Test Requests</div>
           <div class="panel-tab" data-view="submit">Submit Tier Result</div>
         </div>
+        ${canReviewApps ? `
+        <div class="panel-nav-group">
+          <h5>Management</h5>
+          <div class="panel-tab" data-view="applications">Tester Applications</div>
+        </div>` : ''}
         <div class="panel-nav-group">
           <h5>My assignment</h5>
           <div class="panel-tab" data-view="profile">My Certification</div>
@@ -66,6 +86,7 @@
             <div class="mt-16" style="display:flex; gap:12px; flex-wrap:wrap;">
               <button class="btn btn-secondary btn-sm" data-goto="requests" style="text-transform:none;">Review requests</button>
               <button class="btn btn-secondary btn-sm" data-goto="submit" style="text-transform:none;">Log a tier result</button>
+              ${canReviewApps ? '<button class="btn btn-ghost btn-sm" data-goto="applications" style="text-transform:none;">Review tester applications</button>' : ''}
             </div>
           </div>
         </div>
@@ -85,6 +106,10 @@
           </div>
         </div>
 
+        <div class="panel-view" id="view-applications">
+          <div class="table-wrap glass" id="testerAppsWrap"></div>
+        </div>
+
         <div class="panel-view" id="view-profile">
           <div class="glass card">
             <div class="eyebrow">Certification</div>
@@ -101,6 +126,7 @@
         const target = el.dataset.view || el.dataset.goto;
         root.querySelectorAll('.panel-tab').forEach(t=>t.classList.toggle('active', t.dataset.view===target));
         root.querySelectorAll('.panel-view').forEach(v=>v.classList.toggle('active', v.id==='view-'+target));
+        if(target==='applications') renderTesterApplications();
       });
     });
 
@@ -136,6 +162,87 @@
       ATL_SESSION.saveStore('leaderboard_'+gm, board);
       document.getElementById('subPlayer').value='';
       ATL_toast(`Logged ${player} as ${tier} in ${gm}.`, 'success');
+    });
+  }
+
+  /* ---------------- TESTER APPLICATIONS (review, Testing Manager+) ---------------- */
+  function renderTesterApplications(){
+    if(!canReviewApps) return;
+    const all = ATL_SESSION.loadStore('applications', []);
+    const apps = all.map((a,i)=>({ ...a, _idx: i })).filter(a=>a.track==='tester');
+    const wrap = document.getElementById('testerAppsWrap');
+    if(!wrap) return;
+
+    if(apps.length===0){
+      wrap.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 2l3 6 6 1-4.5 4.5L18 20l-6-3-6 3 1.5-6.5L3 9l6-1z"/></svg><h3>No tester applications</h3><p>Submissions from the Applications page will show up here for review.</p></div>`;
+      return;
+    }
+
+    wrap.innerHTML = `<table class="dt"><thead><tr><th>Applicant</th><th>Gamemodes requested</th><th>Submitted</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>${apps.slice().reverse().map(a=>`
+      <tr>
+        <td>${a.username}</td>
+        <td>${(a.gamemodes||[]).map(gm=>`<span class="pill pill-teal">${(ATL_DATA.GAMEMODES.find(g=>g.id===gm)||{label:gm}).label}</span>`).join(' ')||'<span class="text-muted text-sm">None</span>'}</td>
+        <td class="mono text-muted">${a.submitted}</td>
+        <td><span class="pill ${a.status==='approved'?'pill-teal':a.status==='rejected'?'pill-red':'pill-gold'}">${a.status}</span></td>
+        <td style="display:flex; gap:6px; flex-wrap:wrap;">
+          <button class="btn btn-ghost btn-sm" data-view-app="${a._idx}" style="text-transform:none;">View</button>
+          <button class="btn btn-secondary btn-sm" data-approve="${a._idx}" style="text-transform:none;" ${a.status!=='pending'?'disabled':''}>Approve</button>
+          <button class="btn btn-outline-red btn-sm" data-reject="${a._idx}" style="text-transform:none;" ${a.status!=='pending'?'disabled':''}>Reject</button>
+        </td>
+      </tr>`).join('')}</tbody></table>`;
+
+    wrap.querySelectorAll('[data-view-app]').forEach(b=> b.addEventListener('click', ()=>{
+      const a = all[+b.dataset.viewApp];
+      openModal(`
+        <div class="modal-head"><h3>${a.username}'s application</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+        <div class="field"><label>Age</label><p class="text-sm">${a.age}</p></div>
+        <div class="field"><label>Timezone</label><p class="text-sm">${a.timezone}</p></div>
+        <div class="field"><label>Gamemodes requested</label><p class="text-sm">${(a.gamemodes||[]).map(gm=>(ATL_DATA.GAMEMODES.find(g=>g.id===gm)||{label:gm}).label).join(', ')||'—'}</p></div>
+        <div class="field"><label>Why they want to test</label><p class="text-sm text-muted">${a.why||'—'}</p></div>
+        <div class="field"><label>Relevant experience</label><p class="text-sm text-muted">${a.experience||'—'}</p></div>
+        <div class="field"><label>Scenario 1</label><p class="text-sm text-muted">${a.scenario1||'—'}</p></div>
+        <div class="field"><label>Scenario 2</label><p class="text-sm text-muted">${a.scenario2||'—'}</p></div>
+      `);
+    }));
+    wrap.querySelectorAll('[data-approve]').forEach(b=> b.addEventListener('click', ()=>{
+      const idx = +b.dataset.approve;
+      approveTesterApplication(all[idx], idx, all);
+    }));
+    wrap.querySelectorAll('[data-reject]').forEach(b=> b.addEventListener('click', ()=>{
+      const idx = +b.dataset.reject;
+      all[idx].status = 'rejected';
+      ATL_SESSION.saveStore('applications', all);
+      audit('Rejected tester application', all[idx].username);
+      ATL_toast('Application rejected.', 'success');
+      renderTesterApplications();
+    }));
+  }
+
+  function approveTesterApplication(app, idx, all){
+    openModal(`
+      <div class="modal-head"><h3>Approve ${app.username}</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+      <p class="text-sm text-muted">This adds them to the Testers roster as a Tester, certified for the gamemodes they requested.</p>
+      <div class="field mt-16"><label>Certified gamemodes</label>
+        <div style="display:flex; flex-wrap:wrap; gap:8px;">
+          ${ATL_DATA.GAMEMODES.map(g=>`<label class="checkbox-row" style="background:var(--panel-2); padding:6px 10px; border-radius:var(--r-full); border:1px solid var(--glass-brd);">
+            <input type="checkbox" value="${g.id}" class="approveGm" ${(app.gamemodes||[]).includes(g.id)?'checked':''}> <span>${g.label}</span>
+          </label>`).join('')}
+        </div>
+      </div>
+      <button class="btn btn-secondary btn-block mt-16" id="confirmApproveTester">Approve &amp; Add to Testers</button>
+    `);
+    document.getElementById('confirmApproveTester').addEventListener('click', ()=>{
+      const gamemodes = Array.from(document.querySelectorAll('.approveGm:checked')).map(c=>c.value);
+      const testers = ATL_SESSION.loadStore('testers', []);
+      testers.push({ username: app.username, display: app.username, rank:'Tester', gamemodes });
+      ATL_SESSION.saveStore('testers', testers);
+      all[idx].status = 'approved';
+      ATL_SESSION.saveStore('applications', all);
+      audit('Approved tester application', app.username);
+      closeModal();
+      ATL_toast(`${app.username} added to Testers.`, 'success');
+      renderTesterApplications();
     });
   }
 </script>
