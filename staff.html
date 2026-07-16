@@ -25,11 +25,11 @@
 <script src="assets/js/session.js"></script>
 <script src="assets/js/nav.js"></script>
 <script src="assets/js/backgrounds.js"></script>
-<script>
+<script type="module">
   ATL_mountBackground('staff');
   ATL_initShell('staff.html');
 
-  const staff = ATL_SESSION.loadStore('staff', []);
+  const staff = await ATL_SESSION.loadStore('staff', []);
   const container = document.getElementById('staffContainer');
 
   if(staff.length === 0){
