@@ -15,7 +15,7 @@
 <script src="assets/js/session.js"></script>
 <script src="assets/js/nav.js"></script>
 <script src="assets/js/backgrounds.js"></script>
-<script>
+<script type="module">
   ATL_mountBackground('profile');
   const session = ATL_initShell('profile.html');
   const root = document.getElementById('profileRoot');
@@ -32,7 +32,7 @@
   } else {
     const u = session.user;
     const avatar = u.avatar || `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(u.username)}&backgroundColor=141a29`;
-    const tierRecord = ATL_SESSION.loadStore('tier_'+u.id, null);
+    const tierRecord = await ATL_SESSION.loadStore('tier_'+u.id, null);
 
     root.innerHTML = `
       <div class="glass card" style="padding:0; overflow:hidden; margin-top:20px;">
