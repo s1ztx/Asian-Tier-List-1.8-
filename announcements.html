@@ -27,11 +27,11 @@
 <script src="assets/js/session.js"></script>
 <script src="assets/js/nav.js"></script>
 <script src="assets/js/backgrounds.js"></script>
-<script>
+<script type="module">
   ATL_mountBackground('announcements');
   ATL_initShell('announcements.html');
 
-  const items = ATL_SESSION.loadStore('announcements', []);
+  const items = await ATL_SESSION.loadStore('announcements', []);
   const list = document.getElementById('announcementList');
 
   if(items.length === 0){
