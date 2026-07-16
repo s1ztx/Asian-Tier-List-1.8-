@@ -57,14 +57,27 @@ window.ATL_SESSION = (function(){
     return s;
   }
 
-  // ---- Local demo persistence for Owner/Tester panel CRUD ----
-  function loadStore(key, fallback){
+  // ---- Shared store (Cloudflare Worker + KV) so Staff/Testers/
+  // Announcements/Reviews/Leaderboards/Applications are visible to
+  // every visitor, not just the browser that added them. ----
+  async function loadStore(key, fallback){
     try{
-      const raw = localStorage.getItem(STORE_PREFIX+key);
-      return raw ? JSON.parse(raw) : (fallback || []);
+      const resp = await fetch(`${OAUTH_WORKER_URL}/api/store?key=${encodeURIComponent(key)}`);
+      if(!resp.ok) return fallback || [];
+      const data = await resp.json();
+      return (data.value !== null && data.value !== undefined) ? data.value : (fallback || []);
     }catch(e){ return fallback || []; }
   }
-  function saveStore(key, value){ localStorage.setItem(STORE_PREFIX+key, JSON.stringify(value)); }
+  async function saveStore(key, value){
+    try{
+      await fetch(`${OAUTH_WORKER_URL}/api/store`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key, value })
+      });
+      return true;
+    }catch(e){ return false; }
+  }
 
   return { loginWithDiscord, current, logout, loadStore, saveStore, consumeCallbackHash };
 })();
