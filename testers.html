@@ -43,13 +43,13 @@
 <script src="assets/js/session.js"></script>
 <script src="assets/js/nav.js"></script>
 <script src="assets/js/backgrounds.js"></script>
-<script>
+<script type="module">
   ATL_mountBackground('testers');
   const session = ATL_initShell('testers.html');
 
   document.getElementById('gmSelect').innerHTML = ATL_DATA.GAMEMODES.map(g=>`<option value="${g.id}">${g.label}</option>`).join('');
 
-  const testers = ATL_SESSION.loadStore('testers', []);
+  const testers = await ATL_SESSION.loadStore('testers', []);
   const container = document.getElementById('testerContainer');
   if(testers.length === 0){
     container.innerHTML = `
@@ -89,11 +89,11 @@
     gate.textContent = 'Login with Discord to submit a test request.';
     submitBtn.disabled = true;
   }
-  submitBtn.addEventListener('click', ()=>{
+  submitBtn.addEventListener('click', async ()=>{
     const gm = document.getElementById('gmSelect').value;
-    const requests = ATL_SESSION.loadStore('test_requests', []);
+    const requests = await ATL_SESSION.loadStore('test_requests', []);
     requests.push({ id: Date.now(), user: session.user.username, gamemode: gm, note: document.getElementById('reqNote').value, status:'pending', date: new Date().toISOString().slice(0,10) });
-    ATL_SESSION.saveStore('test_requests', requests);
+    await ATL_SESSION.saveStore('test_requests', requests);
     document.getElementById('reqNote').value = '';
     ATL_toast('Test request submitted. A tester will reach out.', 'success');
   });
