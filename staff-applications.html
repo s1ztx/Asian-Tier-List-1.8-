@@ -103,7 +103,7 @@
 <script src="assets/js/session.js"></script>
 <script src="assets/js/nav.js"></script>
 <script src="assets/js/backgrounds.js"></script>
-<script>
+<script type="module">
   ATL_mountBackground('staff-applications');
   const session = ATL_initShell('staff-applications.html');
 
@@ -215,7 +215,7 @@
   }
 
   const form = document.getElementById('appForm');
-  form.addEventListener('submit', (e)=>{
+  form.addEventListener('submit', async (e)=>{
     e.preventDefault();
     if(!document.getElementById('tc1').checked || !document.getElementById('tc2').checked){
       ATL_toast('Please accept both terms checkboxes.', 'error'); return;
@@ -226,7 +226,7 @@
       gamemodes = Array.from(document.querySelectorAll('.gmCheck:checked')).map(c=>c.value);
       if(gamemodes.length === 0){ ATL_toast('Select at least one gamemode.', 'error'); return; }
     }
-    const apps = ATL_SESSION.loadStore('applications', []);
+    const apps = await ATL_SESSION.loadStore('applications', []);
     apps.push({
       id: Date.now(),
       track: currentTrack,
@@ -241,7 +241,7 @@
       submitted: new Date().toISOString().slice(0,10),
       status: 'pending'
     });
-    ATL_SESSION.saveStore('applications', apps);
+    await ATL_SESSION.saveStore('applications', apps);
     ATL_toast(`${t.label} application submitted. Staff will review it soon.`, 'success');
     form.reset();
     show('select');
