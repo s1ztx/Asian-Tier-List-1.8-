@@ -106,6 +106,7 @@ function buildPanel(){
 }
 
 function counts(){
+  const apps = ATL_SESSION.loadStore('applications', []);
   return {
     staff: ATL_SESSION.loadStore('staff', []).length,
     testers: ATL_SESSION.loadStore('testers', []).length,
@@ -114,6 +115,7 @@ function counts(){
     requests: ATL_SESSION.loadStore('test_requests', []).length,
     tiersLogged: ATL_SESSION.loadStore('tier_log', []).length,
     audit: ATL_SESSION.loadStore('audit_log', []).length,
+    pendingStaffApps: apps.filter(a=>a.track==='staff' && a.status==='pending').length,
   };
 }
 
@@ -125,13 +127,14 @@ function renderView(view){
         <div class="glass stat-card"><div class="s-val">${c.staff}</div><div class="s-label">Staff members</div></div>
         <div class="glass stat-card"><div class="s-val">${c.testers}</div><div class="s-label">Testers</div></div>
         <div class="glass stat-card"><div class="s-val">${c.requests}</div><div class="s-label">Test requests</div></div>
-        <div class="glass stat-card"><div class="s-val">${c.tiersLogged}</div><div class="s-label">Tiers logged</div></div>
+        <div class="glass stat-card"><div class="s-val">${c.pendingStaffApps}</div><div class="s-label">Pending staff applications</div></div>
       </div>
       <div class="glass card mt-24">
         <div class="eyebrow">Quick actions</div>
         <div class="mt-16" style="display:flex; gap:12px; flex-wrap:wrap;">
           <button class="btn btn-primary btn-sm" style="text-transform:none;" data-goto="staff">+ Add staff</button>
           <button class="btn btn-secondary btn-sm" style="text-transform:none;" data-goto="testers">+ Add tester</button>
+          <button class="btn btn-ghost btn-sm" style="text-transform:none;" data-goto="staffApps">Review applications</button>
           <button class="btn btn-ghost btn-sm" style="text-transform:none;" data-goto="announcements">+ Post announcement</button>
           <button class="btn btn-ghost btn-sm" style="text-transform:none;" data-goto="settings">Website settings</button>
         </div>
@@ -278,6 +281,84 @@ function renderStaff(){
   }
 }
 
+/* ---------------- STAFF APPLICATIONS (review) ---------------- */
+function renderStaffApplications(){
+  const all = ATL_SESSION.loadStore('applications', []);
+  const apps = all.map((a,i)=>({ ...a, _idx: i })).filter(a=>a.track==='staff');
+  const el = document.getElementById('view-staffApps');
+  el.innerHTML = `<div class="table-wrap glass" id="staffAppsWrap"></div>`;
+  const wrap = document.getElementById('staffAppsWrap');
+
+  if(apps.length===0){
+    wrap.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 4h16v16H4z"/></svg><h3>No staff applications</h3><p>Submissions from the Applications page will show up here for review.</p></div>`;
+    return;
+  }
+
+  wrap.innerHTML = `<table class="dt"><thead><tr><th>Applicant</th><th>Age</th><th>Timezone</th><th>Submitted</th><th>Status</th><th>Actions</th></tr></thead>
+  <tbody>${apps.slice().reverse().map(a=>`
+    <tr>
+      <td>${a.username}</td>
+      <td class="mono">${a.age}</td>
+      <td class="mono text-muted">${a.timezone}</td>
+      <td class="mono text-muted">${a.submitted}</td>
+      <td><span class="pill ${a.status==='approved'?'pill-teal':a.status==='rejected'?'pill-red':'pill-gold'}">${a.status}</span></td>
+      <td style="display:flex; gap:6px; flex-wrap:wrap;">
+        <button class="btn btn-ghost btn-sm" data-view-app="${a._idx}" style="text-transform:none;">View</button>
+        <button class="btn btn-secondary btn-sm" data-approve="${a._idx}" style="text-transform:none;" ${a.status!=='pending'?'disabled':''}>Approve</button>
+        <button class="btn btn-outline-red btn-sm" data-reject="${a._idx}" style="text-transform:none;" ${a.status!=='pending'?'disabled':''}>Reject</button>
+      </td>
+    </tr>`).join('')}</tbody></table>`;
+
+  wrap.querySelectorAll('[data-view-app]').forEach(b=> b.addEventListener('click', ()=>{
+    const a = all[+b.dataset.viewApp];
+    openModal(`
+      <div class="modal-head"><h3>${a.username}'s application</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+      <div class="field"><label>Age</label><p class="text-sm">${a.age}</p></div>
+      <div class="field"><label>Timezone</label><p class="text-sm">${a.timezone}</p></div>
+      <div class="field"><label>Why they want to join</label><p class="text-sm text-muted">${a.why||'—'}</p></div>
+      <div class="field"><label>Relevant experience</label><p class="text-sm text-muted">${a.experience||'—'}</p></div>
+      <div class="field"><label>Scenario 1</label><p class="text-sm text-muted">${a.scenario1||'—'}</p></div>
+      <div class="field"><label>Scenario 2</label><p class="text-sm text-muted">${a.scenario2||'—'}</p></div>
+    `);
+  }));
+  wrap.querySelectorAll('[data-approve]').forEach(b=> b.addEventListener('click', ()=>{
+    const idx = +b.dataset.approve;
+    const a = all[idx];
+    approveStaffApplication(a, idx, all);
+  }));
+  wrap.querySelectorAll('[data-reject]').forEach(b=> b.addEventListener('click', ()=>{
+    const idx = +b.dataset.reject;
+    all[idx].status = 'rejected';
+    ATL_SESSION.saveStore('applications', all);
+    audit('Rejected staff application', all[idx].username);
+    ATL_toast('Application rejected.', 'success');
+    renderStaffApplications();
+  }));
+}
+
+function approveStaffApplication(app, idx, all){
+  openModal(`
+    <div class="modal-head"><h3>Approve ${app.username}</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <p class="text-sm text-muted">Choose their starting staff role. This adds them straight to the Staff roster.</p>
+    <div class="field mt-16"><label>Starting role</label>
+      <select class="select" id="approveRole">${ATL_DATA.STAFF_ROLES.slice().reverse().map(r=>`<option ${r==='Trial Moderator'?'selected':''}>${r}</option>`).join('')}</select>
+    </div>
+    <button class="btn btn-primary btn-block" id="confirmApproveStaff">Approve &amp; Add to Staff</button>
+  `);
+  document.getElementById('confirmApproveStaff').addEventListener('click', ()=>{
+    const role = document.getElementById('approveRole').value;
+    const staff = ATL_SESSION.loadStore('staff', []);
+    staff.push({ username: app.username, display: app.username, role, discordRole: role, added: new Date().toISOString().slice(0,10) });
+    ATL_SESSION.saveStore('staff', staff);
+    all[idx].status = 'approved';
+    ATL_SESSION.saveStore('applications', all);
+    audit('Approved staff application', `${app.username} → ${role}`);
+    closeModal();
+    ATL_toast(`${app.username} added to Staff as ${role}.`, 'success');
+    renderStaffApplications();
+  });
+}
+
 /* ---------------- TESTERS ---------------- */
 function renderTesters(){
   const testers = ATL_SESSION.loadStore('testers', []);
@@ -346,4 +427,133 @@ function renderTesters(){
     `);
     document.getElementById('saveTester').addEventListener('click', ()=>{
       const username = document.getElementById('tUsername').value.trim();
-      if(!usernam
+      if(!username){ ATL_toast('Enter a Discord username.', 'error'); return; }
+      const gamemodes = Array.from(document.querySelectorAll('#formModalInner input[type=checkbox]:checked')).map(c=>c.value);
+      const entry = { username, display: document.getElementById('tDisplay').value.trim()||username, rank: document.getElementById('tRank').value, gamemodes };
+      let list = ATL_SESSION.loadStore('testers', []);
+      if(existing!=null && idx!=null) list[idx]=entry; else list.push(entry);
+      ATL_SESSION.saveStore('testers', list);
+      audit(existing?'Edited tester':'Added tester', entry.display);
+      closeModal(); ATL_toast(existing?'Tester updated.':'Tester added.', 'success');
+      renderTesters();
+    });
+  }
+}
+
+/* ---------------- ANNOUNCEMENTS ---------------- */
+function renderAnnouncements(){
+  const items = ATL_SESSION.loadStore('announcements', []);
+  const el = document.getElementById('view-announcements');
+  el.innerHTML = `
+    <div class="glass card">
+      <div class="eyebrow">New post</div>
+      <div class="field mt-16"><label>Title</label><input class="input" id="aTitle" placeholder="Season 4 begins"></div>
+      <div class="field"><label>Tag</label><select class="select" id="aTag"><option value="update">update</option><option value="event">event</option><option value="maintenance">maintenance</option></select></div>
+      <div class="field"><label>Body</label><textarea class="textarea" id="aBody" placeholder="What's happening..."></textarea></div>
+      <button class="btn btn-primary" id="postAnn">Publish Announcement</button>
+    </div>
+    <div class="mt-24" style="display:flex; flex-direction:column; gap:12px;" id="annList"></div>`;
+  const list = document.getElementById('annList');
+  list.innerHTML = items.length ? items.slice().reverse().map((a,ri)=>{
+    const i = items.length-1-ri;
+    return `<div class="glass card"><div class="flex-between"><div><span class="pill pill-blue">${a.tag}</span><h4 class="mt-8">${a.title}</h4></div><button class="btn btn-outline-red btn-sm" data-del="${i}" style="text-transform:none;">Delete</button></div><p class="text-sm text-muted">${a.body}</p></div>`;
+  }).join('') : '<p class="text-sm text-muted">No announcements posted yet.</p>';
+  list.querySelectorAll('[data-del]').forEach(b=> b.addEventListener('click', ()=>{
+    const updated = items.filter((_,i)=>i!==+b.dataset.del);
+    ATL_SESSION.saveStore('announcements', updated);
+    audit('Deleted announcement', items[+b.dataset.del].title);
+    ATL_toast('Announcement deleted.', 'success');
+    renderAnnouncements();
+  }));
+  document.getElementById('postAnn').addEventListener('click', ()=>{
+    const title = document.getElementById('aTitle').value.trim();
+    const body = document.getElementById('aBody').value.trim();
+    if(!title||!body){ ATL_toast('Fill in a title and body.', 'error'); return; }
+    items.push({ title, body, tag: document.getElementById('aTag').value, author: session.user.display, date: new Date().toISOString().slice(0,10) });
+    ATL_SESSION.saveStore('announcements', items);
+    audit('Posted announcement', title);
+    ATL_toast('Announcement published.', 'success');
+    renderAnnouncements();
+  });
+}
+
+/* ---------------- REVIEWS MODERATION ---------------- */
+function renderReviewsMod(){
+  const reviews = ATL_SESSION.loadStore('reviews', []);
+  const el = document.getElementById('view-reviews');
+  el.innerHTML = `<div class="table-wrap glass" id="revWrap"></div>`;
+  const wrap = document.getElementById('revWrap');
+  wrap.innerHTML = reviews.length ? `<table class="dt"><thead><tr><th>Member</th><th>Rating</th><th>Review</th><th>Date</th><th></th></tr></thead>
+  <tbody>${reviews.map((r,i)=>`<tr><td>${r.display}</td><td class="mono">${r.rating}★</td><td class="text-muted" style="max-width:260px;">${r.body}</td><td class="mono text-muted">${r.date}</td><td><button class="btn btn-outline-red btn-sm" data-del="${i}" style="text-transform:none;">Remove</button></td></tr>`).join('')}</tbody></table>`
+  : `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 17.3 6.2 20l1.1-6.5L2.5 9l6.5-1L12 2l3 6 6.5 1-4.8 4.5 1.1 6.5z"/></svg><h3>No reviews to moderate</h3><p>Reviews submitted by members will appear here.</p></div>`;
+  wrap.querySelectorAll('[data-del]').forEach(b=> b.addEventListener('click', ()=>{
+    const removed = reviews[+b.dataset.del];
+    ATL_SESSION.saveStore('reviews', reviews.filter((_,i)=>i!==+b.dataset.del));
+    audit('Removed review', removed.display);
+    ATL_toast('Review removed.', 'success');
+    renderReviewsMod();
+  }));
+}
+
+/* ---------------- LEADERBOARDS MOD ---------------- */
+function renderLeaderboardsMod(){
+  const el = document.getElementById('view-leaderboards');
+  el.innerHTML = `<div id="lbGmTabs" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;"></div><div class="table-wrap glass" id="lbModWrap"></div>`;
+  let active = ATL_DATA.GAMEMODES[0].id;
+  function draw(){
+    document.getElementById('lbGmTabs').innerHTML = ATL_DATA.GAMEMODES.map(g=>`<button class="btn ${g.id===active?'btn-secondary':'btn-ghost'} btn-sm" data-gm="${g.id}" style="text-transform:none;">${g.label}</button>`).join('');
+    document.querySelectorAll('#lbGmTabs [data-gm]').forEach(b=> b.addEventListener('click', ()=>{ active=b.dataset.gm; draw(); }));
+    const board = ATL_SESSION.loadStore('leaderboard_'+active, []);
+    const wrap = document.getElementById('lbModWrap');
+    wrap.innerHTML = board.length ? `<table class="dt"><thead><tr><th>Player</th><th>Tier</th><th>Tester</th><th>Date</th><th></th></tr></thead>
+      <tbody>${board.map((p,i)=>`<tr><td>${p.player}</td><td>${ATL_hex(p.tier,'sm')}</td><td class="text-muted">${p.tester}</td><td class="mono text-muted">${p.date}</td><td><button class="btn btn-outline-red btn-sm" data-del="${i}" style="text-transform:none;">Remove</button></td></tr>`).join('')}</tbody></table>`
+      : `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 20V10M12 20V4M20 20v-7"/></svg><h3>Empty board</h3><p>No entries logged for ${ATL_DATA.GAMEMODES.find(g=>g.id===active).label} yet.</p></div>`;
+    wrap.querySelectorAll('[data-del]').forEach(b=> b.addEventListener('click', ()=>{
+      const updated = board.filter((_,i)=>i!==+b.dataset.del);
+      ATL_SESSION.saveStore('leaderboard_'+active, updated);
+      audit('Removed leaderboard entry', active);
+      ATL_toast('Entry removed.', 'success');
+      draw();
+    }));
+  }
+  draw();
+}
+
+/* ---------------- RULES MOD ---------------- */
+function renderRulesMod(){
+  document.getElementById('view-rules').innerHTML = `
+    <div class="glass card">
+      <div class="eyebrow">Content management</div>
+      <h3 class="mt-8">Rules page</h3>
+      <p class="text-sm text-muted">Rules sections are maintained directly in the Rules page template for consistency and version control. Connect a backend endpoint here to make them editable from this panel without a redeploy.</p>
+      <a href="rules.html" class="btn btn-ghost btn-sm mt-8" style="text-transform:none;">View live Rules page →</a>
+    </div>`;
+}
+
+/* ---------------- SETTINGS ---------------- */
+function renderSettings(){
+  const s = ATL_SESSION.loadStore('website_settings', { siteName:'Asian Tier List', maintenance:false, registrationOpen:true });
+  document.getElementById('view-settings').innerHTML = `
+    <div class="glass card" style="max-width:520px;">
+      <div class="eyebrow">Website settings</div>
+      <div class="field mt-16"><label>Site name</label><input class="input" id="stSiteName" value="${s.siteName}"></div>
+      <div class="field checkbox-row"><input type="checkbox" id="stMaint" ${s.maintenance?'checked':''}><span>Enable maintenance mode</span></div>
+      <div class="field checkbox-row"><input type="checkbox" id="stReg" ${s.registrationOpen?'checked':''}><span>Allow new test requests</span></div>
+      <button class="btn btn-primary" id="saveSettings">Save Settings</button>
+    </div>`;
+  document.getElementById('saveSettings').addEventListener('click', ()=>{
+    const updated = { siteName: document.getElementById('stSiteName').value.trim()||'Asian Tier List', maintenance: document.getElementById('stMaint').checked, registrationOpen: document.getElementById('stReg').checked };
+    ATL_SESSION.saveStore('website_settings', updated);
+    audit('Updated website settings', JSON.stringify(updated));
+    ATL_toast('Settings saved.', 'success');
+  });
+}
+
+/* ---------------- AUDIT LOG ---------------- */
+function renderAudit(){
+  const log = ATL_SESSION.loadStore('audit_log', []).slice().reverse();
+  document.getElementById('view-audit').innerHTML = `<div class="table-wrap glass">${log.length ? `<table class="dt"><thead><tr><th>Action</th><th>Detail</th><th>Actor</th><th>When</th></tr></thead><tbody>${log.map(a=>`<tr><td>${a.action}</td><td class="text-muted">${a.detail}</td><td>${a.actor}</td><td class="mono text-muted">${a.date}</td></tr>`).join('')}</tbody></table>` : `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 12h18M3 6h18M3 18h18"/></svg><h3>No actions logged</h3><p>Every change you make in this panel is recorded here.</p></div>`}</div>`;
+}
+</script>
+</body>
+</html>
