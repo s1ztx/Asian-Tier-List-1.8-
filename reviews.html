@@ -40,21 +40,21 @@
 <script src="assets/js/session.js"></script>
 <script src="assets/js/nav.js"></script>
 <script src="assets/js/backgrounds.js"></script>
-<script>
+<script type="module">
   ATL_mountBackground('reviews');
   const session = ATL_initShell('reviews.html');
   const listEl = document.getElementById('reviewList');
   const composer = document.getElementById('reviewComposer');
 
-  function loadReviews(){ return ATL_SESSION.loadStore('reviews', []); }
-  function saveReviews(r){ ATL_SESSION.saveStore('reviews', r); }
+  async function loadReviews(){ return await ATL_SESSION.loadStore('reviews', []); }
+  async function saveReviews(r){ return await ATL_SESSION.saveStore('reviews', r); }
 
   function starRow(n){
     return `<div class="mono" style="color:var(--gold-500); letter-spacing:2px;">${'★'.repeat(n)}${'☆'.repeat(5-n)}</div>`;
   }
 
-  function renderList(){
-    const reviews = loadReviews();
+  async function renderList(){
+    const reviews = await loadReviews();
     if(reviews.length === 0){
       listEl.innerHTML = `
         <div class="glass empty-state">
@@ -81,7 +81,7 @@
     }
   }
 
-  function renderComposer(){
+  async function renderComposer(){
     if(!session.authenticated){
       composer.innerHTML = `
         <div class="eyebrow">Members only</div>
@@ -91,7 +91,7 @@
       document.getElementById('composerLogin').addEventListener('click', ATL_SESSION.loginWithDiscord);
       return;
     }
-    const reviews = loadReviews();
+    const reviews = await loadReviews();
     const mine = reviews.find(r=>r.userId===session.user.id);
     if(mine){
       composer.innerHTML = `
@@ -106,10 +106,11 @@
       document.getElementById('editReview').addEventListener('click', ()=> openForm(mine));
       document.getElementById('deleteReview').addEventListener('click', ()=>{
         document.getElementById('confirmDelete').classList.add('open');
-        document.getElementById('confirmDeleteBtn').onclick = ()=>{
-          saveReviews(loadReviews().filter(r=>r.userId!==session.user.id));
+        document.getElementById('confirmDeleteBtn').onclick = async ()=>{
+          const current = await loadReviews();
+          await saveReviews(current.filter(r=>r.userId!==session.user.id));
           document.getElementById('confirmDelete').classList.remove('open');
-          renderComposer(); renderList();
+          await renderComposer(); await renderList();
           ATL_toast('Review deleted.', 'success');
         };
       });
@@ -137,14 +138,15 @@
     `;
     const cancelBtn = document.getElementById('cancelEdit');
     if(cancelBtn) cancelBtn.addEventListener('click', renderComposer);
-    document.getElementById('saveReview').addEventListener('click', ()=>{
+    document.getElementById('saveReview').addEventListener('click', async ()=>{
       const body = document.getElementById('bodyInput').value.trim();
       if(!body){ ATL_toast('Write something before posting.', 'error'); return; }
       const rating = parseInt(document.getElementById('ratingSelect').value,10);
-      let reviews = loadReviews().filter(r=>r.userId!==session.user.id);
+      const current = await loadReviews();
+      let reviews = current.filter(r=>r.userId!==session.user.id);
       reviews.push({ userId:session.user.id, username:session.user.username, display:session.user.display, avatar:null, rating, body, date:new Date().toISOString().slice(0,10) });
-      saveReviews(reviews);
-      renderComposer(); renderList();
+      await saveReviews(reviews);
+      await renderComposer(); await renderList();
       ATL_toast(existing?'Review updated.':'Review posted.', 'success');
     });
   }
