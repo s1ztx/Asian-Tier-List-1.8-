@@ -38,27 +38,46 @@ assets/js/backgrounds.js    Canvas engine, unique animated background per page
 ```
 
 ## Discord OAuth2
-The login button builds a real Discord authorize URL using the provided
-Client ID (`1518971939073429708`) and redirects to Discord. No client
-secret or bot token is anywhere in this codebase — code exchange and
-role sync need a backend, which isn't part of this frontend brief.
-`discord-callback.html` is the placeholder redirect target: point your
-backend's OAuth callback here (or replace it) once it exists.
+The login button redirects to your Cloudflare Worker's `/login` route,
+which redirects to Discord, then back to `/callback` on the Worker.
+The Worker is the only place the Client Secret ever lives — never in
+this static frontend. See `worker/worker.js` for the full flow and
+required environment variables.
+
+## Shared data (Cloudflare Worker + KV)
+Staff, Testers, Announcements, Reviews, Leaderboards, and Applications
+are **not** stored in the browser anymore — they're read and written
+through the same Worker via a small `/api/store` endpoint backed by
+Cloudflare KV. That means what one person adds in the Owner/Tester
+Panel is visible to every visitor, not just their own browser.
+
+Requirements on the Worker side:
+- A KV namespace bound as `ATL_KV` (Worker → Settings → Bindings → Add
+  → KV Namespace, variable name `ATL_KV`)
+- `assets/js/session.js`'s `OAUTH_WORKER_URL` constant pointed at your
+  deployed Worker (it's also the base URL used for the store API)
+
+Note: the store API currently has no write authentication — anyone
+who can reach the Worker can write to any store key. That matches the
+original brief (frontend-only role gating, no backend authorization
+yet) but is worth locking down before this handles anything sensitive
+— e.g. requiring the Worker's own signed session on write requests.
 
 ## Reviewing role-gated UI before a backend exists
 Every page's footer has a **"⚙ Preview role (design QA)"** button. It's
 a clearly-labeled frontend-only tool (not real auth) that sets a local
 role so you can click through Guest → Member → Tester → Testing Manager
 → Senior Tester → Owner → Founder and see the Tester Panel / Owner
-Panel / restricted nav links change accordingly. Swap `session.js`'s
-storage source for a real backend session later — every page already
-reads from the same `ATL_SESSION.current()` shape.
+Panel / restricted nav links change accordingly. Note: this preview
+role is stored locally and does not affect what the shared stores
+return — it only changes what the current browser is allowed to see
+and do in the UI.
 
 ## Data
 No staff, testers, reviews, leaderboard entries, or announcements are
-pre-filled. The Owner Panel and Tester Panel write to localStorage
-(`atl_store_*` keys) so the whole CRUD flow is demonstrable in the
-browser; swap those calls for real API calls once a backend exists.
+pre-filled. The Owner Panel and Tester Panel write to the shared KV
+store described above, so the whole CRUD flow is real and visible to
+every visitor once the Worker is deployed and configured.
 
 ## Tier system
 Only these fourteen tiers are ever used, high to low:
