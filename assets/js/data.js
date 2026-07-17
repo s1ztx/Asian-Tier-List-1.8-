@@ -33,6 +33,7 @@ window.ATL_DATA = {
 
   GAMEMODES: [
     { id:'bedwars',       label:'BedWars',        icon:'bed' },
+    { id:'bedfight',      label:'Bedfight',       icon:'bedfight' },
     { id:'fireballfight', label:'Fireball Fight', icon:'fireball' },
     { id:'sumo',          label:'Sumo',           icon:'sumo' },
     { id:'nodebuff',      label:'Nodebuff',       icon:'sword' },
