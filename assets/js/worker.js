@@ -27,9 +27,39 @@
      WORKER_URL               https://<your-worker-subdomain>.workers.dev
                               (must match exactly what you register in
                               Discord's OAuth2 Redirects as WORKER_URL + "/callback")
+
+   Also required: a KV namespace bound as ATL_KV
+   (Worker -> Settings -> Bindings -> Add -> KV Namespace -> variable
+   name "ATL_KV", pick or create a namespace). This is the shared
+   database every visitor's browser reads/writes through instead of
+   localStorage, so Staff/Testers/Announcements/Reviews/Leaderboards/
+   Applications are visible to everyone, not just your own browser.
    ============================================================ */
 
 const SCOPE = 'identify guilds guilds.members.read';
+
+function jsonResponse(obj, status, env) {
+  const resp = new Response(JSON.stringify(obj), {
+    status: status || 200,
+    headers: { 'Content-Type': 'application/json' }
+  });
+  return cors(resp, env);
+}
+
+async function handleStoreGet(request, env) {
+  const key = new URL(request.url).searchParams.get('key');
+  if (!key) return jsonResponse({ error: 'missing_key' }, 400, env);
+  const raw = await env.ATL_KV.get('store:' + key);
+  return jsonResponse({ key, value: raw ? JSON.parse(raw) : null }, 200, env);
+}
+
+async function handleStoreSet(request, env) {
+  let body;
+  try { body = await request.json(); } catch (e) { return jsonResponse({ error: 'bad_json' }, 400, env); }
+  if (!body || !body.key) return jsonResponse({ error: 'missing_key' }, 400, env);
+  await env.ATL_KV.put('store:' + body.key, JSON.stringify(body.value ?? null));
+  return jsonResponse({ ok: true }, 200, env);
+}
 
 function randomState() {
   const bytes = crypto.getRandomValues(new Uint8Array(24));
@@ -175,10 +205,18 @@ async function handleCallback(request, env) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-    if (request.method === 'OPTIONS') return cors(new Response(null, { status: 204 }), env);
+
+    if (request.method === 'OPTIONS') {
+      const resp = new Response(null, { status: 204 });
+      resp.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+      resp.headers.set('Access-Control-Allow-Headers', 'Content-Type');
+      return cors(resp, env);
+    }
 
     if (url.pathname === '/login') return handleLogin(request, env);
     if (url.pathname === '/callback') return handleCallback(request, env);
+    if (url.pathname === '/api/store' && request.method === 'GET') return handleStoreGet(request, env);
+    if (url.pathname === '/api/store' && request.method === 'POST') return handleStoreSet(request, env);
 
     return new Response('Asian Tier List OAuth2 worker. Use /login to start sign-in.', { status: 200 });
   }
