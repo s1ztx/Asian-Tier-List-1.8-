@@ -63,20 +63,33 @@ window.ATL_SESSION = (function(){
   async function loadStore(key, fallback){
     try{
       const resp = await fetch(`${OAUTH_WORKER_URL}/api/store?key=${encodeURIComponent(key)}`);
-      if(!resp.ok) return fallback || [];
+      if(!resp.ok){
+        console.error(`[ATL_SESSION] loadStore('${key}') failed: HTTP ${resp.status} from ${OAUTH_WORKER_URL}/api/store`);
+        return fallback || [];
+      }
       const data = await resp.json();
       return (data.value !== null && data.value !== undefined) ? data.value : (fallback || []);
-    }catch(e){ return fallback || []; }
+    }catch(e){
+      console.error(`[ATL_SESSION] loadStore('${key}') threw — likely CORS, wrong OAUTH_WORKER_URL, or the Worker is unreachable:`, e);
+      return fallback || [];
+    }
   }
   async function saveStore(key, value){
     try{
-      await fetch(`${OAUTH_WORKER_URL}/api/store`, {
+      const resp = await fetch(`${OAUTH_WORKER_URL}/api/store`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ key, value })
       });
+      if(!resp.ok){
+        console.error(`[ATL_SESSION] saveStore('${key}') failed: HTTP ${resp.status} from ${OAUTH_WORKER_URL}/api/store`);
+        return false;
+      }
       return true;
-    }catch(e){ return false; }
+    }catch(e){
+      console.error(`[ATL_SESSION] saveStore('${key}') threw — likely CORS, wrong OAUTH_WORKER_URL, or the Worker is unreachable:`, e);
+      return false;
+    }
   }
 
   return { loginWithDiscord, current, logout, loadStore, saveStore, consumeCallbackHash };
