@@ -281,7 +281,8 @@ async function renderStaff(){
       };
       let list = await ATL_SESSION.loadStore('staff', []);
       if(existing!=null && idx!=null) list[idx]=entry; else list.push(entry);
-      await ATL_SESSION.saveStore('staff', list);
+      const ok = await ATL_SESSION.saveStore('staff', list);
+      if(!ok){ ATL_toast('Save failed — check the console for details.', 'error'); return; }
       await audit(existing?'Edited staff':'Added staff', entry.display);
       closeModal(); ATL_toast(existing?'Staff updated.':'Staff added.', 'success');
       renderStaff();
@@ -440,7 +441,8 @@ async function renderTesters(){
       const entry = { username, display: document.getElementById('tDisplay').value.trim()||username, rank: document.getElementById('tRank').value, gamemodes };
       let list = await ATL_SESSION.loadStore('testers', []);
       if(existing!=null && idx!=null) list[idx]=entry; else list.push(entry);
-      await ATL_SESSION.saveStore('testers', list);
+      const ok = await ATL_SESSION.saveStore('testers', list);
+      if(!ok){ ATL_toast('Save failed — check the console for details.', 'error'); return; }
       await audit(existing?'Edited tester':'Added tester', entry.display);
       closeModal(); ATL_toast(existing?'Tester updated.':'Tester added.', 'success');
       renderTesters();
