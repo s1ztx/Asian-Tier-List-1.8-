@@ -29,7 +29,7 @@
 <script src="assets/js/session.js"></script>
 <script src="assets/js/nav.js"></script>
 <script src="assets/js/backgrounds.js"></script>
-<script>
+<script type="module">
   ATL_mountBackground('tester-panel');
   const session = ATL_initShell('tester-panel.html');
   const root = document.getElementById('panelRoot');
@@ -39,10 +39,10 @@
   function closeModal(){ document.getElementById('formModal').classList.remove('open'); }
   document.getElementById('formModal').addEventListener('click', e=>{ if(e.target.id==='formModal') closeModal(); });
 
-  function audit(action, detail){
-    const log = ATL_SESSION.loadStore('audit_log', []);
+  async function audit(action, detail){
+    const log = await ATL_SESSION.loadStore('audit_log', []);
     log.push({ action, detail, actor: session.user ? session.user.display : 'Unknown', date: new Date().toLocaleString() });
-    ATL_SESSION.saveStore('audit_log', log);
+    await ATL_SESSION.saveStore('audit_log', log);
   }
 
   if(!ATL_DATA.hasAtLeast(session.role, 'Tester')){
@@ -130,12 +130,13 @@
       });
     });
 
-    const requests = ATL_SESSION.loadStore('test_requests', []);
+    const requests = await ATL_SESSION.loadStore('test_requests', []);
     const pending = requests.filter(r=>r.status==='pending');
+    const tierLogForStats = await ATL_SESSION.loadStore('tier_log', []);
     document.getElementById('tpStats').innerHTML = [
       [pending.length, 'Pending requests'],
       [requests.length, 'Total requests'],
-      [ATL_SESSION.loadStore('tier_log', []).length, 'Tiers logged'],
+      [tierLogForStats.length, 'Tiers logged'],
       [session.role, 'Your rank']
     ].map(([v,l])=>`<div class="glass stat-card"><div class="s-val" style="font-size:22px;">${v}</div><div class="s-label">${l}</div></div>`).join('');
 
@@ -147,28 +148,28 @@
       <tbody>${requests.slice().reverse().map(r=>`<tr><td>${r.user}</td><td>${(ATL_DATA.GAMEMODES.find(g=>g.id===r.gamemode)||{label:r.gamemode}).label}</td><td class="text-muted">${r.note||'—'}</td><td><span class="pill ${r.status==='pending'?'pill-gold':'pill-teal'}">${r.status}</span></td><td class="mono text-muted">${r.date}</td></tr>`).join('')}</tbody></table>`;
     }
 
-    document.getElementById('submitTier').addEventListener('click', ()=>{
+    document.getElementById('submitTier').addEventListener('click', async ()=>{
       const player = document.getElementById('subPlayer').value.trim();
       if(!player){ ATL_toast('Enter a player username.', 'error'); return; }
       const gm = document.getElementById('subGm').value;
       const tier = document.getElementById('subTier').value;
-      const log = ATL_SESSION.loadStore('tier_log', []);
+      const log = await ATL_SESSION.loadStore('tier_log', []);
       log.push({ player, gamemode:gm, tier, tester:session.user.display, date:new Date().toISOString().slice(0,10) });
-      ATL_SESSION.saveStore('tier_log', log);
-      const board = ATL_SESSION.loadStore('leaderboard_'+gm, []);
+      await ATL_SESSION.saveStore('tier_log', log);
+      const board = await ATL_SESSION.loadStore('leaderboard_'+gm, []);
       const existingIdx = board.findIndex(b=>b.player===player);
       const entry = { player, tier, tester:session.user.display, date:new Date().toISOString().slice(0,10) };
       if(existingIdx>=0) board[existingIdx]=entry; else board.push(entry);
-      ATL_SESSION.saveStore('leaderboard_'+gm, board);
+      await ATL_SESSION.saveStore('leaderboard_'+gm, board);
       document.getElementById('subPlayer').value='';
       ATL_toast(`Logged ${player} as ${tier} in ${gm}.`, 'success');
     });
   }
 
   /* ---------------- TESTER APPLICATIONS (review, Testing Manager+) ---------------- */
-  function renderTesterApplications(){
+  async function renderTesterApplications(){
     if(!canReviewApps) return;
-    const all = ATL_SESSION.loadStore('applications', []);
+    const all = await ATL_SESSION.loadStore('applications', []);
     const apps = all.map((a,i)=>({ ...a, _idx: i })).filter(a=>a.track==='tester');
     const wrap = document.getElementById('testerAppsWrap');
     if(!wrap) return;
@@ -209,11 +210,11 @@
       const idx = +b.dataset.approve;
       approveTesterApplication(all[idx], idx, all);
     }));
-    wrap.querySelectorAll('[data-reject]').forEach(b=> b.addEventListener('click', ()=>{
+    wrap.querySelectorAll('[data-reject]').forEach(b=> b.addEventListener('click', async ()=>{
       const idx = +b.dataset.reject;
       all[idx].status = 'rejected';
-      ATL_SESSION.saveStore('applications', all);
-      audit('Rejected tester application', all[idx].username);
+      await ATL_SESSION.saveStore('applications', all);
+      await audit('Rejected tester application', all[idx].username);
       ATL_toast('Application rejected.', 'success');
       renderTesterApplications();
     }));
@@ -232,14 +233,14 @@
       </div>
       <button class="btn btn-secondary btn-block mt-16" id="confirmApproveTester">Approve &amp; Add to Testers</button>
     `);
-    document.getElementById('confirmApproveTester').addEventListener('click', ()=>{
+    document.getElementById('confirmApproveTester').addEventListener('click', async ()=>{
       const gamemodes = Array.from(document.querySelectorAll('.approveGm:checked')).map(c=>c.value);
-      const testers = ATL_SESSION.loadStore('testers', []);
+      const testers = await ATL_SESSION.loadStore('testers', []);
       testers.push({ username: app.username, display: app.username, rank:'Tester', gamemodes });
-      ATL_SESSION.saveStore('testers', testers);
+      await ATL_SESSION.saveStore('testers', testers);
       all[idx].status = 'approved';
-      ATL_SESSION.saveStore('applications', all);
-      audit('Approved tester application', app.username);
+      await ATL_SESSION.saveStore('applications', all);
+      await audit('Approved tester application', app.username);
       closeModal();
       ATL_toast(`${app.username} added to Testers.`, 'success');
       renderTesterApplications();
