@@ -423,6 +423,37 @@
     }};
   }
 
+  /* ---------------- SUPPORT: chat bubbles + blue spotlight ---------------- */
+  function chatBubblesLayer(){
+    let bubbles=[];
+    return {
+      resize(w,h){ bubbles = Array.from({length:10},()=>({ x:rand(0,w), y:rand(0,h), w:rand(46,90), hh:rand(28,44), vy:rand(.06,.18), tail: Math.random()>.5, a:rand(.02,.05) })); },
+      draw(ctx,w,h){
+        bubbles.forEach(b=>{
+          b.y -= b.vy; if(b.y < -80) b.y = h + 80;
+          ctx.save();
+          ctx.translate(b.x,b.y);
+          ctx.fillStyle = `rgba(58,134,255,${b.a})`;
+          ctx.strokeStyle = 'rgba(58,134,255,.12)';
+          ctx.lineWidth = 1;
+          const r = 10;
+          ctx.beginPath();
+          if(ctx.roundRect) ctx.roundRect(-b.w/2, -b.hh/2, b.w, b.hh, r); else ctx.rect(-b.w/2,-b.hh/2,b.w,b.hh);
+          ctx.fill(); ctx.stroke();
+          ctx.beginPath();
+          const tailX = b.tail ? -b.w/4 : b.w/4;
+          ctx.moveTo(tailX-6, b.hh/2-2);
+          ctx.lineTo(tailX+6, b.hh/2-2);
+          ctx.lineTo(tailX, b.hh/2+10);
+          ctx.closePath();
+          ctx.fillStyle = `rgba(58,134,255,${b.a})`;
+          ctx.fill();
+          ctx.restore();
+        });
+      }
+    };
+  }
+
   const REGISTRY = {
     home: ()=> [auroraLayer, hexGridLayer, ()=>particlesLayer(70), beamsLayer],
     rules: ()=> [blueprintLayer, digitalLinesLayer],
@@ -435,6 +466,7 @@
     'tester-panel': ()=> [cyberDashboardLayer, holoGridLayer],
     'owner-panel': ()=> [commandCenterLayer, neonNetworkLayer],
     'staff-applications': ()=> [()=>spotlightLayer('255,214,10'), floatingDocsLayer],
+    support: ()=> [()=>spotlightLayer('58,134,255'), chatBubblesLayer],
     '404': ()=> [voidGlitchLayer, ()=>particlesLayer(30,['#e63946'])]
   };
 
