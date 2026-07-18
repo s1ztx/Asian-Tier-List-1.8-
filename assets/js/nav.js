@@ -59,7 +59,7 @@ function closeIconSvg(){ return `<svg viewBox="0 0 24 24" fill="none" stroke="cu
 function brandMarkSvg(){
   return `<svg class="brand-mark" viewBox="0 0 100 112" xmlns="http://www.w3.org/2000/svg">
     <defs><linearGradient id="bm" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#e63946"/><stop offset="1" stop-color="#3a86ff"/>
+      <stop offset="0" style="stop-color:var(--red-500)"/><stop offset="1" style="stop-color:var(--blue-500)"/>
     </linearGradient></defs>
     <polygon points="50,2 96,27 96,85 50,110 4,85 4,27" fill="url(#bm)" stroke="rgba(255,255,255,.5)" stroke-width="2"/>
     <text x="50" y="70" text-anchor="middle" font-family="Orbitron, sans-serif" font-weight="800" font-size="42" fill="#0a0e15">A</text>
@@ -71,6 +71,20 @@ function avatarUrl(user){
   const seed = user ? user.username : 'guest';
   return `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(seed)}&backgroundColor=141a29`;
 }
+
+const ATL_THEMES = [
+  { id:'crimson', label:'Crimson',       colors:['#e63946','#3a86ff'] },
+  { id:'violet',  label:'Violet Storm',  colors:['#8b5cf6','#ec4899'] },
+  { id:'cyber',   label:'Cyber Neon',    colors:['#06b6d4','#f97316'] },
+  { id:'emerald', label:'Emerald',       colors:['#22c55e','#a855f7'] },
+];
+// Applied as soon as this script loads (before the nav renders) to
+// minimize any flash of the default theme on load.
+(function(){
+  const saved = localStorage.getItem('atl_theme');
+  if(saved && ATL_THEMES.some(t=>t.id===saved)) document.documentElement.dataset.theme = saved;
+})();
+function paletteIconSvg(){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="8.5" cy="10.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="7.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="15.5" cy="10.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="10.5" cy="14.5" r="1.4" fill="currentColor" stroke="none"/><path d="M12 22a10 10 0 0 1 0-20 5 5 0 0 1 0 10c-1.1 0-2 .9-2 2a2 2 0 0 0 2 2 2 2 0 0 1 2 2 2 2 0 0 1-2 4z" fill="none"/></svg>`; }
 
 window.ATL_initShell = function(activePage){
   const session = window.ATL_SESSION.current();
@@ -93,6 +107,13 @@ window.ATL_initShell = function(activePage){
        </div>`
     : `<button class="discord-btn" id="loginBtn">${discordIconSvg()}Login with Discord</button>`;
 
+  const currentTheme = document.documentElement.dataset.theme || 'crimson';
+  const themeOptionsHtml = (suffix)=> ATL_THEMES.map(t=>`
+    <div class="theme-option ${t.id===currentTheme?'active':''}" data-theme-pick="${t.id}${suffix}" style="color:${t.colors[0]}">
+      <span class="theme-swatch" style="background:linear-gradient(135deg, ${t.colors[0]}, ${t.colors[1]})"></span>
+      <span style="color:var(--text-1);">${t.label}</span>
+    </div>`).join('');
+
   const nav = document.createElement('div');
   nav.innerHTML = `
   <nav class="nav">
@@ -103,6 +124,13 @@ window.ATL_initShell = function(activePage){
       </a>
       <div class="nav-links">${linksHtml}</div>
       <div class="nav-actions">
+        <div class="theme-switcher" style="position:relative;">
+          <button class="theme-toggle" id="themeToggle" aria-label="Switch theme">${paletteIconSvg()}</button>
+          <div class="glass theme-dropdown" id="themeDropdown">
+            <div class="eyebrow" style="padding:4px 10px 8px;">Theme</div>
+            ${themeOptionsHtml('')}
+          </div>
+        </div>
         ${authArea}
         <button class="nav-menu-toggle" id="menuToggle" aria-label="Open menu">${menuIconSvg()}</button>
       </div>
@@ -116,8 +144,29 @@ window.ATL_initShell = function(activePage){
     </div>
     ${linksHtml}
     <div class="mt-24">${authArea}</div>
+    <div class="eyebrow mt-24" style="margin-bottom:8px;">Theme</div>
+    ${themeOptionsHtml('-drawer')}
   </div>`;
   document.body.prepend(nav);
+
+  function applyTheme(id){
+    document.documentElement.dataset.theme = id;
+    localStorage.setItem('atl_theme', id);
+    document.querySelectorAll('[data-theme-pick]').forEach(el=>{
+      const pickId = el.dataset.themePick.replace('-drawer','');
+      el.classList.toggle('active', pickId===id);
+    });
+  }
+  document.querySelectorAll('[data-theme-pick]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      applyTheme(el.dataset.themePick.replace('-drawer',''));
+      document.getElementById('themeDropdown').classList.remove('open');
+    });
+  });
+  const themeToggle = document.getElementById('themeToggle');
+  const themeDropdown = document.getElementById('themeDropdown');
+  themeToggle.addEventListener('click', (e)=>{ e.stopPropagation(); themeDropdown.classList.toggle('open'); });
+  document.addEventListener('click', (e)=>{ if(!themeDropdown.contains(e.target) && e.target!==themeToggle) themeDropdown.classList.remove('open'); });
 
   document.getElementById('menuToggle').addEventListener('click', ()=>{
     document.getElementById('navDrawer').classList.add('open');
