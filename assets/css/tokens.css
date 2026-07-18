@@ -89,6 +89,45 @@
   --ease: cubic-bezier(.16,.84,.44,1);
 }
 
+/* ============================================================
+   THEMES
+   Only the brand accent colors (red/blue/gold + their glows)
+   switch per theme. Tier colors (--tier-S ... --tier-D-) and
+   status colors (online/idle/dnd, teal "approved" pills) are
+   intentionally NEVER touched by theming — a tier badge or a
+   status pill has to mean the same thing regardless of what
+   skin the person chose, or the whole ranking system stops
+   being legible at a glance.
+   Applied via `document.documentElement.dataset.theme = 'id'`.
+   ============================================================ */
+
+html[data-theme="violet"]{
+  --red-500: #8b5cf6; --red-400: #a78bfa; --red-300: #c4b5fd; --red-700: #6d28d9; --red-900: #2e1065;
+  --red-glow: rgba(139,92,246,.45);
+  --blue-500: #ec4899; --blue-400: #f472b6; --blue-700: #be185d;
+  --blue-glow: rgba(236,72,153,.4);
+  --gold-500: #fbbf24; --gold-400: #fcd34d; --gold-700: #b45309;
+  --gold-glow: rgba(251,191,36,.4);
+}
+
+html[data-theme="cyber"]{
+  --red-500: #06b6d4; --red-400: #22d3ee; --red-300: #67e8f9; --red-700: #0e7490; --red-900: #083344;
+  --red-glow: rgba(6,182,212,.45);
+  --blue-500: #f97316; --blue-400: #fb923c; --blue-700: #c2410c;
+  --blue-glow: rgba(249,115,22,.4);
+  --gold-500: #eab308; --gold-400: #facc15; --gold-700: #a16207;
+  --gold-glow: rgba(234,179,8,.4);
+}
+
+html[data-theme="emerald"]{
+  --red-500: #22c55e; --red-400: #4ade80; --red-300: #86efac; --red-700: #15803d; --red-900: #052e16;
+  --red-glow: rgba(34,197,94,.45);
+  --blue-500: #a855f7; --blue-400: #c084fc; --blue-700: #7e22ce;
+  --blue-glow: rgba(168,85,247,.4);
+  --gold-500: #ffd60a; --gold-400: #ffe64d; --gold-700: #a97e00;
+  --gold-glow: rgba(255,214,10,.4);
+}
+
 @media (prefers-color-scheme: light){ :root{ color-scheme: dark; } }
 
 *,*::before,*::after{ box-sizing: border-box; }
