@@ -130,6 +130,32 @@
       });
     });
 
+    await renderRequestsAndStats();
+
+    document.getElementById('submitTier').addEventListener('click', async ()=>{
+      const player = document.getElementById('subPlayer').value.trim();
+      if(!player){ ATL_toast('Enter a player username.', 'error'); return; }
+      const gm = document.getElementById('subGm').value;
+      const tier = document.getElementById('subTier').value;
+      await logTierResult(player, gm, tier);
+      document.getElementById('subPlayer').value='';
+      ATL_toast(`Logged ${player} as ${tier} in ${gm}.`, 'success');
+      renderRequestsAndStats();
+    });
+  }
+
+  async function logTierResult(player, gamemode, tier){
+    const log = await ATL_SESSION.loadStore('tier_log', []);
+    log.push({ player, gamemode, tier, tester:session.user.display, date:new Date().toISOString().slice(0,10) });
+    await ATL_SESSION.saveStore('tier_log', log);
+    const board = await ATL_SESSION.loadStore('leaderboard_'+gamemode, []);
+    const existingIdx = board.findIndex(b=>b.player===player);
+    const entry = { player, tier, tester:session.user.display, date:new Date().toISOString().slice(0,10) };
+    if(existingIdx>=0) board[existingIdx]=entry; else board.push(entry);
+    await ATL_SESSION.saveStore('leaderboard_'+gamemode, board);
+  }
+
+  async function renderRequestsAndStats(){
     const requests = await ATL_SESSION.loadStore('test_requests', []);
     const pending = requests.filter(r=>r.status==='pending');
     const tierLogForStats = await ATL_SESSION.loadStore('tier_log', []);
@@ -143,26 +169,44 @@
     const reqWrap = document.getElementById('requestsWrap');
     if(requests.length === 0){
       reqWrap.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 4h16v16H4z"/></svg><h3>No test requests</h3><p>Nothing in the queue right now.</p></div>`;
-    } else {
-      reqWrap.innerHTML = `<table class="dt"><thead><tr><th>Player</th><th>Gamemode</th><th>Note</th><th>Status</th><th>Date</th></tr></thead>
-      <tbody>${requests.slice().reverse().map(r=>`<tr><td>${r.user}</td><td>${(ATL_DATA.GAMEMODES.find(g=>g.id===r.gamemode)||{label:r.gamemode}).label}</td><td class="text-muted">${r.note||'—'}</td><td><span class="pill ${r.status==='pending'?'pill-gold':'pill-teal'}">${r.status}</span></td><td class="mono text-muted">${r.date}</td></tr>`).join('')}</tbody></table>`;
+      return;
     }
 
-    document.getElementById('submitTier').addEventListener('click', async ()=>{
-      const player = document.getElementById('subPlayer').value.trim();
-      if(!player){ ATL_toast('Enter a player username.', 'error'); return; }
-      const gm = document.getElementById('subGm').value;
-      const tier = document.getElementById('subTier').value;
-      const log = await ATL_SESSION.loadStore('tier_log', []);
-      log.push({ player, gamemode:gm, tier, tester:session.user.display, date:new Date().toISOString().slice(0,10) });
-      await ATL_SESSION.saveStore('tier_log', log);
-      const board = await ATL_SESSION.loadStore('leaderboard_'+gm, []);
-      const existingIdx = board.findIndex(b=>b.player===player);
-      const entry = { player, tier, tester:session.user.display, date:new Date().toISOString().slice(0,10) };
-      if(existingIdx>=0) board[existingIdx]=entry; else board.push(entry);
-      await ATL_SESSION.saveStore('leaderboard_'+gm, board);
-      document.getElementById('subPlayer').value='';
-      ATL_toast(`Logged ${player} as ${tier} in ${gm}.`, 'success');
+    reqWrap.innerHTML = `<table class="dt"><thead><tr><th>Player</th><th>Gamemode</th><th>Note</th><th>Status</th><th>Date</th><th></th></tr></thead>
+    <tbody>${requests.map((r,i)=>({...r,_idx:i})).slice().reverse().map(r=>`
+      <tr>
+        <td>${r.user}</td>
+        <td>${(ATL_DATA.GAMEMODES.find(g=>g.id===r.gamemode)||{label:r.gamemode}).label}</td>
+        <td class="text-muted">${r.note||'—'}</td>
+        <td><span class="pill ${r.status==='pending'?'pill-gold':'pill-teal'}">${r.status}</span></td>
+        <td class="mono text-muted">${r.date}</td>
+        <td>${r.status==='pending' ? `<button class="btn btn-secondary btn-sm" data-done="${r._idx}" style="text-transform:none;">Done</button>` : ''}</td>
+      </tr>`).join('')}</tbody></table>`;
+
+    reqWrap.querySelectorAll('[data-done]').forEach(b=> b.addEventListener('click', ()=>{
+      const idx = +b.dataset.done;
+      openDoneModal(requests[idx], idx, requests);
+    }));
+  }
+
+  function openDoneModal(req, idx, requests){
+    const gmLabel = (ATL_DATA.GAMEMODES.find(g=>g.id===req.gamemode)||{label:req.gamemode}).label;
+    openModal(`
+      <div class="modal-head"><h3>Complete ${req.user}'s test</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+      <p class="text-sm text-muted">Gamemode: <strong style="color:var(--text-0);">${gmLabel}</strong></p>
+      <div class="field mt-16"><label>Assign tier</label>
+        <select class="select" id="doneTier">${ATL_DATA.TIERS.map(t=>`<option value="${t.id}">${t.id} — ${t.desc}</option>`).join('')}</select>
+      </div>
+      <button class="btn btn-secondary btn-block" id="confirmDone">Log Tier &amp; Mark Done</button>
+    `);
+    document.getElementById('confirmDone').addEventListener('click', async ()=>{
+      const tier = document.getElementById('doneTier').value;
+      await logTierResult(req.user, req.gamemode, tier);
+      requests[idx].status = 'completed';
+      await ATL_SESSION.saveStore('test_requests', requests);
+      closeModal();
+      ATL_toast(`${req.user} logged as ${tier} in ${gmLabel}.`, 'success');
+      renderRequestsAndStats();
     });
   }
 
