@@ -44,6 +44,7 @@ const NAV_ITEMS = [
   { href:'testers.html', label:'Testers' },
   { href:'leaderboards.html', label:'Leaderboards' },
   { href:'reviews.html', label:'Reviews' },
+  { href:'support.html', label:'Support' },
   { href:'profile.html', label:'Player Profile' },
   { href:'tester-panel.html', label:'Tester Panel', minRole:'Tester' },
   { href:'owner-panel.html', label:'Owner Panel', minRole:'Owner' },
@@ -151,7 +152,7 @@ window.ATL_initShell = function(activePage){
         <a href="staff.html">Staff</a><a href="testers.html">Testers</a><a href="staff-applications.html">Applications</a><a href="profile.html">Player Profile</a>
       </div>
       <div class="footer-col"><h4>Account</h4>
-        <a href="#" id="footerDiscordLink">Discord Server</a><a href="tester-panel.html">Tester Panel</a><a href="owner-panel.html">Owner Panel</a>
+        <a href="#" id="footerDiscordLink">Discord Server</a><a href="support.html">Support</a><a href="tester-panel.html">Tester Panel</a><a href="owner-panel.html">Owner Panel</a>
       </div>
     </div>
     <div class="footer-bottom">
