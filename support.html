@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Support — Asian Tier List [1.8+]</title>
+<meta name="description" content="Open a private support ticket with staff — tier disputes, player reports, bugs, and more.">
+<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+<main>
+  <section class="page-hero">
+    <div class="container">
+      <div class="eyebrow">We're here to help</div>
+      <h1 class="h-title" style="font-size:clamp(32px,5vw,52px);">Support</h1>
+      <p class="h-sub" style="max-width:640px;">Open a private ticket with staff for tier disputes, player reports, bugs, or anything else. Only you and staff can see it.</p>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0;">
+    <div class="container" id="supportRoot"></div>
+  </section>
+</main>
+
+<div class="modal-backdrop" id="newTicketModal">
+  <div class="glass modal">
+    <div class="modal-head">
+      <h3>New support ticket</h3>
+      <button class="modal-close" id="ntClose">✕</button>
+    </div>
+    <div class="field"><label>Category</label>
+      <select class="select" id="ntCategory">
+        <option>General</option>
+        <option>Report a Player</option>
+        <option>Tier Dispute</option>
+        <option>Bug Report</option>
+        <option>Staff Application Help</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <div class="field"><label>Subject</label><input class="input" id="ntSubject" placeholder="Short summary of your issue"></div>
+    <div class="field"><label>Message</label><textarea class="textarea" id="ntMessage" placeholder="Describe your issue in detail..."></textarea></div>
+    <button class="btn btn-primary btn-block" id="ntSubmit">Open Ticket</button>
+  </div>
+</div>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/session.js"></script>
+<script src="assets/js/nav.js"></script>
+<script src="assets/js/backgrounds.js"></script>
+<script type="module">
+  ATL_mountBackground('support');
+  const session = ATL_initShell('support.html');
+  const root = document.getElementById('supportRoot');
+
+  const POLL_MS = 4000;
+  let pollTimer = null;
+  let activeTicketId = null;
+  let viewMode = 'mine'; // 'mine' | 'all' (staff only)
+  let isStaff = false;
+
+  async function checkStaff(){
+    if(!session.authenticated) return false;
+    if(ATL_DATA.hasAtLeast(session.role, 'Owner')) return true;
+    const staff = await ATL_SESSION.loadStore('staff', []);
+    return staff.some(s => s.username && s.username.toLowerCase() === session.user.username.toLowerCase());
+  }
+
+  function timeAgo(iso){
+    const diff = Date.now() - new Date(iso).getTime();
+    const mins = Math.floor(diff/60000);
+    if(mins < 1) return 'just now';
+    if(mins < 60) return `${mins}m ago`;
+    const hrs = Math.floor(mins/60);
+    if(hrs < 24) return `${hrs}h ago`;
+    return `${Math.floor(hrs/24)}d ago`;
+  }
+
+  function avatarFor(name){
+    return `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(name)}&backgroundColor=141a29`;
+  }
+
+  if(!session.authenticated){
+    root.innerHTML = `
+      <div class="glass empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <h3>Sign in to open a ticket</h3>
+        <p>Support tickets are private and tied to your Discord account. Login to view or open one.</p>
+        <button class="btn btn-primary mt-16" id="supportLogin">Login with Discord</button>
+      </div>`;
+    document.getElementById('supportLogin').addEventListener('click', ATL_SESSION.loginWithDiscord);
+  } else {
+    isStaff = await checkStaff();
+    buildShell();
+    await refreshList();
+    pollTimer = setInterval(refreshList, POLL_MS);
+    window.addEventListener('beforeunload', ()=> clearInterval(pollTimer));
+  }
+
+  function buildShell(){
+    root.innerHTML = `
+      <div class="flex-between" style="margin-bottom:18px;">
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-secondary btn-sm" id="tabMine" style="text-transform:none;">My Tickets</button>
+          ${isStaff ? '<button class="btn btn-ghost btn-sm" id="tabAll" style="text-transform:none;">All Tickets (Staff)</button>' : ''}
+        </div>
+        <button class="btn btn-primary btn-sm" id="openNewTicket" style="text-transform:none;">+ New Ticket</button>
+      </div>
+      <div class="ticket-shell">
+        <div class="glass card" style="padding:12px;">
+          <div class="ticket-list" id="ticketList"></div>
+        </div>
+        <div class="glass chat-panel" id="chatPanel">
+          <div class="empty-state" style="height:100%; justify-content:center;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <h3>Select a ticket</h3>
+            <p>Pick a ticket on the left, or open a new one.</p>
+          </div>
+        </div>
+      </div>`;
+
+    document.getElementById('openNewTicket').addEventListener('click', ()=> document.getElementById('newTicketModal').classList.add('open'));
+    document.getElementById('tabMine').addEventListener('click', ()=>{ viewMode='mine'; activeTicketId=null; setTabActive(); refreshList(); renderEmptyChat(); });
+    const tabAll = document.getElementById('tabAll');
+    if(tabAll) tabAll.addEventListener('click', ()=>{ viewMode='all'; activeTicketId=null; setTabActive(); refreshList(); renderEmptyChat(); });
+    setTabActive();
+  }
+
+  function setTabActive(){
+    const m = document.getElementById('tabMine'), a = document.getElementById('tabAll');
+    if(m) m.className = 'btn btn-sm ' + (viewMode==='mine' ? 'btn-secondary' : 'btn-ghost');
+    if(a) a.className = 'btn btn-sm ' + (viewMode==='all' ? 'btn-secondary' : 'btn-ghost');
+    if(m) m.style.textTransform='none'; if(a) a.style.textTransform='none';
+  }
+
+  function renderEmptyChat(){
+    document.getElementById('chatPanel').innerHTML = `
+      <div class="empty-state" style="height:100%; justify-content:center;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <h3>Select a ticket</h3>
+        <p>Pick a ticket on the left, or open a new one.</p>
+      </div>`;
+  }
+
+  async function refreshList(){
+    const all = await ATL_SESSION.loadStore('tickets', []);
+    const mine = all.filter(t => t.userId === session.user.id);
+    const visible = viewMode === 'all' ? all : mine;
+
+    const listEl = document.getElementById('ticketList');
+    if(!listEl) return;
+
+    if(visible.length === 0){
+      listEl.innerHTML = `<p class="text-sm text-muted" style="padding:12px;">${viewMode==='all' ? 'No tickets have been opened yet.' : "You haven't opened a ticket yet."}</p>`;
+    } else {
+      listEl.innerHTML = visible.slice().sort((a,b)=> new Date(b.updatedAt)-new Date(a.updatedAt)).map(t=>{
+        const last = t.messages[t.messages.length-1];
+        return `<div class="ticket-item ${t.id===activeTicketId?'active':''}" data-id="${t.id}">
+          <div class="ti-top">
+            <span class="ti-subject">${t.subject}</span>
+            <span class="pill ${t.status==='open'?'pill-teal':'pill-red'}" style="flex-shrink:0;">${t.status}</span>
+          </div>
+          <div class="ti-meta">${t.category} ${viewMode==='all' ? '· '+t.display : ''} · ${timeAgo(t.updatedAt)}</div>
+          <div class="ti-preview">${last ? (last.from==='staff'?'Staff: ':'')+last.body : ''}</div>
+        </div>`;
+      }).join('');
+      listEl.querySelectorAll('[data-id]').forEach(el=> el.addEventListener('click', ()=> openTicket(el.dataset.id)));
+    }
+
+    // if a ticket is open, refresh its chat contents too (for live-ish updates)
+    if(activeTicketId){
+      const t = all.find(x=>x.id===activeTicketId);
+      if(t) renderChat(t); else { activeTicketId=null; renderEmptyChat(); }
+    }
+  }
+
+  async function openTicket(id){
+    activeTicketId = id;
+    const all = await ATL_SESSION.loadStore('tickets', []);
+    const t = all.find(x=>x.id===id);
+    if(!t) return;
+    document.querySelectorAll('.ticket-item').forEach(el=> el.classList.toggle('active', el.dataset.id===id));
+    renderChat(t);
+  }
+
+  function renderChat(t){
+    const panel = document.getElementById('chatPanel');
+    const canClose = isStaff || t.userId === session.user.id;
+    panel.innerHTML = `
+      <div class="chat-header">
+        <div>
+          <div style="font-family:var(--f-sub); font-weight:700; color:var(--text-0);">${t.subject}</div>
+          <div class="text-sm text-muted">${t.category} ${isStaff||viewMode==='all' ? '· opened by '+t.display : ''}</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span class="pill ${t.status==='open'?'pill-teal':'pill-red'}">${t.status}</span>
+          ${canClose && t.status==='open' ? '<button class="btn btn-outline-red btn-sm" id="closeTicketBtn" style="text-transform:none;">Close Ticket</button>' : ''}
+        </div>
+      </div>
+      <div class="chat-messages" id="chatMessages"></div>
+      <div class="chat-input-row">
+        <textarea class="textarea" id="chatInput" placeholder="${t.status==='closed'?'This ticket is closed.':'Type a message...'}" style="min-height:44px; max-height:120px;" ${t.status==='closed'?'disabled':''}></textarea>
+        <button class="btn btn-primary" id="chatSend" ${t.status==='closed'?'disabled':''}>Send</button>
+      </div>`;
+
+    const msgsEl = document.getElementById('chatMessages');
+    msgsEl.innerHTML = t.messages.map(m=>{
+      const mine = m.authorId === session.user.id;
+      return `<div class="msg-row ${mine?'mine':''} ${m.from==='staff'&&!mine?'staff-msg':''}">
+        <img src="${m.authorAvatar || avatarFor(m.authorName)}">
+        <div>
+          <div class="msg-bubble">${m.body}</div>
+          <div class="msg-meta">${m.authorName}${m.from==='staff'?' · staff':''} · ${timeAgo(m.at)}</div>
+        </div>
+      </div>`;
+    }).join('') || '<p class="text-sm text-muted">No messages yet.</p>';
+    msgsEl.scrollTop = msgsEl.scrollHeight;
+
+    const closeBtn = document.getElementById('closeTicketBtn');
+    if(closeBtn) closeBtn.addEventListener('click', async ()=>{
+      const all = await ATL_SESSION.loadStore('tickets', []);
+      const idx = all.findIndex(x=>x.id===t.id);
+      if(idx>=0){ all[idx].status='closed'; all[idx].updatedAt = new Date().toISOString(); await ATL_SESSION.saveStore('tickets', all); }
+      ATL_toast('Ticket closed.', 'success');
+      openTicket(t.id); refreshList();
+    });
+
+    const sendBtn = document.getElementById('chatSend');
+    if(sendBtn) sendBtn.addEventListener('click', async ()=>{
+      const input = document.getElementById('chatInput');
+      const body = input.value.trim();
+      if(!body) return;
+      const all = await ATL_SESSION.loadStore('tickets', []);
+      const idx = all.findIndex(x=>x.id===t.id);
+      if(idx<0) return;
+      all[idx].messages.push({
+        id: Date.now(),
+        from: isStaff && t.userId !== session.user.id ? 'staff' : 'user',
+        authorId: session.user.id,
+        authorName: session.user.display,
+        authorAvatar: session.user.avatar,
+        body,
+        at: new Date().toISOString()
+      });
+      all[idx].updatedAt = new Date().toISOString();
+      await ATL_SESSION.saveStore('tickets', all);
+      input.value = '';
+      openTicket(t.id); refreshList();
+    });
+  }
+
+  document.getElementById('ntClose').addEventListener('click', ()=> document.getElementById('newTicketModal').classList.remove('open'));
+  document.getElementById('newTicketModal').addEventListener('click', e=>{ if(e.target.id==='newTicketModal') e.currentTarget.classList.remove('open'); });
+  document.getElementById('ntSubmit').addEventListener('click', async ()=>{
+    if(!session.authenticated){ ATL_toast('Login first.', 'error'); return; }
+    const subject = document.getElementById('ntSubject').value.trim();
+    const message = document.getElementById('ntMessage').value.trim();
+    if(!subject || !message){ ATL_toast('Fill in a subject and message.', 'error'); return; }
+    const category = document.getElementById('ntCategory').value;
+    const all = await ATL_SESSION.loadStore('tickets', []);
+    const now = new Date().toISOString();
+    const ticket = {
+      id: 'tk_' + Date.now(),
+      userId: session.user.id,
+      username: session.user.username,
+      display: session.user.display,
+      avatar: session.user.avatar,
+      subject, category, status: 'open',
+      createdAt: now, updatedAt: now,
+      messages: [{ id: Date.now(), from:'user', authorId: session.user.id, authorName: session.user.display, authorAvatar: session.user.avatar, body: message, at: now }]
+    };
+    all.push(ticket);
+    await ATL_SESSION.saveStore('tickets', all);
+    document.getElementById('newTicketModal').classList.remove('open');
+    document.getElementById('ntSubject').value=''; document.getElementById('ntMessage').value='';
+    ATL_toast('Ticket opened.', 'success');
+    viewMode='mine'; setTabActive();
+    await refreshList();
+    openTicket(ticket.id);
+  });
+</script>
+</body>
+</html>
