@@ -56,14 +56,19 @@ function discordIconSvg(){
 }
 function menuIconSvg(){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>`; }
 function closeIconSvg(){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>`; }
+window.ATL_brandFallback = function(img){
+  // If assets/images/logo.png isn't there (or hasn't been uploaded yet),
+  // fall back to a simple gradient "A" mark instead of a broken image icon.
+  const span = document.createElement('span');
+  span.className = 'brand-mark';
+  span.style.cssText = 'display:flex;align-items:center;justify-content:center;border-radius:8px;background:linear-gradient(135deg,var(--red-500),var(--blue-500));color:#0a0e15;font-family:Orbitron,sans-serif;font-weight:800;font-size:15px;';
+  span.textContent = 'A';
+  img.replaceWith(span);
+};
 function brandMarkSvg(){
-  return `<svg class="brand-mark" viewBox="0 0 100 112" xmlns="http://www.w3.org/2000/svg">
-    <defs><linearGradient id="bm" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" style="stop-color:var(--red-500)"/><stop offset="1" style="stop-color:var(--blue-500)"/>
-    </linearGradient></defs>
-    <polygon points="50,2 96,27 96,85 50,110 4,85 4,27" fill="url(#bm)" stroke="rgba(255,255,255,.5)" stroke-width="2"/>
-    <text x="50" y="70" text-anchor="middle" font-family="Orbitron, sans-serif" font-weight="800" font-size="42" fill="#0a0e15">A</text>
-  </svg>`;
+  // Uses your uploaded logo at assets/images/logo.png — change the src
+  // below if you used a different filename or an .svg instead.
+  return `<img class="brand-mark" src="assets/images/logo.png" alt="Asian Tier List logo" onerror="ATL_brandFallback(this)">`;
 }
 
 function avatarUrl(user){
