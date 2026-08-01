@@ -92,5 +92,24 @@ window.ATL_SESSION = (function(){
     }
   }
 
-  return { loginWithDiscord, current, logout, loadStore, saveStore, consumeCallbackHash };
+  // Resolves the best avatar for any player/staff/tester/reviewer entity:
+  // 1) an explicit mcUsername on the entity itself (e.g. staff/tester roster entries)
+  // 2) a Minecraft username the person linked to their own Discord account (self-service on Profile)
+  // 3) their real Discord avatar, if we have one
+  // 4) a generated placeholder as a last resort
+  async function resolveAvatar(entity, size){
+    entity = entity || {};
+    if(entity.mcUsername) return ATL_DATA.mcAvatarUrl(entity.mcUsername, size);
+    if(entity.discordId){
+      try{
+        const links = await loadStore('mc_usernames', {});
+        if(links[entity.discordId]) return ATL_DATA.mcAvatarUrl(links[entity.discordId], size);
+      }catch(e){ /* fall through to next option */ }
+    }
+    if(entity.discordAvatar) return entity.discordAvatar;
+    const seed = entity.discordUsername || entity.username || 'guest';
+    return `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(seed)}&backgroundColor=141a29`;
+  }
+
+  return { loginWithDiscord, current, logout, loadStore, saveStore, consumeCallbackHash, resolveAvatar };
 })();
