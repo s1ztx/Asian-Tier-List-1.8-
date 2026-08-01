@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Owner Panel — Asian Tier List [1.8+]</title>
+<link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="assets/css/main.css">
 </head>
 <body>
@@ -96,9 +97,11 @@ function buildPanel(){
     </div>
   </div>`;
 
+  const OP_TAB_TITLES = { dashboard:'Dashboard', analytics:'Analytics', statistics:'Statistics', staff:'Manage Staff', staffApps:'Staff Applications', testers:'Manage Testers', announcements:'Announcements', reviews:'Reviews', leaderboards:'Leaderboards', rules:'Rules', settings:'Website Settings', audit:'Audit Logs' };
   root.querySelectorAll('.panel-tab').forEach(t=> t.addEventListener('click', ()=>{
     root.querySelectorAll('.panel-tab').forEach(x=>x.classList.toggle('active', x===t));
     root.querySelectorAll('.panel-view').forEach(v=>v.classList.toggle('active', v.id==='view-'+t.dataset.view));
+    document.title = `${OP_TAB_TITLES[t.dataset.view]||'Dashboard'} · Owner Panel — Asian Tier List [1.8+]`;
     renderView(t.dataset.view);
   }));
 
