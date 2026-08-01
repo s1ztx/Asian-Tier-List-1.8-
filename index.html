@@ -6,6 +6,346 @@
 <title>Asian Tier List [1.8+] — Competitive Minecraft PvP Rankings</title>
 <meta name="description" content="The official Asian Tier List for Minecraft 1.8 PvP. Get tested, get ranked, climb the leaderboards across BedWars, Sumo, Nodebuff, Boxing, BUHC and Bridges.">
 <link rel="stylesheet" href="assets/css/main.css">
+
+<style>
+/* ============ MUSIC PLAYER STYLES (ADD THIS) ============ */
+.music-player {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 320px;
+    background: rgba(20, 20, 30, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+    z-index: 9999;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: #fff;
+}
+
+.music-player.minimized {
+    height: 50px;
+    overflow: hidden;
+    width: 220px;
+    border-radius: 25px;
+}
+
+.music-player.minimized .player-body {
+    display: none;
+}
+
+.music-player.minimized .player-toggle {
+    transform: rotate(180deg);
+}
+
+.player-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    cursor: pointer;
+    user-select: none;
+    background: linear-gradient(90deg, rgba(255, 107, 0, 0.1), transparent);
+    border-radius: 16px 16px 0 0;
+}
+
+.player-header:hover {
+    background: linear-gradient(90deg, rgba(255, 107, 0, 0.2), transparent);
+}
+
+.player-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #fff;
+    letter-spacing: 0.5px;
+}
+
+.player-title::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #FF6B00;
+    border-radius: 50%;
+    margin-right: 10px;
+    animation: pulse-dot 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.3; transform: scale(0.8); }
+}
+
+.player-toggle {
+    color: #888;
+    font-size: 0.8rem;
+    transition: transform 0.3s ease;
+}
+
+.player-body {
+    padding: 16px;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.player-body::-webkit-scrollbar {
+    width: 4px;
+}
+.player-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+.player-body::-webkit-scrollbar-thumb {
+    background: #FF6B00;
+    border-radius: 4px;
+}
+
+.now-playing {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+}
+
+.album-art {
+    width: 56px;
+    height: 56px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.track-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.track-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #fff;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.track-artist {
+    font-size: 0.8rem;
+    color: #888;
+    margin: 2px 0 0 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.like-btn {
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 4px 8px;
+}
+
+.like-btn:hover {
+    color: #FF6B00;
+    transform: scale(1.2);
+}
+
+.like-btn.liked {
+    color: #FF6B00;
+}
+
+.progress-container {
+    margin-bottom: 12px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #FF6B00, #FFD700);
+    border-radius: 4px;
+    transition: width 0.1s linear;
+    width: 0%;
+}
+
+.progress-bar:hover .progress-fill {
+    height: 6px;
+}
+
+.time-display {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.7rem;
+    color: #666;
+    margin-top: 4px;
+}
+
+.controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.ctrl-btn {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.ctrl-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #FF6B00;
+}
+
+.play-btn {
+    background: linear-gradient(135deg, #FF6B00, #FF8C00);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 20px rgba(255, 107, 0, 0.3);
+}
+
+.play-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 30px rgba(255, 107, 0, 0.5);
+}
+
+.ctrl-btn.active {
+    color: #FF6B00;
+}
+
+.volume-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    padding: 0 4px;
+}
+
+.volume-container span {
+    color: #888;
+    font-size: 0.9rem;
+}
+
+.volume-container input[type="range"] {
+    flex: 1;
+    height: 3px;
+    -webkit-appearance: none;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    outline: none;
+}
+
+.volume-container input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #FF6B00;
+    cursor: pointer;
+}
+
+.playlist-container {
+    max-height: 200px;
+    overflow-y: auto;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding-top: 12px;
+}
+
+.playlist-container::-webkit-scrollbar {
+    width: 3px;
+}
+.playlist-container::-webkit-scrollbar-thumb {
+    background: #FF6B00;
+    border-radius: 4px;
+}
+
+.playlist-header {
+    display: flex;
+    justify-content: space-between;
+    color: #666;
+    font-size: 0.8rem;
+    margin-bottom: 8px;
+    padding: 0 4px;
+}
+
+.playlist {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.playlist li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #aaa;
+    font-size: 0.85rem;
+}
+
+.playlist li:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+}
+
+.playlist li.active {
+    color: #FF6B00;
+    background: rgba(255, 107, 0, 0.1);
+}
+
+.playlist li .song-duration {
+    color: #555;
+    font-size: 0.75rem;
+}
+
+.playlist li .song-index {
+    color: #444;
+    font-size: 0.7rem;
+    margin-right: 10px;
+    width: 20px;
+}
+
+@media (max-width: 480px) {
+    .music-player {
+        bottom: 10px;
+        right: 10px;
+        width: calc(100% - 20px);
+        max-width: 320px;
+    }
+}
+</style>
+
 </head>
 <body>
 
@@ -97,10 +437,60 @@
 
 </main>
 
+<!-- ============ MUSIC PLAYER HTML (ADD THIS BEFORE SCRIPTS) ============ -->
+<div id="musicPlayer" class="music-player minimized">
+    <div class="player-header" onclick="togglePlayer()">
+        <span class="player-title">🎵 The Neighbourhood</span>
+        <span class="player-toggle">▲</span>
+    </div>
+    <div class="player-body">
+        <div class="now-playing">
+            <img id="albumArt" src="https://i.scdn.co/image/ab67616d0000b273f8e5b5f5b5f5b5f5b5f5b5f5" alt="Album Art" class="album-art">
+            <div class="track-info">
+                <p id="trackName" class="track-name">Sweater Weather</p>
+                <p id="trackArtist" class="track-artist">The Neighbourhood</p>
+            </div>
+            <button class="like-btn" onclick="toggleLike()">♡</button>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar" onclick="seekProgress(event)">
+                <div id="progressFill" class="progress-fill" style="width: 0%"></div>
+            </div>
+            <div class="time-display">
+                <span id="currentTime">0:00</span>
+                <span id="totalTime">0:00</span>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="ctrl-btn" onclick="prevTrack()">⏮</button>
+            <button class="ctrl-btn play-btn" onclick="togglePlay()">▶</button>
+            <button class="ctrl-btn" onclick="nextTrack()">⏭</button>
+            <button class="ctrl-btn" onclick="toggleLoop()">🔁</button>
+            <button class="ctrl-btn" onclick="toggleShuffle()">🔀</button>
+        </div>
+
+        <div class="volume-container">
+            <span>🔊</span>
+            <input type="range" id="volumeSlider" min="0" max="100" value="70" oninput="changeVolume(this.value)">
+        </div>
+
+        <div class="playlist-container">
+            <div class="playlist-header">
+                <span>📋 Playlist</span>
+                <span id="playlistCount">12 songs</span>
+            </div>
+            <ul id="playlist" class="playlist"></ul>
+        </div>
+    </div>
+</div>
+
 <script src="assets/js/data.js"></script>
 <script src="assets/js/session.js"></script>
 <script src="assets/js/nav.js"></script>
 <script src="assets/js/backgrounds.js"></script>
+
 <script>
   ATL_mountBackground('home');
   const session = ATL_initShell('index.html');
@@ -123,7 +513,7 @@
     bed: '<path d="M3 18v-6a3 3 0 0 1 3-3h12a3 3 0 0 1 3 3v6"/><path d="M3 18h18"/><path d="M7 9V6a1 1 0 0 1 1-1h3v4"/>',
     bedfight: '<path d="M2 19v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4"/><path d="M2 19h20"/><path d="m8 8 4 4M12 8l-4 4"/><path d="m16 8 4 4M20 8l-4 4"/>',
     fireball: '<circle cx="12" cy="12" r="7"/><path d="M12 5v-3M8 6l-1-2M16 6l1-2"/>',
-    sumo: '<circle cx="12" cy="7" r="3"/><path d="M6 21c0-4 3-7 6-7s6 3 6 7"/>',
+    sumo: '<circle cx="12" cy="7" r="3"/><path d="M6 21c0-4 3-7 6-7s6 3 6 21"/>',
     sword: '<path d="M14.5 3.5 21 10l-3 3-6.5-6.5z"/><path d="M11 10 3 18v3h3l8-8"/>',
     glove: '<path d="M7 12V6a2 2 0 0 1 4 0v4M11 10V5a2 2 0 0 1 4 0v5M15 10V7a2 2 0 0 1 4 0v7a6 6 0 0 1-6 6H10a5 5 0 0 1-5-5v-3l3-2"/>',
     heart: '<path d="M12 21s-7-4.6-9.5-9C.9 8.6 2.6 5 6 5c2 0 3.5 1.2 4 2 0.5-.8 2-2 4-2 3.4 0 5.1 3.6 3.5 7-2.5 4.4-9.5 9-9.5 9z"/>',
@@ -139,5 +529,231 @@
 
   document.getElementById('ctaLogin').addEventListener('click', ATL_SESSION.loginWithDiscord);
 </script>
+
+<!-- ============ MUSIC PLAYER JAVASCRIPT (ADD THIS AT THE BOTTOM) ============ -->
+<script>
+// ============ THE NEIGHBOURHOOD PLAYLIST ============
+const playlist = [
+    { name: 'Sweater Weather', artist: 'The Neighbourhood', duration: '4:00' },
+    { name: 'Daddy Issues', artist: 'The Neighbourhood', duration: '4:20' },
+    { name: 'Afraid', artist: 'The Neighbourhood', duration: '4:10' },
+    { name: 'Softcore', artist: 'The Neighbourhood', duration: '3:26' },
+    { name: 'Scary Love', artist: 'The Neighbourhood', duration: '3:30' },
+    { name: 'The Beach', artist: 'The Neighbourhood', duration: '4:15' },
+    { name: 'Wires', artist: 'The Neighbourhood', duration: '3:55' },
+    { name: 'Let It Go', artist: 'The Neighbourhood', duration: '3:45' },
+    { name: 'Flowers', artist: 'The Neighbourhood', duration: '3:20' },
+    { name: 'Cry Baby', artist: 'The Neighbourhood', duration: '3:55' },
+    { name: 'R.I.P. 2 My Youth', artist: 'The Neighbourhood', duration: '3:25' },
+    { name: 'Stargazing', artist: 'The Neighbourhood', duration: '3:30' }
+];
+
+// ============ PLAYER STATE ============
+let currentTrackIndex = 0;
+let isPlaying = false;
+let isLooping = false;
+let isShuffled = false;
+let duration = 0;
+let progressInterval = null;
+
+// ============ DOM REFS ============
+const trackName = document.getElementById('trackName');
+const trackArtist = document.getElementById('trackArtist');
+const albumArt = document.getElementById('albumArt');
+const progressFill = document.getElementById('progressFill');
+const currentTimeDisplay = document.getElementById('currentTime');
+const totalTimeDisplay = document.getElementById('totalTime');
+const playBtn = document.querySelector('.play-btn');
+const playlistEl = document.getElementById('playlist');
+const playlistCount = document.getElementById('playlistCount');
+
+// ============ INITIALIZE ============
+function initPlayer() {
+    loadPlaylist();
+    loadTrack(currentTrackIndex);
+    playlistCount.textContent = playlist.length + ' songs';
+}
+
+// ============ LOAD PLAYLIST ============
+function loadPlaylist() {
+    playlistEl.innerHTML = '';
+    const tracks = isShuffled ? shuffleArray([...playlist]) : playlist;
+    tracks.forEach((track, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+            <span>
+                <span class="song-index">${String(index + 1).padStart(2, '0')}</span>
+                ${track.name}
+            </span>
+            <span class="song-duration">${track.duration}</span>
+        `;
+        li.addEventListener('click', () => playTrack(index));
+        if (index === currentTrackIndex) li.classList.add('active');
+        playlistEl.appendChild(li);
+    });
+}
+
+// ============ LOAD TRACK ============
+function loadTrack(index) {
+    const track = playlist[index];
+    trackName.textContent = track.name;
+    trackArtist.textContent = track.artist;
+    document.querySelectorAll('.playlist li').forEach((li, i) => {
+        li.classList.toggle('active', i === index);
+    });
+    currentTrackIndex = index;
+    duration = parseDuration(track.duration);
+    totalTimeDisplay.textContent = track.duration;
+    progressFill.style.width = '0%';
+    currentTimeDisplay.textContent = '0:00';
+}
+
+// ============ PLAY/PAUSE ============
+function togglePlay() {
+    if (isPlaying) {
+        pauseTrack();
+    } else {
+        playTrack(currentTrackIndex);
+    }
+}
+
+function playTrack(index) {
+    if (index !== undefined && index !== currentTrackIndex) {
+        currentTrackIndex = index;
+        loadTrack(index);
+        loadPlaylist();
+    }
+    isPlaying = true;
+    playBtn.textContent = '⏸';
+    startProgress();
+}
+
+function pauseTrack() {
+    isPlaying = false;
+    playBtn.textContent = '▶';
+    clearInterval(progressInterval);
+}
+
+// ============ NEXT/PREV ============
+function nextTrack() {
+    let next;
+    if (isShuffled) {
+        const shuffled = shuffleArray([...playlist]);
+        const current = shuffled.findIndex(t => t.name === playlist[currentTrackIndex].name);
+        next = playlist.findIndex(t => t.name === shuffled[(current + 1) % shuffled.length].name);
+    } else {
+        next = (currentTrackIndex + 1) % playlist.length;
+    }
+    loadTrack(next);
+    loadPlaylist();
+    if (isPlaying) playTrack(next);
+}
+
+function prevTrack() {
+    let prev;
+    if (isShuffled) {
+        const shuffled = shuffleArray([...playlist]);
+        const current = shuffled.findIndex(t => t.name === playlist[currentTrackIndex].name);
+        prev = playlist.findIndex(t => t.name === shuffled[(current - 1 + shuffled.length) % shuffled.length].name);
+    } else {
+        prev = (currentTrackIndex - 1 + playlist.length) % playlist.length;
+    }
+    loadTrack(prev);
+    loadPlaylist();
+    if (isPlaying) playTrack(prev);
+}
+
+// ============ PROGRESS ============
+function startProgress() {
+    clearInterval(progressInterval);
+    let progress = 0;
+    progressInterval = setInterval(() => {
+        progress += 0.5;
+        if (progress >= 100) {
+            clearInterval(progressInterval);
+            if (isLooping) {
+                playTrack(currentTrackIndex);
+            } else {
+                nextTrack();
+            }
+            return;
+        }
+        progressFill.style.width = progress + '%';
+        currentTimeDisplay.textContent = formatTime(progress);
+    }, 200);
+}
+
+function seekProgress(e) {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    const percentage = Math.max(0, Math.min(1, x));
+    progressFill.style.width = (percentage * 100) + '%';
+    currentTimeDisplay.textContent = formatTime(percentage * 100);
+}
+
+// ============ TOGGLE FUNCTIONS ============
+function toggleLoop() {
+    isLooping = !isLooping;
+    document.querySelector('.ctrl-btn:nth-child(4)').classList.toggle('active');
+}
+
+function toggleShuffle() {
+    isShuffled = !isShuffled;
+    document.querySelector('.ctrl-btn:nth-child(5)').classList.toggle('active');
+    loadPlaylist();
+}
+
+function toggleLike() {
+    const btn = document.querySelector('.like-btn');
+    btn.classList.toggle('liked');
+    btn.textContent = btn.classList.contains('liked') ? '❤️' : '♡';
+}
+
+function changeVolume(value) {
+    console.log('Volume:', value);
+}
+
+// ============ TOGGLE PLAYER ============
+function togglePlayer() {
+    const player = document.getElementById('musicPlayer');
+    player.classList.toggle('minimized');
+    const toggle = document.querySelector('.player-toggle');
+    toggle.textContent = player.classList.contains('minimized') ? '▼' : '▲';
+}
+
+// ============ HELPERS ============
+function parseDuration(str) {
+    const parts = str.split(':');
+    return parseInt(parts[0]) * 60 + parseInt(parts[1]);
+}
+
+function formatTime(progress) {
+    const totalSeconds = duration || 180;
+    const current = Math.floor((progress / 100) * totalSeconds);
+    const mins = Math.floor(current / 60);
+    const secs = current % 60;
+    return mins + ':' + String(secs).padStart(2, '0');
+}
+
+function shuffleArray(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
+// ============ KEYBOARD SHORTCUTS ============
+document.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT') return;
+    if (e.code === 'Space') { e.preventDefault(); togglePlay(); }
+    if (e.code === 'ArrowRight') nextTrack();
+    if (e.code === 'ArrowLeft') prevTrack();
+});
+
+// ============ START ============
+initPlayer();
+</script>
+
 </body>
 </html>
