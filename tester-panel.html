@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tester Panel — Asian Tier List [1.8+]</title>
+<link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="assets/css/main.css">
 </head>
 <body>
@@ -100,6 +101,7 @@
             <div class="eyebrow">Log result</div>
             <h3 class="mt-8">Submit a tier result</h3>
             <div class="field mt-16"><label>Player Discord username</label><input class="input" id="subPlayer" placeholder="e.g. kairo_ace"></div>
+            <div class="field"><label>Minecraft username (optional)</label><input class="input" id="subMc" placeholder="For their skin avatar on the leaderboard"></div>
             <div class="field"><label>Gamemode</label><select class="select" id="subGm">${ATL_DATA.GAMEMODES.map(g=>`<option value="${g.id}">${g.label}</option>`).join('')}</select></div>
             <div class="field"><label>Tier</label><select class="select" id="subTier">${ATL_DATA.TIERS.map(t=>`<option value="${t.id}">${t.id} — ${t.desc}</option>`).join('')}</select></div>
             <button class="btn btn-primary btn-block" id="submitTier">Log Tier Result</button>
@@ -121,11 +123,13 @@
       </div>
     </div>`;
 
+    const TAB_TITLES = { dashboard:'Dashboard', requests:'Test Requests', submit:'Submit Tier Result', applications:'Tester Applications', profile:'My Certification' };
     root.querySelectorAll('.panel-tab, [data-goto]').forEach(el=>{
       el.addEventListener('click', ()=>{
         const target = el.dataset.view || el.dataset.goto;
         root.querySelectorAll('.panel-tab').forEach(t=>t.classList.toggle('active', t.dataset.view===target));
         root.querySelectorAll('.panel-view').forEach(v=>v.classList.toggle('active', v.id==='view-'+target));
+        document.title = `${TAB_TITLES[target]||'Tester Panel'} · Tester Panel — Asian Tier List [1.8+]`;
         if(target==='applications') renderTesterApplications();
       });
     });
@@ -137,22 +141,73 @@
       if(!player){ ATL_toast('Enter a player username.', 'error'); return; }
       const gm = document.getElementById('subGm').value;
       const tier = document.getElementById('subTier').value;
-      await logTierResult(player, gm, tier);
-      document.getElementById('subPlayer').value='';
-      ATL_toast(`Logged ${player} as ${tier} in ${gm}.`, 'success');
+      const mc = document.getElementById('subMc').value.trim();
+      await logTierResult(player, gm, tier, mc);
+      document.getElementById('subPlayer').value=''; document.getElementById('subMc').value='';
       renderRequestsAndStats();
     });
   }
 
-  async function logTierResult(player, gamemode, tier){
+  async function logTierResult(player, gamemode, tier, mcUsername){
     const log = await ATL_SESSION.loadStore('tier_log', []);
     log.push({ player, gamemode, tier, tester:session.user.display, date:new Date().toISOString().slice(0,10) });
     await ATL_SESSION.saveStore('tier_log', log);
+
     const board = await ATL_SESSION.loadStore('leaderboard_'+gamemode, []);
     const existingIdx = board.findIndex(b=>b.player===player);
-    const entry = { player, tier, tester:session.user.display, date:new Date().toISOString().slice(0,10) };
+    const entry = { player, tier, mcUsername: mcUsername||'', tester:session.user.display, date:new Date().toISOString().slice(0,10) };
     if(existingIdx>=0) board[existingIdx]=entry; else board.push(entry);
     await ATL_SESSION.saveStore('leaderboard_'+gamemode, board);
+
+    // Link this result to the player's real Profile page, if they've
+    // ever logged in (so Gamemode Tiers / Tier History / Overall
+    // actually populate instead of staying empty forever).
+    const known = await ATL_SESSION.loadStore('known_users', {});
+    const match = known[player.toLowerCase()];
+    if(match){
+      const record = await ATL_SESSION.loadStore('tier_'+match.id, { overall:null, gamemodes:{}, history:[] });
+      record.gamemodes[gamemode] = tier;
+      record.history.push({ gamemode, tier, tester:session.user.display, date:new Date().toISOString().slice(0,10) });
+      const order = ATL_DATA.TIERS.map(t=>t.id);
+      record.overall = Object.values(record.gamemodes).sort((a,b)=> order.indexOf(a)-order.indexOf(b))[0] || record.overall;
+      await ATL_SESSION.saveStore('tier_'+match.id, record);
+    }
+
+    await showTierReveal(player, gamemode, tier);
+  }
+
+  // A little showpiece moment for the tester right after logging a
+  // result: cycles rapidly through tier letters before landing on the
+  // real one, instead of just a plain toast.
+  function showTierReveal(player, gamemode, finalTier){
+    return new Promise(resolve=>{
+      const gmLabel = (ATL_DATA.GAMEMODES.find(g=>g.id===gamemode)||{label:gamemode}).label;
+      openModal(`
+        <div style="text-align:center; padding:10px 0 4px;">
+          <div class="eyebrow" style="justify-content:center;">Tier assigned</div>
+          <h3 class="mt-8" style="font-size:19px;">${player} · ${gmLabel}</h3>
+          <div id="revealStage" style="margin:28px 0 8px; display:flex; justify-content:center;"></div>
+          <p class="text-sm text-muted" id="revealCaption">Locking in result…</p>
+        </div>
+      `);
+      const stage = document.getElementById('revealStage');
+      const caption = document.getElementById('revealCaption');
+      const cycleTiers = ATL_DATA.TIERS.map(t=>t.id);
+      let i = 0;
+      const spin = setInterval(()=>{
+        stage.innerHTML = ATL_hex(cycleTiers[i % cycleTiers.length], 'lg');
+        i++;
+      }, 70);
+      setTimeout(()=>{
+        clearInterval(spin);
+        stage.innerHTML = ATL_hex(finalTier, 'lg');
+        caption.textContent = `${player} is now ${finalTier} in ${gmLabel}.`;
+        stage.firstElementChild.style.transition = 'transform .4s cubic-bezier(.34,1.56,.64,1)';
+        stage.firstElementChild.style.transform = 'scale(1.15)';
+        setTimeout(()=>{ if(stage.firstElementChild) stage.firstElementChild.style.transform='scale(1)'; }, 400);
+      }, 1400);
+      setTimeout(()=>{ closeModal(); resolve(); }, 2600);
+    });
   }
 
   async function renderRequestsAndStats(){
@@ -197,15 +252,15 @@
       <div class="field mt-16"><label>Assign tier</label>
         <select class="select" id="doneTier">${ATL_DATA.TIERS.map(t=>`<option value="${t.id}">${t.id} — ${t.desc}</option>`).join('')}</select>
       </div>
+      <div class="field"><label>Minecraft username (optional)</label><input class="input" id="doneMc" placeholder="For their skin avatar on the leaderboard"></div>
       <button class="btn btn-secondary btn-block" id="confirmDone">Log Tier &amp; Mark Done</button>
     `);
     document.getElementById('confirmDone').addEventListener('click', async ()=>{
       const tier = document.getElementById('doneTier').value;
-      await logTierResult(req.user, req.gamemode, tier);
+      const mc = document.getElementById('doneMc').value.trim();
       requests[idx].status = 'completed';
       await ATL_SESSION.saveStore('test_requests', requests);
-      closeModal();
-      ATL_toast(`${req.user} logged as ${tier} in ${gmLabel}.`, 'success');
+      await logTierResult(req.user, req.gamemode, tier, mc);
       renderRequestsAndStats();
     });
   }
