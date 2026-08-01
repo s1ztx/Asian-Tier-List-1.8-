@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Connecting Discord — Asian Tier List [1.8+]</title>
+<link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="assets/css/main.css">
 </head>
 <body>
@@ -22,7 +23,7 @@
   </section>
 </main>
 <script src="assets/js/session.js"></script>
-<script>
+<script type="module">
   const heading = document.getElementById('cbHeading');
   const msg = document.getElementById('cbMessage');
   const result = ATL_SESSION.consumeCallbackHash();
@@ -30,6 +31,15 @@
   if(result.ok){
     heading.textContent = `Welcome, ${result.session.user.display}`;
     msg.textContent = `Signed in as ${result.session.role}. Redirecting to your profile…`;
+    // Register this account in the shared directory so a tester typing
+    // this Discord username elsewhere can link a tier result back to
+    // this real profile instead of it going nowhere.
+    try{
+      const u = result.session.user;
+      const known = await ATL_SESSION.loadStore('known_users', {});
+      known[u.username.toLowerCase()] = { id:u.id, username:u.username, display:u.display, avatar:u.avatar };
+      await ATL_SESSION.saveStore('known_users', known);
+    }catch(e){ /* non-critical, sign-in still succeeded */ }
     setTimeout(()=>{ window.location.href = 'profile.html'; }, 900);
   } else {
     const messages = {
