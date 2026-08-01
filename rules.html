@@ -17,28 +17,18 @@
     </div>
   </section>
 
-  <section class="section">
-    <div class="container" style="display:grid; grid-template-columns: 240px 1fr; gap:32px;">
-      <aside class="glass card" style="align-self:flex-start; position:sticky; top:calc(var(--nav-h)+20px);">
-        <div class="eyebrow" style="margin-bottom:12px;">On this page</div>
-        <nav id="rulesToc" style="display:flex; flex-direction:column; gap:2px;"></nav>
-      </aside>
-
-      <div id="rulesBody" style="display:flex; flex-direction:column; gap:22px;"></div>
+  <section class="section" style="padding-top:0;">
+    <div class="container">
+      <div id="categoryTabs" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:26px;"></div>
+      <div id="rulesBody"></div>
     </div>
   </section>
 </main>
 
 <style>
-  @media (max-width: 860px){
-    main .container[style*="grid-template-columns"]{ grid-template-columns: 1fr !important; }
-    aside.glass{ position:relative !important; top:0 !important; }
-  }
   .rule-item{ display:flex; gap:14px; padding:14px 0; border-bottom:1px solid var(--hairline); }
   .rule-item:last-child{ border-bottom:none; }
-  .rule-num{ font-family:var(--f-mono); color:var(--text-3); font-size:13px; min-width:28px; }
-  .toc-link{ font-family:var(--f-sub); font-size:13.5px; font-weight:600; color:var(--text-2); padding:8px 10px; border-radius:var(--r-xs); }
-  .toc-link:hover{ color:var(--text-0); background:rgba(255,255,255,.04); }
+  .rule-num{ font-family:var(--f-mono); color:var(--text-3); font-size:13px; min-width:28px; flex-shrink:0; }
 </style>
 
 <script src="assets/js/data.js"></script>
@@ -49,46 +39,75 @@
   ATL_mountBackground('rules');
   ATL_initShell('rules.html');
 
-  const SECTIONS = [
-    { id:'testing', title:'Testing conduct', rules:[
+  const CATEGORIES = [
+    { id:'testing', title:'Testing Conduct', desc:'How test sessions are requested, run, and evaluated.', rules:[
       'Test requests are handled in the order they are received unless a Testing Manager reassigns priority.',
       'Both the Tester and the candidate must be present and ready before a session starts; no-shows may forfeit the request.',
       'Recording the session (screen or replay) may be requested by either party and cannot be refused without reason.',
-      'A Tester may pause or end a session early if they suspect cheating, disconnect abuse, or unsafe conduct.'
+      'A Tester may pause or end a session early if they suspect cheating, disconnect abuse, or unsafe conduct.',
+      'Candidates must use a version-legal 1.8 client with no combat-affecting modifications (reach, killaura, hitbox, or timer changes).',
+      'A Tester cannot test a candidate they have a personal conflict of interest with; reassign to another Tester instead.',
+      'Sessions should be run at reasonable ping for both parties; excessive lag on either side is grounds for a reschedule, not a low tier.'
     ]},
-    { id:'placement', title:'Tier placement', rules:[
+    { id:'placement', title:'Tier Placement', desc:'How tiers are assigned and what they mean.', rules:[
       'Only the fourteen official tiers (S, S-, A+, A, A-, B+, B, B-, C+, C, C-, D+, D, D-) may ever be assigned.',
       'Tiers are assigned per gamemode. Your overall tier reflects your highest-performing gamemode.',
       'A tier decision is final once logged unless a formal retest is approved.',
-      'Testers must record the assignment date and their own name against every tier they issue.'
+      'Testers must record the assignment date and their own name against every tier they issue.',
+      'Tier badges and history are public on a player\u2019s profile; tiers cannot be hidden or made private.',
+      'Placements reflect the meta and ruleset current at the time of testing and may shift as the meta evolves.'
     ]},
-    { id:'retest', title:'Retest policy', rules:[
-      'A retest may be requested no earlier than 14 days after your last result in that gamemode.',
+    { id:'retest', title:'Retest Policy', desc:'When and how you can request to be re-evaluated.', rules:[
+      'A retest may be requested no earlier than 7 days after your last result in that gamemode.',
       'Retest requests citing meta changes, gear changes, or a documented improvement period are prioritized.',
-      'Abuse of the retest system (spamming requests) can result in a temporary testing freeze.'
+      'Abuse of the retest system (spamming requests) can result in a temporary testing freeze.',
+      'Where possible, retests are assigned to a different Tester than your previous session to keep evaluations independent.',
+      'A retest can only move your tier up or down based on that session\u2014previous results carry no weight once a retest is logged.'
     ]},
-    { id:'conduct', title:'Member conduct', rules:[
+    { id:'fairplay', title:'Fair Play', desc:'Cheating, smurfing, and other integrity violations.', rules:[
+      'Using an alternate ("smurf") account to be tested at a lower tier than your known skill is not allowed.',
+      'Boosting\u2014deliberately underperforming to help someone else win or rank\u2014voids the result and can lead to suspension.',
+      'Exploiting client or server bugs during a test session invalidates that session\u2019s result.',
+      'Sharing accounts to inflate a tier or leaderboard position is treated as smurfing for both parties involved.',
+      'Any use of cheat clients, macros, or third-party combat assistance during a test results in a permanent testing ban.'
+    ]},
+    { id:'conduct', title:'Member Conduct', desc:'General behavior standards across the platform and Discord.', rules:[
       'Harassment, hate speech, or targeted abuse toward staff, testers, or members is never tolerated.',
       'Impersonating staff, testers, or the Founder account is grounds for immediate suspension.',
       'Do not share, sell, or trade tier placements or accounts.',
-      'Respect decisions made by Senior Moderators and above; disputes go through the appeals process, not public callouts.'
+      'Respect decisions made by Senior Moderators and above; disputes go through the appeals process, not public callouts.',
+      'Spamming test requests, tickets, or staff DMs to pressure a faster response is not permitted.',
+      'Reviews and profile content must stay on-topic\u2014no advertising, no unrelated links, no doxxing.'
     ]},
-    { id:'appeals', title:'Appeals', rules:[
+    { id:'appeals', title:'Appeals', desc:'Disputing a tier or moderation decision.', rules:[
       'Tier or moderation appeals are submitted through a ticket in the Discord server, not in public channels.',
       'Appeals are reviewed by a Manager or higher and are never handled by the original Tester alone.',
-      'Decisions on appeals are final for that submission; a new appeal requires new evidence.'
+      'Decisions on appeals are final for that submission; a new appeal requires new evidence.',
+      'Appeals must be submitted within 14 days of the original decision; older results are considered settled.'
     ]}
   ];
 
-  document.getElementById('rulesToc').innerHTML = SECTIONS.map(s=>`<a class="toc-link" href="#${s.id}">${s.title}</a>`).join('');
-  document.getElementById('rulesBody').innerHTML = SECTIONS.map(s=>`
-    <div class="glass card" id="${s.id}">
-      <h3 style="font-size:20px;">${s.title}</h3>
-      <div class="mt-16">
-        ${s.rules.map((r,i)=>`<div class="rule-item"><span class="rule-num">${String(i+1).padStart(2,'0')}</span><span class="text-sm" style="color:var(--text-1);">${r}</span></div>`).join('')}
-      </div>
-    </div>
-  `).join('');
+  let active = CATEGORIES[0].id;
+  const tabsEl = document.getElementById('categoryTabs');
+  const bodyEl = document.getElementById('rulesBody');
+
+  function render(){
+    tabsEl.innerHTML = CATEGORIES.map(c=>`
+      <button class="btn ${c.id===active?'btn-secondary':'btn-ghost'} btn-sm" data-cat="${c.id}" style="text-transform:none;">${c.title}</button>
+    `).join('');
+    tabsEl.querySelectorAll('[data-cat]').forEach(b=> b.addEventListener('click', ()=>{ active=b.dataset.cat; render(); }));
+
+    const cat = CATEGORIES.find(c=>c.id===active);
+    bodyEl.innerHTML = `
+      <div class="glass card">
+        <div class="eyebrow">${cat.title}</div>
+        <h3 class="mt-8" style="font-size:20px;">${cat.desc}</h3>
+        <div class="mt-16">
+          ${cat.rules.map((r,i)=>`<div class="rule-item"><span class="rule-num">${String(i+1).padStart(2,'0')}</span><span class="text-sm" style="color:var(--text-1);">${r}</span></div>`).join('')}
+        </div>
+      </div>`;
+  }
+  render();
 </script>
 </body>
 </html>
