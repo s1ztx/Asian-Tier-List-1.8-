@@ -13,8 +13,8 @@
     position: fixed;
     bottom: 20px;
     right: 20px;
-    width: 360px;
-    background: rgba(10, 10, 26, 0.95);
+    width: 380px;
+    background: rgba(10, 10, 26, 0.97);
     backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 107, 0, 0.2);
     border-radius: 16px;
@@ -88,7 +88,7 @@
 
 .player-body {
     padding: 16px;
-    max-height: 550px;
+    max-height: 600px;
     overflow-y: auto;
 }
 
@@ -103,7 +103,7 @@
     border-radius: 4px;
 }
 
-/* Spotify Embed - ACTUALLY WORKS */
+/* Spotify Embeds - ACTUALLY WORKS */
 .spotify-wrapper {
     border-radius: 12px;
     overflow: hidden;
@@ -114,50 +114,49 @@
 .spotify-wrapper iframe {
     display: block;
     width: 100%;
-    height: 352px;
+    height: 80px;
     border: none;
 }
 
-.now-playing {
+.spotify-wrapper iframe.playlist-embed {
+    height: 380px;
+}
+
+.artist-tabs {
     display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 10px;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 12px;
+    gap: 10px;
     margin-bottom: 12px;
 }
 
-.album-art {
-    width: 48px;
-    height: 48px;
-    border-radius: 8px;
-    object-fit: cover;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.track-info {
+.artist-tab {
     flex: 1;
-    min-width: 0;
-}
-
-.track-name {
+    padding: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
     font-weight: 600;
     font-size: 0.85rem;
-    color: #fff;
-    margin: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    background: transparent;
+    color: #888;
 }
 
-.track-artist {
-    font-size: 0.7rem;
-    color: #888;
-    margin: 2px 0 0 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+.artist-tab:hover {
+    border-color: rgba(255, 107, 0, 0.3);
+    color: #fff;
+}
+
+.artist-tab.active {
+    border-color: #FF6B00;
+    background: rgba(255, 107, 0, 0.1);
+    color: #FF6B00;
+}
+
+.artist-tab .tab-icon {
+    display: block;
+    font-size: 1.5rem;
+    margin-bottom: 4px;
 }
 
 .controls {
@@ -165,7 +164,7 @@
     justify-content: center;
     align-items: center;
     gap: 12px;
-    margin-bottom: 12px;
+    margin: 12px 0;
 }
 
 .ctrl-btn {
@@ -209,7 +208,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-bottom: 12px;
+    margin: 12px 0;
     padding: 0 4px;
 }
 
@@ -236,117 +235,48 @@
     cursor: pointer;
 }
 
-.playlist-container {
-    max-height: 200px;
-    overflow-y: auto;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-    padding-top: 12px;
-}
-
-.playlist-container::-webkit-scrollbar {
-    width: 3px;
-}
-.playlist-container::-webkit-scrollbar-thumb {
-    background: #FF6B00;
-    border-radius: 4px;
-}
-
-.playlist-header {
+.now-playing-info {
     display: flex;
-    justify-content: space-between;
-    color: #666;
-    font-size: 0.75rem;
-    margin-bottom: 8px;
-    padding: 0 4px;
-}
-
-.playlist {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.playlist li {
-    display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 4px 8px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    color: #aaa;
-    font-size: 0.75rem;
+    gap: 12px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    margin: 12px 0;
 }
 
-.playlist li:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: #fff;
+.now-playing-info .np-icon {
+    font-size: 1.5rem;
 }
 
-.playlist li.active {
-    color: #FF6B00;
-    background: rgba(255, 107, 0, 0.1);
-}
-
-.playlist li .song-duration {
-    color: #555;
-    font-size: 0.65rem;
-}
-
-.playlist li .song-index {
-    color: #444;
-    font-size: 0.65rem;
-    margin-right: 8px;
-    width: 16px;
-}
-
-.playlist li .song-album {
-    color: #444;
-    font-size: 0.6rem;
-    margin-left: 8px;
-}
-
-.search-bar {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 12px;
-}
-
-.search-bar input {
+.now-playing-info .np-text {
     flex: 1;
-    padding: 8px 12px;
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(255, 255, 255, 0.05);
-    color: #fff;
-    font-size: 0.8rem;
-    outline: none;
 }
 
-.search-bar input::placeholder {
-    color: #666;
+.now-playing-info .np-text .np-artist {
+    font-size: 0.7rem;
+    color: #888;
 }
 
-.search-bar input:focus {
-    border-color: #FF6B00;
+.now-playing-info .np-text .np-song {
+    font-size: 0.85rem;
+    font-weight: 600;
 }
 
-.spotify-btn {
-    display: inline-block;
-    padding: 6px 12px;
+.open-spotify-btn {
+    padding: 6px 14px;
     background: #1DB954;
     color: #fff;
-    border-radius: 8px;
+    border-radius: 20px;
     text-decoration: none;
     font-size: 0.7rem;
     font-weight: 600;
     transition: all 0.3s ease;
-    text-align: center;
 }
 
-.spotify-btn:hover {
+.open-spotify-btn:hover {
     background: #1ed760;
-    transform: scale(1.02);
+    transform: scale(1.05);
 }
 
 @media (max-width: 480px) {
@@ -354,7 +284,7 @@
         bottom: 10px;
         right: 10px;
         width: calc(100% - 20px);
-        max-width: 360px;
+        max-width: 380px;
         max-height: 95vh;
     }
 }
@@ -451,18 +381,31 @@
 
 </main>
 
-<!-- ============ MUSIC PLAYER - SPOTIFY EMBED ============ -->
+<!-- ============ MUSIC PLAYER - SPOTIFY WITH ODETARI & THE NEIGHBOURHOOD ============ -->
 <div id="musicPlayer" class="music-player minimized">
     <div class="player-header" onclick="togglePlayer()">
-        <span class="player-title">🎵 The Neighbourhood</span>
+        <span class="player-title">🎵 Spotify Player</span>
         <span class="player-toggle">▲</span>
     </div>
     <div class="player-body">
-        <!-- Spotify Player - ACTUALLY WORKS AND PLAYS MUSIC -->
-        <div class="spotify-wrapper">
+        <!-- Artist Tabs -->
+        <div class="artist-tabs">
+            <div class="artist-tab active" data-artist="neighbourhood" onclick="switchArtist('neighbourhood')">
+                <span class="tab-icon">🌆</span>
+                The Neighbourhood
+            </div>
+            <div class="artist-tab" data-artist="odetari" onclick="switchArtist('odetari')">
+                <span class="tab-icon">🎧</span>
+                Odetari
+            </div>
+        </div>
+
+        <!-- Spotify Embed Container -->
+        <div id="spotifyContainer" class="spotify-wrapper">
             <iframe 
                 id="spotifyIframe"
-                src="https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M?utm_source=generator"
+                class="playlist-embed"
+                src="https://open.spotify.com/embed/artist/77SW9BnxLY8rJ0RciFqkHh?utm_source=generator"
                 frameborder="0" 
                 allowfullscreen="" 
                 allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
@@ -471,42 +414,26 @@
         </div>
 
         <!-- Now Playing -->
-        <div class="now-playing">
-            <img src="https://i.scdn.co/image/ab67616d0000b273f8e5b5f5b5f5b5f5b5f5b5f5" alt="Album Art" class="album-art" id="albumArt">
-            <div class="track-info">
-                <p id="trackName" class="track-name">The Neighbourhood</p>
-                <p id="trackArtist" class="track-artist">Full Discography</p>
+        <div class="now-playing-info">
+            <span class="np-icon">🎵</span>
+            <div class="np-text">
+                <div class="np-song" id="npSong">The Neighbourhood</div>
+                <div class="np-artist" id="npArtist">Click play on Spotify above</div>
             </div>
-            <a href="https://open.spotify.com/artist/77SW9BnxLY8rJ0RciFqkHh" target="_blank" class="spotify-btn">🎵 Open</a>
+            <a href="https://open.spotify.com/artist/77SW9BnxLY8rJ0RciFqkHh" target="_blank" class="open-spotify-btn">Open Spotify</a>
         </div>
 
         <!-- Controls -->
         <div class="controls">
-            <button class="ctrl-btn" onclick="prevTrack()">⏮</button>
-            <button class="ctrl-btn play-btn" onclick="togglePlay()">▶</button>
-            <button class="ctrl-btn" onclick="nextTrack()">⏭</button>
+            <button class="ctrl-btn" onclick="refreshSpotify()">🔄</button>
             <button class="ctrl-btn" onclick="toggleLoop()" id="loopBtn">🔁</button>
             <button class="ctrl-btn" onclick="toggleShuffle()" id="shuffleBtn">🔀</button>
         </div>
 
-        <!-- Volume -->
-        <div class="volume-container">
-            <span>🔊</span>
-            <input type="range" id="volumeSlider" min="0" max="100" value="70" oninput="changeVolume(this.value)">
-        </div>
-
-        <!-- Search -->
-        <div class="search-bar">
-            <input type="text" id="songSearch" placeholder="🔍 Search songs..." oninput="filterSongs(this.value)">
-        </div>
-
-        <!-- Playlist -->
-        <div class="playlist-container">
-            <div class="playlist-header">
-                <span>📋 All Songs</span>
-                <span id="playlistCount">100+ songs</span>
-            </div>
-            <ul id="playlist" class="playlist"></ul>
+        <!-- Quick Links -->
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
+            <a href="https://open.spotify.com/artist/77SW9BnxLY8rJ0RciFqkHh" target="_blank" style="color:#FF6B00; font-size:0.7rem; text-decoration:none; padding:4px 12px; border:1px solid rgba(255,107,0,0.2); border-radius:20px;">🌆 The Neighbourhood</a>
+            <a href="https://open.spotify.com/artist/6h0I73noSg4k3qKXpGL87z" target="_blank" style="color:#FF6B00; font-size:0.7rem; text-decoration:none; padding:4px 12px; border:1px solid rgba(255,107,0,0.2); border-radius:20px;">🎧 Odetari</a>
         </div>
     </div>
 </div>
@@ -554,238 +481,40 @@
 
   document.getElementById('ctaLogin').addEventListener('click', ATL_SESSION.loginWithDiscord);
 
-// ============ THE NEIGHBOURHOOD - FULL DISCOGRAPHY ============
-const allSongs = [
-    // I Love You. (2013)
-    { name: 'Sweater Weather', artist: 'The Neighbourhood', album: 'I Love You.', duration: '4:00' },
-    { name: 'Afraid', artist: 'The Neighbourhood', album: 'I Love You.', duration: '4:10' },
-    { name: 'Let It Go', artist: 'The Neighbourhood', album: 'I Love You.', duration: '3:45' },
-    { name: 'W.D.Y.W.F.M?', artist: 'The Neighbourhood', album: 'I Love You.', duration: '4:00' },
-    { name: 'Flawless', artist: 'The Neighbourhood', album: 'I Love You.', duration: '3:50' },
-    { name: 'Female Robbery', artist: 'The Neighbourhood', album: 'I Love You.', duration: '3:30' },
-    { name: 'Staying Up', artist: 'The Neighbourhood', album: 'I Love You.', duration: '4:05' },
-    { name: 'Float', artist: 'The Neighbourhood', album: 'I Love You.', duration: '3:45' },
-    { name: 'Alleyways', artist: 'The Neighbourhood', album: 'I Love You.', duration: '4:15' },
-    { name: 'How', artist: 'The Neighbourhood', album: 'I Love You.', duration: '3:20' },
-    { name: 'A Little Death', artist: 'The Neighbourhood', album: 'I Love You.', duration: '3:20' },
-    { name: 'Everybody\'s Watching Me (Uh Oh)', artist: 'The Neighbourhood', album: 'I Love You.', duration: '3:35' },
-    
-    // Wiped Out! (2015)
-    { name: 'A Moment of Silence', artist: 'The Neighbourhood', album: 'Wiped Out!', duration: '4:10' },
-    { name: 'Prey', artist: 'The Neighbourhood', album: 'Wiped Out!', duration: '4:10' },
-    { name: 'Cry Baby', artist: 'The Neighbourhood', album: 'Wiped Out!', duration: '3:55' },
-    { name: 'Daddy Issues', artist: 'The Neighbourhood', album: 'Wiped Out!', duration: '4:20' },
-    { name: 'The Beach', artist: 'The Neighbourhood', album: 'Wiped Out!', duration: '4:15' },
-    { name: 'Baby Came Home 2 / Valentines', artist: 'The Neighbourhood', album: 'Wiped Out!', duration: '4:40' },
-    { name: 'Wiped Out!', artist: 'The Neighbourhood', album: 'Wiped Out!', duration: '4:30' },
-    { name: 'Greetings from Califournia', artist: 'The Neighbourhood', album: 'Wiped Out!', duration: '3:30' },
-    { name: 'Ferrari', artist: 'The Neighbourhood', album: 'Wiped Out!', duration: '3:40' },
-    { name: 'Single', artist: 'The Neighbourhood', album: 'Wiped Out!', duration: '3:45' },
-    { name: 'R.I.P. 2 My Youth', artist: 'The Neighbourhood', album: 'Wiped Out!', duration: '3:25' },
-    
-    // #000000 & #FFFFFF (2014)
-    { name: '1 of Those Weaks', artist: 'The Neighbourhood', album: '#000000 & #FFFFFF', duration: '3:30' },
-    { name: 'Dangerous', artist: 'The Neighbourhood', album: '#000000 & #FFFFFF', duration: '4:10' },
-    { name: 'Givin & Takin', artist: 'The Neighbourhood', album: '#000000 & #FFFFFF', duration: '4:20' },
-    { name: '#icanteven', artist: 'The Neighbourhood', album: '#000000 & #FFFFFF', duration: '3:45' },
-    { name: 'Jealou$y', artist: 'The Neighbourhood', album: '#000000 & #FFFFFF', duration: '4:00' },
-    { name: 'Lurk', artist: 'The Neighbourhood', album: '#000000 & #FFFFFF', duration: '3:30' },
-    { name: '*NSTYNCT', artist: 'The Neighbourhood', album: '#000000 & #FFFFFF', duration: '3:55' },
-    { name: 'Rain', artist: 'The Neighbourhood', album: '#000000 & #FFFFFF', duration: '3:30' },
-    { name: 'Silver', artist: 'The Neighbourhood', album: '#000000 & #FFFFFF', duration: '3:25' },
-    { name: 'T$RL', artist: 'The Neighbourhood', album: '#000000 & #FFFFFF', duration: '3:40' },
-    { name: 'To', artist: 'The Neighbourhood', album: '#000000 & #FFFFFF', duration: '3:35' },
-    { name: 'U&I', artist: 'The Neighbourhood', album: '#000000 & #FFFFFF', duration: '3:40' },
-    { name: 'Unfair', artist: 'The Neighbourhood', album: '#000000 & #FFFFFF', duration: '3:25' },
-    { name: 'warm', artist: 'The Neighbourhood', album: '#000000 & #FFFFFF', duration: '4:00' },
-    { name: 'When I Get Back', artist: 'The Neighbourhood', album: '#000000 & #FFFFFF', duration: '3:50' },
-    { name: 'YG Call', artist: 'The Neighbourhood', album: '#000000 & #FFFFFF', duration: '0:30' },
-    
-    // The Neighbourhood (2018)
-    { name: 'Blue', artist: 'The Neighbourhood', album: 'The Neighbourhood', duration: '3:40' },
-    { name: 'Nervous', artist: 'The Neighbourhood', album: 'The Neighbourhood', duration: '3:20' },
-    { name: 'Softcore', artist: 'The Neighbourhood', album: 'The Neighbourhood', duration: '3:26' },
-    { name: 'Flowers', artist: 'The Neighbourhood', album: 'The Neighbourhood', duration: '3:20' },
-    { name: 'Scary Love', artist: 'The Neighbourhood', album: 'The Neighbourhood', duration: '3:30' },
-    { name: 'Reflections', artist: 'The Neighbourhood', album: 'The Neighbourhood', duration: '3:35' },
-    { name: 'Too Serious', artist: 'The Neighbourhood', album: 'The Neighbourhood', duration: '3:40' },
-    { name: 'Revenge', artist: 'The Neighbourhood', album: 'The Neighbourhood', duration: '3:25' },
-    { name: 'Void', artist: 'The Neighbourhood', album: 'The Neighbourhood', duration: '3:30' },
-    { name: 'Stuck with Me', artist: 'The Neighbourhood', album: 'The Neighbourhood', duration: '3:35' },
-    
-    // Chip Chrome & The Mono-Tones (2020)
-    { name: 'Chip Chrome', artist: 'The Neighbourhood', album: 'Chip Chrome & The Mono-Tones', duration: '3:20' },
-    { name: 'Pretty Boy', artist: 'The Neighbourhood', album: 'Chip Chrome & The Mono-Tones', duration: '3:45' },
-    { name: 'Lost in Translation', artist: 'The Neighbourhood', album: 'Chip Chrome & The Mono-Tones', duration: '4:10' },
-    { name: 'Devil\'s Advocate', artist: 'The Neighbourhood', album: 'Chip Chrome & The Mono-Tones', duration: '3:40' },
-    { name: 'Hell or High Water', artist: 'The Neighbourhood', album: 'Chip Chrome & The Mono-Tones', duration: '3:50' },
-    { name: 'Cherry Flavoured', artist: 'The Neighbourhood', album: 'Chip Chrome & The Mono-Tones', duration: '3:30' },
-    { name: 'The Mono-Tones', artist: 'The Neighbourhood', album: 'Chip Chrome & The Mono-Tones', duration: '3:25' },
-    { name: 'BooHoo', artist: 'The Neighbourhood', album: 'Chip Chrome & The Mono-Tones', duration: '3:20' },
-    { name: 'Silver Lining', artist: 'The Neighbourhood', album: 'Chip Chrome & The Mono-Tones', duration: '3:45' },
-    { name: 'Middle of Somewhere', artist: 'The Neighbourhood', album: 'Chip Chrome & The Mono-Tones', duration: '4:00' },
-    { name: 'Tobacco Sunburst', artist: 'The Neighbourhood', album: 'Chip Chrome & The Mono-Tones', duration: '3:40' },
-    { name: 'Stargazing', artist: 'The Neighbourhood', album: 'Chip Chrome & The Mono-Tones (Deluxe)', duration: '3:30' },
-    { name: 'Here We Go Again', artist: 'The Neighbourhood', album: 'Chip Chrome & The Mono-Tones (Deluxe)', duration: '3:35' },
-    { name: 'The Shining', artist: 'The Neighbourhood', album: 'Chip Chrome & The Mono-Tones (Deluxe)', duration: '3:40' },
-    { name: 'Over the Influence', artist: 'The Neighbourhood', album: 'Chip Chrome & The Mono-Tones (Deluxe)', duration: '3:50' },
-    
-    // ultraSOUND (2025)
-    { name: 'Crushed', artist: 'The Neighbourhood', album: 'ultraSOUND', duration: '3:30' },
-    { name: 'Daisy Chain', artist: 'The Neighbourhood', album: 'ultraSOUND', duration: '3:25' },
-    { name: 'Holy Ghost', artist: 'The Neighbourhood', album: 'ultraSOUND', duration: '3:40' },
-    { name: 'Hula Girl', artist: 'The Neighbourhood', album: 'ultraSOUND', duration: '3:20' },
-    { name: 'Lil Ol Me', artist: 'The Neighbourhood', album: 'ultraSOUND', duration: '3:35' },
-    { name: 'Lovebomb', artist: 'The Neighbourhood', album: 'ultraSOUND', duration: '3:45' },
-    { name: 'Mama Drama', artist: 'The Neighbourhood', album: 'ultraSOUND', duration: '3:30' },
-    { name: 'Mute', artist: 'The Neighbourhood', album: 'ultraSOUND', duration: '3:25' },
-    { name: 'OMG', artist: 'The Neighbourhood', album: 'ultraSOUND', duration: '3:40' },
-    { name: 'Planet', artist: 'The Neighbourhood', album: 'ultraSOUND', duration: '3:35' },
-    { name: 'Private', artist: 'The Neighbourhood', album: 'ultraSOUND', duration: '3:20' },
-    { name: 'Rabbit', artist: 'The Neighbourhood', album: 'ultraSOUND', duration: '3:45' },
-    { name: 'Stupid Boy', artist: 'The Neighbourhood', album: 'ultraSOUND', duration: '3:30' },
-    { name: 'Tides', artist: 'The Neighbourhood', album: 'ultraSOUND', duration: '3:40' },
-    { name: 'Zombie', artist: 'The Neighbourhood', album: 'ultraSOUND', duration: '3:35' },
-    
-    // ultraSOUND+ (2026)
-    { name: 'Bed', artist: 'The Neighbourhood', album: 'ultraSOUND+', duration: '3:40' },
-    { name: 'Good Grief', artist: 'The Neighbourhood', album: 'ultraSOUND+', duration: '3:50' },
-    { name: 'Lulu', artist: 'The Neighbourhood', album: 'ultraSOUND+', duration: '3:35' },
-    { name: 'Red Flag', artist: 'The Neighbourhood', album: 'ultraSOUND+', duration: '3:25' },
-    { name: 'Start', artist: 'The Neighbourhood', album: 'ultraSOUND+', duration: '3:30' },
-    
-    // Ever Changing (2018)
-    { name: 'Beat Take 1', artist: 'The Neighbourhood', album: 'Ever Changing', duration: '3:45' },
-    { name: 'Beautiful Oblivion', artist: 'The Neighbourhood', album: 'Ever Changing', duration: '3:50' },
-    { name: 'Kill Us All', artist: 'The Neighbourhood', album: 'Ever Changing', duration: '4:00' },
-    { name: 'Livin\' in a Dream', artist: 'The Neighbourhood', album: 'Ever Changing', duration: '3:55' },
-    { name: 'Paradise', artist: 'The Neighbourhood', album: 'Ever Changing', duration: '3:35' },
-    
-    // Hard to Imagine / To Imagine (2018)
-    { name: '24/7', artist: 'The Neighbourhood', album: 'Hard to Imagine', duration: '3:40' },
-    { name: 'Compass', artist: 'The Neighbourhood', album: 'To Imagine', duration: '3:30' },
-    { name: 'Dust', artist: 'The Neighbourhood', album: 'To Imagine', duration: '3:45' },
-    { name: 'Heaven', artist: 'The Neighbourhood', album: 'To Imagine', duration: '3:35' },
-    { name: 'Noise', artist: 'The Neighbourhood', album: 'Hard to Imagine', duration: '3:40' },
-    { name: 'Roll Call', artist: 'The Neighbourhood', album: 'Hard to Imagine', duration: '3:25' },
-    { name: 'Sadderdaze', artist: 'The Neighbourhood', album: 'Hard to Imagine', duration: '3:40' },
-    { name: 'You Get Me So High', artist: 'The Neighbourhood', album: 'Hard to Imagine', duration: '3:30' },
-    
-    // Wiped Out! 10th Anniversary (2025)
-    { name: 'Cinnamon', artist: 'The Neighbourhood', album: 'Wiped Out! 10th Anniversary', duration: '3:30' },
-    { name: 'Cry Baby (Memo)', artist: 'The Neighbourhood', album: 'Wiped Out! 10th Anniversary', duration: '3:20' },
-    { name: 'Daddy Issues (Memo)', artist: 'The Neighbourhood', album: 'Wiped Out! 10th Anniversary', duration: '3:25' },
-    { name: 'Daddy Issues (Remix)', artist: 'The Neighbourhood', album: 'Wiped Out! 10th Anniversary', duration: '4:00' },
-    { name: 'Greetings from Califournia (Demo)', artist: 'The Neighbourhood', album: 'Wiped Out! 10th Anniversary', duration: '3:40' },
-    { name: 'Leather Weather', artist: 'The Neighbourhood', album: 'Wiped Out! 10th Anniversary', duration: '3:35' },
-    { name: 'Maniac', artist: 'The Neighbourhood', album: 'Wiped Out! 10th Anniversary', duration: '3:45' },
-    { name: 'Pressure', artist: 'The Neighbourhood', album: 'Wiped Out! 10th Anniversary', duration: '3:30' },
-    { name: 'R.I.P. 2 My Youth (Demo)', artist: 'The Neighbourhood', album: 'Wiped Out! 10th Anniversary', duration: '3:30' },
-    { name: 'The Beach (Demo)', artist: 'The Neighbourhood', album: 'Wiped Out! 10th Anniversary', duration: '3:40' },
-    { name: 'Wiped Out?! (Memo)', artist: 'The Neighbourhood', album: 'Wiped Out! 10th Anniversary', duration: '3:25' },
-    
-    // EPs & Singles
-    { name: 'Baby Came Home', artist: 'The Neighbourhood', album: 'I\'m Sorry… EP', duration: '3:45' },
-    { name: 'Leaving Tonight', artist: 'The Neighbourhood', album: 'I\'m Sorry… EP', duration: '3:30' },
-    { name: 'Wires', artist: 'The Neighbourhood', album: 'I\'m Sorry… EP', duration: '3:55' },
-    { name: 'No Grey', artist: 'The Neighbourhood', album: 'The Love Collection', duration: '3:25' },
-    { name: '$ting', artist: 'The Neighbourhood', album: 'The Love Collection', duration: '3:30' },
-    { name: 'West Coast', artist: 'The Neighbourhood', album: 'The Love Collection', duration: '3:35' },
-    { name: 'Honest', artist: 'The Neighbourhood', album: 'The Amazing Spider-Man 2 OST', duration: '3:30' },
-    { name: 'Yellow Box', artist: 'The Neighbourhood', album: 'Death Stranding: Timefall', duration: '3:40' },
-    { name: 'Fallen Star', artist: 'The Neighbourhood', album: 'Non-album single', duration: '3:25' }
-];
-
-// ============ PLAYER STATE ============
-let currentTrackIndex = 0;
+// ============ SPOTIFY PLAYER CONTROLS ============
+let currentArtist = 'neighbourhood';
 let isLooping = false;
 let isShuffled = false;
-let isPlaying = false;
-let filteredSongs = [...allSongs];
 
-function loadPlaylist() {
-    const list = document.getElementById('playlist');
-    list.innerHTML = '';
-    const tracks = isShuffled ? shuffleArray([...filteredSongs]) : filteredSongs;
-    tracks.forEach((track, index) => {
-        const li = document.createElement('li');
-        li.innerHTML = `
-            <span>
-                <span class="song-index">${String(index + 1).padStart(2, '0')}</span>
-                ${track.name}
-                <span class="song-album">${track.album}</span>
-            </span>
-            <span class="song-duration">${track.duration}</span>
-        `;
-        li.addEventListener('click', () => playTrack(index));
-        if (index === currentTrackIndex) li.classList.add('active');
-        list.appendChild(li);
-    });
-    document.getElementById('playlistCount').textContent = filteredSongs.length + ' songs';
-}
-
-function filterSongs(query) {
-    if (!query) {
-        filteredSongs = [...allSongs];
-    } else {
-        const q = query.toLowerCase();
-        filteredSongs = allSongs.filter(s => 
-            s.name.toLowerCase().includes(q) || 
-            s.album.toLowerCase().includes(q) ||
-            s.artist.toLowerCase().includes(q)
-        );
-    }
-    currentTrackIndex = 0;
-    loadPlaylist();
-}
-
-function playTrack(index) {
-    if (index >= filteredSongs.length) return;
-    currentTrackIndex = index;
-    const track = filteredSongs[index];
-    document.getElementById('trackName').textContent = track.name;
-    document.getElementById('trackArtist').textContent = track.artist + ' · ' + track.album;
-    
-    document.querySelectorAll('.playlist li').forEach((li, i) => {
-        li.classList.toggle('active', i === index);
-    });
-}
-
-function togglePlay() {
+function switchArtist(artist) {
+    currentArtist = artist;
     const iframe = document.getElementById('spotifyIframe');
-    const playBtn = document.querySelector('.play-btn');
+    const tabs = document.querySelectorAll('.artist-tab');
+    const npSong = document.getElementById('npSong');
+    const npArtist = document.getElementById('npArtist');
     
-    // Toggle playback by changing the embed source
-    if (isPlaying) {
-        playBtn.textContent = '▶';
-        isPlaying = false;
-        // Pause by reloading
-        iframe.src = iframe.src.replace('&autoplay=1', '&autoplay=0');
+    tabs.forEach(tab => {
+        tab.classList.toggle('active', tab.dataset.artist === artist);
+    });
+    
+    if (artist === 'neighbourhood') {
+        iframe.src = 'https://open.spotify.com/embed/artist/77SW9BnxLY8rJ0RciFqkHh?utm_source=generator';
+        npSong.textContent = 'The Neighbourhood';
+        npArtist.textContent = 'Click play on Spotify above';
     } else {
-        playBtn.textContent = '⏸';
-        isPlaying = true;
-        if (iframe.src.includes('autoplay=')) {
-            iframe.src = iframe.src.replace('autoplay=0', 'autoplay=1');
-        } else {
-            iframe.src = iframe.src + '&autoplay=1';
-        }
+        iframe.src = 'https://open.spotify.com/embed/artist/6h0I73noSg4k3qKXpGL87z?utm_source=generator';
+        npSong.textContent = 'Odetari';
+        npArtist.textContent = 'Click play on Spotify above';
     }
 }
 
-function nextTrack() {
-    const next = (currentTrackIndex + 1) % filteredSongs.length;
-    playTrack(next);
-    if (isPlaying) {
-        document.querySelector('.play-btn').textContent = '⏸';
-    }
-}
-
-function prevTrack() {
-    const prev = (currentTrackIndex - 1 + filteredSongs.length) % filteredSongs.length;
-    playTrack(prev);
-    if (isPlaying) {
-        document.querySelector('.play-btn').textContent = '⏸';
-    }
+function refreshSpotify() {
+    const iframe = document.getElementById('spotifyIframe');
+    const currentSrc = iframe.src;
+    iframe.src = 'about:blank';
+    setTimeout(() => {
+        iframe.src = currentSrc;
+    }, 300);
 }
 
 function toggleLoop() {
@@ -796,11 +525,6 @@ function toggleLoop() {
 function toggleShuffle() {
     isShuffled = !isShuffled;
     document.getElementById('shuffleBtn').classList.toggle('active');
-    loadPlaylist();
-}
-
-function changeVolume(value) {
-    console.log('Volume:', value);
 }
 
 function togglePlayer() {
@@ -809,26 +533,6 @@ function togglePlayer() {
     const toggle = document.querySelector('.player-toggle');
     toggle.textContent = player.classList.contains('minimized') ? '▼' : '▲';
 }
-
-function shuffleArray(arr) {
-    for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
-    return arr;
-}
-
-// Keyboard shortcuts
-document.addEventListener('keydown', (e) => {
-    if (e.target.tagName === 'INPUT') return;
-    if (e.code === 'Space') { e.preventDefault(); togglePlay(); }
-    if (e.code === 'ArrowRight') nextTrack();
-    if (e.code === 'ArrowLeft') prevTrack();
-});
-
-// ============ INIT ============
-loadPlaylist();
-playTrack(0);
 </script>
 
 </body>
