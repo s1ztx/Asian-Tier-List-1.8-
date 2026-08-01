@@ -64,5 +64,13 @@ window.ATL_DATA = {
   },
   roleSlug(role){
     return role.toLowerCase().replace(/\s+/g,'-');
+  },
+
+  // Minecraft skin avatars via Crafatar (free, no key, resolves by username server-side)
+  mcAvatarUrl(mcUsername, size){
+    return `https://crafatar.com/avatars/${encodeURIComponent(mcUsername)}?size=${size||128}&overlay`;
+  },
+  mcBodyUrl(mcUsername, scale){
+    return `https://crafatar.com/renders/body/${encodeURIComponent(mcUsername)}?scale=${scale||8}&overlay`;
   }
 };
