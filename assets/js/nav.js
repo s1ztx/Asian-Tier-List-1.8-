@@ -215,7 +215,7 @@ window.ATL_initShell = function(activePage){
   </div>`;
   document.body.appendChild(footer);
 
-  const discordServerHref = 'https://discord.com/';
+  const discordServerHref = 'https://discord.gg/5TrdqnKYy/';
   const fdl = document.getElementById('footerDiscordLink');
   if(fdl) fdl.href = discordServerHref;
 
