@@ -8,21 +8,22 @@
 <link rel="stylesheet" href="assets/css/main.css">
 
 <style>
-/* ============ MUSIC PLAYER STYLES (ADD THIS) ============ */
+/* ============ MUSIC PLAYER STYLES ============ */
 .music-player {
     position: fixed;
     bottom: 20px;
     right: 20px;
-    width: 320px;
-    background: rgba(20, 20, 30, 0.95);
+    width: 360px;
+    background: rgba(10, 10, 26, 0.95);
     backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 107, 0, 0.2);
     border-radius: 16px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
     z-index: 9999;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     color: #fff;
+    max-height: 90vh;
 }
 
 .music-player.minimized {
@@ -30,6 +31,7 @@
     overflow: hidden;
     width: 220px;
     border-radius: 25px;
+    max-height: 50px;
 }
 
 .music-player.minimized .player-body {
@@ -47,12 +49,12 @@
     padding: 12px 16px;
     cursor: pointer;
     user-select: none;
-    background: linear-gradient(90deg, rgba(255, 107, 0, 0.1), transparent);
+    background: linear-gradient(90deg, rgba(255, 107, 0, 0.15), transparent);
     border-radius: 16px 16px 0 0;
 }
 
 .player-header:hover {
-    background: linear-gradient(90deg, rgba(255, 107, 0, 0.2), transparent);
+    background: linear-gradient(90deg, rgba(255, 107, 0, 0.25), transparent);
 }
 
 .player-title {
@@ -86,7 +88,7 @@
 
 .player-body {
     padding: 16px;
-    max-height: 500px;
+    max-height: 550px;
     overflow-y: auto;
 }
 
@@ -101,19 +103,37 @@
     border-radius: 4px;
 }
 
+.youtube-wrapper {
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
+    overflow: hidden;
+    border-radius: 12px;
+    margin-bottom: 12px;
+}
+
+.youtube-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+}
+
 .now-playing {
     display: flex;
     align-items: center;
     gap: 14px;
-    margin-bottom: 16px;
     padding: 10px;
     background: rgba(255, 255, 255, 0.03);
     border-radius: 12px;
+    margin-bottom: 12px;
 }
 
 .album-art {
-    width: 56px;
-    height: 56px;
+    width: 48px;
+    height: 48px;
     border-radius: 8px;
     object-fit: cover;
     border: 1px solid rgba(255, 255, 255, 0.05);
@@ -126,7 +146,7 @@
 
 .track-name {
     font-weight: 600;
-    font-size: 0.95rem;
+    font-size: 0.85rem;
     color: #fff;
     margin: 0;
     white-space: nowrap;
@@ -135,65 +155,12 @@
 }
 
 .track-artist {
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     color: #888;
     margin: 2px 0 0 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-}
-
-.like-btn {
-    background: none;
-    border: none;
-    color: #888;
-    font-size: 1.2rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    padding: 4px 8px;
-}
-
-.like-btn:hover {
-    color: #FF6B00;
-    transform: scale(1.2);
-}
-
-.like-btn.liked {
-    color: #FF6B00;
-}
-
-.progress-container {
-    margin-bottom: 12px;
-}
-
-.progress-bar {
-    width: 100%;
-    height: 4px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 4px;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-}
-
-.progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #FF6B00, #FFD700);
-    border-radius: 4px;
-    transition: width 0.1s linear;
-    width: 0%;
-}
-
-.progress-bar:hover .progress-fill {
-    height: 6px;
-}
-
-.time-display {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.7rem;
-    color: #666;
-    margin-top: 4px;
 }
 
 .controls {
@@ -272,6 +239,15 @@
     cursor: pointer;
 }
 
+.volume-container input[type="range"]::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #FF6B00;
+    cursor: pointer;
+    border: none;
+}
+
 .playlist-container {
     max-height: 200px;
     overflow-y: auto;
@@ -291,7 +267,7 @@
     display: flex;
     justify-content: space-between;
     color: #666;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     margin-bottom: 8px;
     padding: 0 4px;
 }
@@ -306,12 +282,12 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 10px;
-    border-radius: 8px;
+    padding: 4px 8px;
+    border-radius: 6px;
     cursor: pointer;
     transition: all 0.2s ease;
     color: #aaa;
-    font-size: 0.85rem;
+    font-size: 0.75rem;
 }
 
 .playlist li:hover {
@@ -326,14 +302,63 @@
 
 .playlist li .song-duration {
     color: #555;
-    font-size: 0.75rem;
+    font-size: 0.65rem;
 }
 
 .playlist li .song-index {
     color: #444;
+    font-size: 0.65rem;
+    margin-right: 8px;
+    width: 16px;
+}
+
+.playlist li .song-album {
+    color: #444;
+    font-size: 0.6rem;
+    margin-left: 8px;
+}
+
+.youtube-btn {
+    display: inline-block;
+    padding: 6px 12px;
+    background: #FF0000;
+    color: #fff;
+    border-radius: 8px;
+    text-decoration: none;
     font-size: 0.7rem;
-    margin-right: 10px;
-    width: 20px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.youtube-btn:hover {
+    background: #cc0000;
+    transform: scale(1.02);
+}
+
+.search-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.search-bar input {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+    font-size: 0.8rem;
+    outline: none;
+}
+
+.search-bar input::placeholder {
+    color: #666;
+}
+
+.search-bar input:focus {
+    border-color: #FF6B00;
 }
 
 @media (max-width: 480px) {
@@ -341,7 +366,8 @@
         bottom: 10px;
         right: 10px;
         width: calc(100% - 20px);
-        max-width: 320px;
+        max-width: 360px;
+        max-height: 95vh;
     }
 }
 </style>
@@ -437,49 +463,59 @@
 
 </main>
 
-<!-- ============ MUSIC PLAYER HTML (ADD THIS BEFORE SCRIPTS) ============ -->
+<!-- ============ MUSIC PLAYER ============ -->
 <div id="musicPlayer" class="music-player minimized">
     <div class="player-header" onclick="togglePlayer()">
         <span class="player-title">🎵 The Neighbourhood</span>
         <span class="player-toggle">▲</span>
     </div>
     <div class="player-body">
+        <!-- YouTube Player -->
+        <div class="youtube-wrapper">
+            <iframe 
+                id="youtubeIframe"
+                src="https://www.youtube.com/embed/videoseries?list=PLw-vLvFbjqQ4Hp7HjQ8zHKBDbxjM-Jl1d&autoplay=0"
+                frameborder="0" 
+                allow="autoplay; encrypted-media" 
+                allowfullscreen>
+            </iframe>
+        </div>
+
+        <!-- Now Playing -->
         <div class="now-playing">
-            <img id="albumArt" src="https://i.scdn.co/image/ab67616d0000b273f8e5b5f5b5f5b5f5b5f5b5f5" alt="Album Art" class="album-art">
+            <img src="https://i.scdn.co/image/ab67616d0000b273f8e5b5f5b5f5b5f5b5f5b5f5" alt="Album Art" class="album-art" id="albumArt">
             <div class="track-info">
-                <p id="trackName" class="track-name">Sweater Weather</p>
-                <p id="trackArtist" class="track-artist">The Neighbourhood</p>
+                <p id="trackName" class="track-name">The Neighbourhood</p>
+                <p id="trackArtist" class="track-artist">Full Discography</p>
             </div>
-            <button class="like-btn" onclick="toggleLike()">♡</button>
+            <a href="https://www.youtube.com/results?search_query=The+Neighbourhood" target="_blank" class="youtube-btn">▶️</a>
         </div>
 
-        <div class="progress-container">
-            <div class="progress-bar" onclick="seekProgress(event)">
-                <div id="progressFill" class="progress-fill" style="width: 0%"></div>
-            </div>
-            <div class="time-display">
-                <span id="currentTime">0:00</span>
-                <span id="totalTime">0:00</span>
-            </div>
-        </div>
-
+        <!-- Controls -->
         <div class="controls">
-            <button class="ctrl-btn" onclick="prevTrack()">⏮</button>
-            <button class="ctrl-btn play-btn" onclick="togglePlay()">▶</button>
-            <button class="ctrl-btn" onclick="nextTrack()">⏭</button>
-            <button class="ctrl-btn" onclick="toggleLoop()">🔁</button>
-            <button class="ctrl-btn" onclick="toggleShuffle()">🔀</button>
+            <button class="ctrl-btn" onclick="prevYoutube()">⏮</button>
+            <button class="ctrl-btn play-btn" onclick="toggleYoutubePlay()">▶</button>
+            <button class="ctrl-btn" onclick="nextYoutube()">⏭</button>
+            <button class="ctrl-btn" onclick="toggleLoop()" id="loopBtn">🔁</button>
+            <button class="ctrl-btn" onclick="toggleShuffle()" id="shuffleBtn">🔀</button>
         </div>
 
+        <!-- Volume -->
         <div class="volume-container">
             <span>🔊</span>
             <input type="range" id="volumeSlider" min="0" max="100" value="70" oninput="changeVolume(this.value)">
         </div>
 
+        <!-- Search -->
+        <div class="search-bar">
+            <input type="text" id="songSearch" placeholder="🔍 Search songs..." oninput="filterSongs(this.value)">
+        </div>
+
+        <!-- Playlist -->
         <div class="playlist-container">
             <div class="playlist-header">
-                <span>📋 Playlist</span>
-                <span id="playlistCount">12 songs</span>
+                <span>📋 All Songs</span>
+                <span id="playlistCount">100+ songs</span>
             </div>
             <ul id="playlist" class="playlist"></ul>
         </div>
@@ -528,211 +564,264 @@
   `).join('');
 
   document.getElementById('ctaLogin').addEventListener('click', ATL_SESSION.loginWithDiscord);
-</script>
 
-<!-- ============ MUSIC PLAYER JAVASCRIPT (ADD THIS AT THE BOTTOM) ============ -->
-<script>
-// ============ THE NEIGHBOURHOOD PLAYLIST ============
-const playlist = [
-    { name: 'Sweater Weather', artist: 'The Neighbourhood', duration: '4:00' },
-    { name: 'Daddy Issues', artist: 'The Neighbourhood', duration: '4:20' },
-    { name: 'Afraid', artist: 'The Neighbourhood', duration: '4:10' },
-    { name: 'Softcore', artist: 'The Neighbourhood', duration: '3:26' },
-    { name: 'Scary Love', artist: 'The Neighbourhood', duration: '3:30' },
-    { name: 'The Beach', artist: 'The Neighbourhood', duration: '4:15' },
-    { name: 'Wires', artist: 'The Neighbourhood', duration: '3:55' },
-    { name: 'Let It Go', artist: 'The Neighbourhood', duration: '3:45' },
-    { name: 'Flowers', artist: 'The Neighbourhood', duration: '3:20' },
-    { name: 'Cry Baby', artist: 'The Neighbourhood', duration: '3:55' },
-    { name: 'R.I.P. 2 My Youth', artist: 'The Neighbourhood', duration: '3:25' },
-    { name: 'Stargazing', artist: 'The Neighbourhood', duration: '3:30' }
+// ============ THE NEIGHBOURHOOD - FULL DISCOGRAPHY (100+ SONGS) ============
+const allSongs = [
+    // I Love You. (2013)
+    { name: 'Sweater Weather', artist: 'The Neighbourhood', album: 'I Love You.', duration: '4:00' },
+    { name: 'Afraid', artist: 'The Neighbourhood', album: 'I Love You.', duration: '4:10' },
+    { name: 'Let It Go', artist: 'The Neighbourhood', album: 'I Love You.', duration: '3:45' },
+    { name: 'W.D.Y.W.F.M?', artist: 'The Neighbourhood', album: 'I Love You.', duration: '4:00' },
+    { name: 'Flawless', artist: 'The Neighbourhood', album: 'I Love You.', duration: '3:50' },
+    { name: 'Female Robbery', artist: 'The Neighbourhood', album: 'I Love You.', duration: '3:30' },
+    { name: 'Staying Up', artist: 'The Neighbourhood', album: 'I Love You.', duration: '4:05' },
+    { name: 'Float', artist: 'The Neighbourhood', album: 'I Love You.', duration: '3:45' },
+    { name: 'Alleyways', artist: 'The Neighbourhood', album: 'I Love You.', duration: '4:15' },
+    { name: 'How', artist: 'The Neighbourhood', album: 'I Love You.', duration: '3:20' },
+    { name: 'A Little Death', artist: 'The Neighbourhood', album: 'I Love You.', duration: '3:20' },
+    { name: 'Everybody\'s Watching Me (Uh Oh)', artist: 'The Neighbourhood', album: 'I Love You.', duration: '3:35' },
+    
+    // Wiped Out! (2015)
+    { name: 'A Moment of Silence', artist: 'The Neighbourhood', album: 'Wiped Out!', duration: '4:10' },
+    { name: 'Prey', artist: 'The Neighbourhood', album: 'Wiped Out!', duration: '4:10' },
+    { name: 'Cry Baby', artist: 'The Neighbourhood', album: 'Wiped Out!', duration: '3:55' },
+    { name: 'Daddy Issues', artist: 'The Neighbourhood', album: 'Wiped Out!', duration: '4:20' },
+    { name: 'The Beach', artist: 'The Neighbourhood', album: 'Wiped Out!', duration: '4:15' },
+    { name: 'Baby Came Home 2 / Valentines', artist: 'The Neighbourhood', album: 'Wiped Out!', duration: '4:40' },
+    { name: 'Wiped Out!', artist: 'The Neighbourhood', album: 'Wiped Out!', duration: '4:30' },
+    { name: 'Greetings from Califournia', artist: 'The Neighbourhood', album: 'Wiped Out!', duration: '3:30' },
+    { name: 'Ferrari', artist: 'The Neighbourhood', album: 'Wiped Out!', duration: '3:40' },
+    { name: 'Single', artist: 'The Neighbourhood', album: 'Wiped Out!', duration: '3:45' },
+    { name: 'R.I.P. 2 My Youth', artist: 'The Neighbourhood', album: 'Wiped Out!', duration: '3:25' },
+    
+    // #000000 & #FFFFFF (No DJ Version) (2014)
+    { name: '1 of Those Weaks', artist: 'The Neighbourhood', album: '#000000 & #FFFFFF', duration: '3:30' },
+    { name: 'Dangerous', artist: 'The Neighbourhood feat. YG', album: '#000000 & #FFFFFF', duration: '4:10' },
+    { name: 'Givin & Takin', artist: 'The Neighbourhood feat. Danny Seth, DeJ Loaf', album: '#000000 & #FFFFFF', duration: '4:20' },
+    { name: '#icanteven', artist: 'The Neighbourhood feat. French Montana', album: '#000000 & #FFFFFF', duration: '3:45' },
+    { name: 'Jealou$y', artist: 'The Neighbourhood feat. Casey Veggies, Kossisko', album: '#000000 & #FFFFFF', duration: '4:00' },
+    { name: 'Lurk', artist: 'The Neighbourhood', album: '#000000 & #FFFFFF', duration: '3:30' },
+    { name: '*NSTYNCT', artist: 'The Neighbourhood feat. Skeme, OG Maco', album: '#000000 & #FFFFFF', duration: '3:55' },
+    { name: 'Rain', artist: 'The Neighbourhood', album: '#000000 & #FFFFFF', duration: '3:30' },
+    { name: 'Silver', artist: 'The Neighbourhood', album: '#000000 & #FFFFFF', duration: '3:25' },
+    { name: 'T$RL', artist: 'The Neighbourhood', album: '#000000 & #FFFFFF', duration: '3:40' },
+    { name: 'To', artist: 'The Neighbourhood', album: '#000000 & #FFFFFF', duration: '3:35' },
+    { name: 'U&I', artist: 'The Neighbourhood', album: '#000000 & #FFFFFF', duration: '3:40' },
+    { name: 'Unfair', artist: 'The Neighbourhood', album: '#000000 & #FFFFFF', duration: '3:25' },
+    { name: 'warm', artist: 'The Neighbourhood feat. Raury', album: '#000000 & #FFFFFF', duration: '4:00' },
+    { name: 'When I Get Back', artist: 'The Neighbourhood feat. G-Eazy', album: '#000000 & #FFFFFF', duration: '3:50' },
+    { name: 'YG Call', artist: 'The Neighbourhood', album: '#000000 & #FFFFFF', duration: '0:30' },
+    
+    // The Neighbourhood (2018)
+    { name: 'Blue', artist: 'The Neighbourhood', album: 'The Neighbourhood', duration: '3:40' },
+    { name: 'Nervous', artist: 'The Neighbourhood', album: 'The Neighbourhood', duration: '3:20' },
+    { name: 'Softcore', artist: 'The Neighbourhood', album: 'The Neighbourhood', duration: '3:26' },
+    { name: 'Flowers', artist: 'The Neighbourhood', album: 'The Neighbourhood', duration: '3:20' },
+    { name: 'Scary Love', artist: 'The Neighbourhood', album: 'The Neighbourhood', duration: '3:30' },
+    { name: 'Reflections', artist: 'The Neighbourhood', album: 'The Neighbourhood', duration: '3:35' },
+    { name: 'Too Serious', artist: 'The Neighbourhood', album: 'The Neighbourhood', duration: '3:40' },
+    { name: 'Revenge', artist: 'The Neighbourhood', album: 'The Neighbourhood', duration: '3:25' },
+    { name: 'Void', artist: 'The Neighbourhood', album: 'The Neighbourhood', duration: '3:30' },
+    { name: 'Stuck with Me', artist: 'The Neighbourhood', album: 'The Neighbourhood', duration: '3:35' },
+    
+    // Chip Chrome & The Mono-Tones (2020)
+    { name: 'Chip Chrome', artist: 'The Neighbourhood', album: 'Chip Chrome & The Mono-Tones', duration: '3:20' },
+    { name: 'Pretty Boy', artist: 'The Neighbourhood', album: 'Chip Chrome & The Mono-Tones', duration: '3:45' },
+    { name: 'Lost in Translation', artist: 'The Neighbourhood', album: 'Chip Chrome & The Mono-Tones', duration: '4:10' },
+    { name: 'Devil\'s Advocate', artist: 'The Neighbourhood', album: 'Chip Chrome & The Mono-Tones', duration: '3:40' },
+    { name: 'Hell or High Water', artist: 'The Neighbourhood', album: 'Chip Chrome & The Mono-Tones', duration: '3:50' },
+    { name: 'Cherry Flavoured', artist: 'The Neighbourhood', album: 'Chip Chrome & The Mono-Tones', duration: '3:30' },
+    { name: 'The Mono-Tones', artist: 'The Neighbourhood', album: 'Chip Chrome & The Mono-Tones', duration: '3:25' },
+    { name: 'BooHoo', artist: 'The Neighbourhood', album: 'Chip Chrome & The Mono-Tones', duration: '3:20' },
+    { name: 'Silver Lining', artist: 'The Neighbourhood', album: 'Chip Chrome & The Mono-Tones', duration: '3:45' },
+    { name: 'Middle of Somewhere', artist: 'The Neighbourhood', album: 'Chip Chrome & The Mono-Tones', duration: '4:00' },
+    { name: 'Tobacco Sunburst', artist: 'The Neighbourhood', album: 'Chip Chrome & The Mono-Tones', duration: '3:40' },
+    { name: 'Stargazing', artist: 'The Neighbourhood', album: 'Chip Chrome & The Mono-Tones (Deluxe)', duration: '3:30' },
+    { name: 'Here We Go Again', artist: 'The Neighbourhood', album: 'Chip Chrome & The Mono-Tones (Deluxe)', duration: '3:35' },
+    { name: 'The Shining', artist: 'The Neighbourhood', album: 'Chip Chrome & The Mono-Tones (Deluxe)', duration: '3:40' },
+    { name: 'Over the Influence', artist: 'The Neighbourhood', album: 'Chip Chrome & The Mono-Tones (Deluxe)', duration: '3:50' },
+    
+    // (((((ultraSOUND))))) (2025)
+    { name: 'Crushed', artist: 'The Neighbourhood', album: 'ultraSOUND', duration: '3:30' },
+    { name: 'Daisy Chain', artist: 'The Neighbourhood', album: 'ultraSOUND', duration: '3:25' },
+    { name: 'Holy Ghost', artist: 'The Neighbourhood', album: 'ultraSOUND', duration: '3:40' },
+    { name: 'Hula Girl', artist: 'The Neighbourhood', album: 'ultraSOUND', duration: '3:20' },
+    { name: 'Lil Ol Me', artist: 'The Neighbourhood', album: 'ultraSOUND', duration: '3:35' },
+    { name: 'Lovebomb', artist: 'The Neighbourhood', album: 'ultraSOUND', duration: '3:45' },
+    { name: 'Mama Drama', artist: 'The Neighbourhood', album: 'ultraSOUND', duration: '3:30' },
+    { name: 'Mute', artist: 'The Neighbourhood', album: 'ultraSOUND', duration: '3:25' },
+    { name: 'OMG', artist: 'The Neighbourhood', album: 'ultraSOUND', duration: '3:40' },
+    { name: 'Planet', artist: 'The Neighbourhood', album: 'ultraSOUND', duration: '3:35' },
+    { name: 'Private', artist: 'The Neighbourhood', album: 'ultraSOUND', duration: '3:20' },
+    { name: 'Rabbit', artist: 'The Neighbourhood', album: 'ultraSOUND', duration: '3:45' },
+    { name: 'Stupid Boy', artist: 'The Neighbourhood', album: 'ultraSOUND', duration: '3:30' },
+    { name: 'Tides', artist: 'The Neighbourhood', album: 'ultraSOUND', duration: '3:40' },
+    { name: 'Zombie', artist: 'The Neighbourhood', album: 'ultraSOUND', duration: '3:35' },
+    
+    // (((((ultraSOUND)))))+ (2026)
+    { name: 'Bed', artist: 'The Neighbourhood', album: 'ultraSOUND+', duration: '3:40' },
+    { name: 'Good Grief', artist: 'The Neighbourhood', album: 'ultraSOUND+', duration: '3:50' },
+    { name: 'Lulu', artist: 'The Neighbourhood', album: 'ultraSOUND+', duration: '3:35' },
+    { name: 'Red Flag', artist: 'The Neighbourhood', album: 'ultraSOUND+', duration: '3:25' },
+    { name: 'Start', artist: 'The Neighbourhood', album: 'ultraSOUND+', duration: '3:30' },
+    
+    // Ever Changing (2018)
+    { name: 'Beat Take 1', artist: 'The Neighbourhood feat. Ghostface Killah', album: 'Ever Changing', duration: '3:45' },
+    { name: 'Beautiful Oblivion', artist: 'The Neighbourhood feat. IDK', album: 'Ever Changing', duration: '3:50' },
+    { name: 'Kill Us All', artist: 'The Neighbourhood feat. Denzel Curry', album: 'Ever Changing', duration: '4:00' },
+    { name: 'Livin\' in a Dream', artist: 'The Neighbourhood feat. Nipsey Hussle', album: 'Ever Changing', duration: '3:55' },
+    { name: 'Paradise', artist: 'The Neighbourhood', album: 'Ever Changing', duration: '3:35' },
+    
+    // To Imagine and Hard to Imagine (2018)
+    { name: '24/7', artist: 'The Neighbourhood', album: 'Hard to Imagine', duration: '3:40' },
+    { name: 'Compass', artist: 'The Neighbourhood', album: 'To Imagine', duration: '3:30' },
+    { name: 'Dust', artist: 'The Neighbourhood', album: 'To Imagine', duration: '3:45' },
+    { name: 'Heaven', artist: 'The Neighbourhood', album: 'To Imagine', duration: '3:35' },
+    { name: 'Noise', artist: 'The Neighbourhood', album: 'Hard to Imagine', duration: '3:40' },
+    { name: 'Roll Call', artist: 'The Neighbourhood', album: 'Hard to Imagine', duration: '3:25' },
+    { name: 'Sadderdaze', artist: 'The Neighbourhood', album: 'Hard to Imagine', duration: '3:40' },
+    { name: 'You Get Me So High', artist: 'The Neighbourhood', album: 'Hard to Imagine', duration: '3:30' },
+    
+    // Wiped Out! (10th Anniversary Edition) (2025) - Bonus Tracks
+    { name: 'Cinnamon', artist: 'The Neighbourhood', album: 'Wiped Out! (10th Anniversary)', duration: '3:30' },
+    { name: 'Cry Baby (Memo)', artist: 'The Neighbourhood', album: 'Wiped Out! (10th Anniversary)', duration: '3:20' },
+    { name: 'Daddy Issues (Memo)', artist: 'The Neighbourhood', album: 'Wiped Out! (10th Anniversary)', duration: '3:25' },
+    { name: 'Daddy Issues (Remix)', artist: 'The Neighbourhood feat. Syd', album: 'Wiped Out! (10th Anniversary)', duration: '4:00' },
+    { name: 'Greetings from Califournia (Demo)', artist: 'The Neighbourhood', album: 'Wiped Out! (10th Anniversary)', duration: '3:40' },
+    { name: 'Leather Weather', artist: 'The Neighbourhood', album: 'Wiped Out! (10th Anniversary)', duration: '3:35' },
+    { name: 'Maniac', artist: 'The Neighbourhood', album: 'Wiped Out! (10th Anniversary)', duration: '3:45' },
+    { name: 'Pressure', artist: 'The Neighbourhood', album: 'Wiped Out! (10th Anniversary)', duration: '3:30' },
+    { name: 'R.I.P. 2 My Youth (Demo)', artist: 'The Neighbourhood', album: 'Wiped Out! (10th Anniversary)', duration: '3:30' },
+    { name: 'The Beach (Demo)', artist: 'The Neighbourhood', album: 'Wiped Out! (10th Anniversary)', duration: '3:40' },
+    { name: 'Wiped Out?! (Memo)', artist: 'The Neighbourhood', album: 'Wiped Out! (10th Anniversary)', duration: '3:25' },
+    
+    // EPs & Singles
+    { name: 'Baby Came Home', artist: 'The Neighbourhood', album: 'I\'m Sorry… EP', duration: '3:45' },
+    { name: 'Leaving Tonight', artist: 'The Neighbourhood', album: 'I\'m Sorry… EP', duration: '3:30' },
+    { name: 'Wires', artist: 'The Neighbourhood', album: 'I\'m Sorry… EP', duration: '3:55' },
+    { name: 'No Grey', artist: 'The Neighbourhood', album: 'The Love Collection', duration: '3:25' },
+    { name: '$ting', artist: 'The Neighbourhood', album: 'The Love Collection', duration: '3:30' },
+    { name: 'West Coast', artist: 'The Neighbourhood', album: 'The Love Collection', duration: '3:35' },
+    { name: 'Honest', artist: 'The Neighbourhood', album: 'The Amazing Spider-Man 2 OST', duration: '3:30' },
+    { name: 'Yellow Box', artist: 'The Neighbourhood', album: 'Death Stranding: Timefall', duration: '3:40' },
+    { name: 'Fallen Star', artist: 'The Neighbourhood', album: 'Non-album single', duration: '3:25' }
 ];
 
 // ============ PLAYER STATE ============
 let currentTrackIndex = 0;
-let isPlaying = false;
 let isLooping = false;
 let isShuffled = false;
-let duration = 0;
-let progressInterval = null;
+let isPlaying = false;
+let filteredSongs = [...allSongs];
 
-// ============ DOM REFS ============
-const trackName = document.getElementById('trackName');
-const trackArtist = document.getElementById('trackArtist');
-const albumArt = document.getElementById('albumArt');
-const progressFill = document.getElementById('progressFill');
-const currentTimeDisplay = document.getElementById('currentTime');
-const totalTimeDisplay = document.getElementById('totalTime');
-const playBtn = document.querySelector('.play-btn');
-const playlistEl = document.getElementById('playlist');
-const playlistCount = document.getElementById('playlistCount');
-
-// ============ INITIALIZE ============
-function initPlayer() {
-    loadPlaylist();
-    loadTrack(currentTrackIndex);
-    playlistCount.textContent = playlist.length + ' songs';
-}
-
-// ============ LOAD PLAYLIST ============
 function loadPlaylist() {
-    playlistEl.innerHTML = '';
-    const tracks = isShuffled ? shuffleArray([...playlist]) : playlist;
+    const list = document.getElementById('playlist');
+    list.innerHTML = '';
+    const tracks = isShuffled ? shuffleArray([...filteredSongs]) : filteredSongs;
     tracks.forEach((track, index) => {
         const li = document.createElement('li');
         li.innerHTML = `
             <span>
                 <span class="song-index">${String(index + 1).padStart(2, '0')}</span>
                 ${track.name}
+                <span class="song-album">${track.album}</span>
             </span>
             <span class="song-duration">${track.duration}</span>
         `;
         li.addEventListener('click', () => playTrack(index));
         if (index === currentTrackIndex) li.classList.add('active');
-        playlistEl.appendChild(li);
+        list.appendChild(li);
     });
+    document.getElementById('playlistCount').textContent = filteredSongs.length + ' songs';
 }
 
-// ============ LOAD TRACK ============
-function loadTrack(index) {
-    const track = playlist[index];
-    trackName.textContent = track.name;
-    trackArtist.textContent = track.artist;
-    document.querySelectorAll('.playlist li').forEach((li, i) => {
-        li.classList.toggle('active', i === index);
-    });
-    currentTrackIndex = index;
-    duration = parseDuration(track.duration);
-    totalTimeDisplay.textContent = track.duration;
-    progressFill.style.width = '0%';
-    currentTimeDisplay.textContent = '0:00';
-}
-
-// ============ PLAY/PAUSE ============
-function togglePlay() {
-    if (isPlaying) {
-        pauseTrack();
+function filterSongs(query) {
+    if (!query) {
+        filteredSongs = [...allSongs];
     } else {
-        playTrack(currentTrackIndex);
+        const q = query.toLowerCase();
+        filteredSongs = allSongs.filter(s => 
+            s.name.toLowerCase().includes(q) || 
+            s.album.toLowerCase().includes(q) ||
+            s.artist.toLowerCase().includes(q)
+        );
     }
+    currentTrackIndex = 0;
+    loadPlaylist();
 }
 
 function playTrack(index) {
-    if (index !== undefined && index !== currentTrackIndex) {
-        currentTrackIndex = index;
-        loadTrack(index);
-        loadPlaylist();
+    if (index >= filteredSongs.length) return;
+    currentTrackIndex = index;
+    const track = filteredSongs[index];
+    document.getElementById('trackName').textContent = track.name;
+    document.getElementById('trackArtist').textContent = track.artist + ' · ' + track.album;
+    
+    document.querySelectorAll('.playlist li').forEach((li, i) => {
+        li.classList.toggle('active', i === index);
+    });
+    
+    const searchQuery = encodeURIComponent(track.name + ' ' + track.artist + ' official audio');
+    const iframe = document.getElementById('youtubeIframe');
+    iframe.src = 'https://www.youtube.com/embed?listType=search&list=' + searchQuery;
+    
+    if (isPlaying) {
+        setTimeout(() => {
+            iframe.src = iframe.src + (iframe.src.includes('?') ? '&' : '?') + 'autoplay=1';
+        }, 800);
     }
-    isPlaying = true;
-    playBtn.textContent = '⏸';
-    startProgress();
 }
 
-function pauseTrack() {
-    isPlaying = false;
-    playBtn.textContent = '▶';
-    clearInterval(progressInterval);
-}
-
-// ============ NEXT/PREV ============
-function nextTrack() {
-    let next;
-    if (isShuffled) {
-        const shuffled = shuffleArray([...playlist]);
-        const current = shuffled.findIndex(t => t.name === playlist[currentTrackIndex].name);
-        next = playlist.findIndex(t => t.name === shuffled[(current + 1) % shuffled.length].name);
+function toggleYoutubePlay() {
+    const iframe = document.getElementById('youtubeIframe');
+    const playBtn = document.querySelector('.play-btn');
+    const currentSrc = iframe.src;
+    
+    if (isPlaying) {
+        playBtn.textContent = '▶';
+        isPlaying = false;
+        iframe.src = iframe.src.replace('autoplay=1', 'autoplay=0');
     } else {
-        next = (currentTrackIndex + 1) % playlist.length;
-    }
-    loadTrack(next);
-    loadPlaylist();
-    if (isPlaying) playTrack(next);
-}
-
-function prevTrack() {
-    let prev;
-    if (isShuffled) {
-        const shuffled = shuffleArray([...playlist]);
-        const current = shuffled.findIndex(t => t.name === playlist[currentTrackIndex].name);
-        prev = playlist.findIndex(t => t.name === shuffled[(current - 1 + shuffled.length) % shuffled.length].name);
-    } else {
-        prev = (currentTrackIndex - 1 + playlist.length) % playlist.length;
-    }
-    loadTrack(prev);
-    loadPlaylist();
-    if (isPlaying) playTrack(prev);
-}
-
-// ============ PROGRESS ============
-function startProgress() {
-    clearInterval(progressInterval);
-    let progress = 0;
-    progressInterval = setInterval(() => {
-        progress += 0.5;
-        if (progress >= 100) {
-            clearInterval(progressInterval);
-            if (isLooping) {
-                playTrack(currentTrackIndex);
-            } else {
-                nextTrack();
-            }
-            return;
+        playBtn.textContent = '⏸';
+        isPlaying = true;
+        if (currentSrc.includes('autoplay=')) {
+            iframe.src = currentSrc.replace('autoplay=0', 'autoplay=1');
+        } else {
+            iframe.src = currentSrc + (currentSrc.includes('?') ? '&' : '?') + 'autoplay=1';
         }
-        progressFill.style.width = progress + '%';
-        currentTimeDisplay.textContent = formatTime(progress);
-    }, 200);
+    }
 }
 
-function seekProgress(e) {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width;
-    const percentage = Math.max(0, Math.min(1, x));
-    progressFill.style.width = (percentage * 100) + '%';
-    currentTimeDisplay.textContent = formatTime(percentage * 100);
+function nextYoutube() {
+    const next = (currentTrackIndex + 1) % filteredSongs.length;
+    playTrack(next);
 }
 
-// ============ TOGGLE FUNCTIONS ============
+function prevYoutube() {
+    const prev = (currentTrackIndex - 1 + filteredSongs.length) % filteredSongs.length;
+    playTrack(prev);
+}
+
 function toggleLoop() {
     isLooping = !isLooping;
-    document.querySelector('.ctrl-btn:nth-child(4)').classList.toggle('active');
+    document.getElementById('loopBtn').classList.toggle('active');
 }
 
 function toggleShuffle() {
     isShuffled = !isShuffled;
-    document.querySelector('.ctrl-btn:nth-child(5)').classList.toggle('active');
+    document.getElementById('shuffleBtn').classList.toggle('active');
     loadPlaylist();
-}
-
-function toggleLike() {
-    const btn = document.querySelector('.like-btn');
-    btn.classList.toggle('liked');
-    btn.textContent = btn.classList.contains('liked') ? '❤️' : '♡';
 }
 
 function changeVolume(value) {
     console.log('Volume:', value);
 }
 
-// ============ TOGGLE PLAYER ============
 function togglePlayer() {
     const player = document.getElementById('musicPlayer');
     player.classList.toggle('minimized');
     const toggle = document.querySelector('.player-toggle');
     toggle.textContent = player.classList.contains('minimized') ? '▼' : '▲';
-}
-
-// ============ HELPERS ============
-function parseDuration(str) {
-    const parts = str.split(':');
-    return parseInt(parts[0]) * 60 + parseInt(parts[1]);
-}
-
-function formatTime(progress) {
-    const totalSeconds = duration || 180;
-    const current = Math.floor((progress / 100) * totalSeconds);
-    const mins = Math.floor(current / 60);
-    const secs = current % 60;
-    return mins + ':' + String(secs).padStart(2, '0');
 }
 
 function shuffleArray(arr) {
@@ -743,16 +832,17 @@ function shuffleArray(arr) {
     return arr;
 }
 
-// ============ KEYBOARD SHORTCUTS ============
+// Keyboard shortcuts
 document.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT') return;
-    if (e.code === 'Space') { e.preventDefault(); togglePlay(); }
-    if (e.code === 'ArrowRight') nextTrack();
-    if (e.code === 'ArrowLeft') prevTrack();
+    if (e.code === 'Space') { e.preventDefault(); toggleYoutubePlay(); }
+    if (e.code === 'ArrowRight') nextYoutube();
+    if (e.code === 'ArrowLeft') prevYoutube();
 });
 
-// ============ START ============
-initPlayer();
+// ============ INIT ============
+loadPlaylist();
+playTrack(0);
 </script>
 
 </body>
