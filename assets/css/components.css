@@ -25,8 +25,8 @@
   border-bottom: 1px solid var(--glass-brd);
 }
 .nav-inner{
-  width:100%; max-width: var(--container); margin:0 auto; padding: 0 24px;
-  display:flex; align-items:center; gap: 16px;
+  width:100%; max-width: 1600px; margin:0 auto; padding: 0 24px;
+  display:flex; align-items:center; gap: 14px;
 }
 .brand{ display:flex; align-items:center; gap:10px; margin-right: 4px; flex-shrink:0; }
 .brand-mark{ width:32px; height:32px; object-fit:contain; flex-shrink:0; }
@@ -36,8 +36,8 @@
 .nav-links{ display:flex; align-items:center; gap: 1px; flex:1; overflow-x:auto; scrollbar-width:none; min-width:0; }
 .nav-links::-webkit-scrollbar{ display:none; }
 .nav-link{
-  position:relative; padding: 8px 10px; border-radius: var(--r-sm);
-  font-family: var(--f-sub); font-weight:600; font-size:13.5px; letter-spacing:.01em;
+  position:relative; padding: 8px 9px; border-radius: var(--r-sm);
+  font-family: var(--f-sub); font-weight:600; font-size:13px; letter-spacing:.01em;
   color: var(--text-2); white-space:nowrap; transition: color .15s var(--ease), background .15s var(--ease);
 }
 .nav-link:hover{ color: var(--text-0); background: rgba(255,255,255,.05); }
