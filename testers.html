@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Testers — Asian Tier List [1.8+]</title>
+<link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="assets/css/main.css">
 </head>
 <body>
@@ -60,6 +61,11 @@
       </div>`;
   } else {
     const groups = ATL_DATA.TESTER_RANKS.map(rank => ({ rank, members: testers.filter(t=>t.rank===rank) })).filter(g=>g.members.length);
+    for(const g of groups){
+      for(const m of g.members){
+        m._avatar = await ATL_SESSION.resolveAvatar({ mcUsername: m.mcUsername, discordUsername: m.username });
+      }
+    }
     container.innerHTML = groups.map(g=>`
       <div class="mt-32">
         <div class="eyebrow" style="margin-bottom:14px;">${g.rank} · ${g.members.length}</div>
@@ -67,7 +73,7 @@
           ${g.members.map(m=>`
             <div class="glass card">
               <div style="display:flex; align-items:center; gap:12px;">
-                <img src="${m.avatar || `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(m.username)}&backgroundColor=141a29`}" style="width:48px;height:48px;border-radius:50%;border:2px solid var(--panel-3);">
+                <img src="${m._avatar}" style="width:48px;height:48px;border-radius:50%;border:2px solid var(--panel-3); object-fit:cover;">
                 <div>
                   <div style="font-family:var(--f-sub); font-weight:700; color:var(--text-0);">${m.display || m.username}</div>
                   ${ATL_roleBadge(m.rank)}
