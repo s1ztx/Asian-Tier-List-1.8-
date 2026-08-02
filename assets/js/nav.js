@@ -90,6 +90,85 @@ const ATL_THEMES = [
   if(saved && ATL_THEMES.some(t=>t.id===saved)) document.documentElement.dataset.theme = saved;
 })();
 function paletteIconSvg(){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="8.5" cy="10.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="7.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="15.5" cy="10.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="10.5" cy="14.5" r="1.4" fill="currentColor" stroke="none"/><path d="M12 22a10 10 0 0 1 0-20 5 5 0 0 1 0 10c-1.1 0-2 .9-2 2a2 2 0 0 0 2 2 2 2 0 0 1 2 2 2 2 0 0 1-2 4z" fill="none"/></svg>`; }
+function bellIconSvg(){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>`; }
+
+const NOTIF_STORAGE_KEY = 'atl_notif_seen';
+function loadNotifSeen(){
+  try{ return JSON.parse(localStorage.getItem(NOTIF_STORAGE_KEY)) || {}; }catch(e){ return {}; }
+}
+function saveNotifSeen(v){ localStorage.setItem(NOTIF_STORAGE_KEY, JSON.stringify(v)); }
+
+// Builds the current user's unread notifications by diffing the shared
+// tier_log / tickets / applications stores against what this browser
+// has already marked as seen. Fire-and-forget from ATL_initShell so it
+// never blocks nav rendering.
+async function computeNotifications(session){
+  const seen = loadNotifSeen();
+  seen.ticketsLastRead = seen.ticketsLastRead || {};
+  seen.appsSeen = seen.appsSeen || {};
+  const items = [];
+
+  try{
+    const tierLog = await window.ATL_SESSION.loadStore('tier_log', []);
+    const mine = tierLog.filter(t => t.player && t.player.toLowerCase() === session.user.username.toLowerCase());
+    const seenCount = seen.tierLogCount || 0;
+    mine.slice(seenCount).forEach(t=>{
+      const gmLabel = (window.ATL_DATA.GAMEMODES.find(g=>g.id===t.gamemode)||{label:t.gamemode}).label;
+      items.push({ icon:'tier', text:`You were assigned ${t.tier} in ${gmLabel}`, link:'profile.html', ts:t.date, key:'tier'+seenCount });
+    });
+  }catch(e){}
+
+  try{
+    const tickets = await window.ATL_SESSION.loadStore('tickets', []);
+    tickets.filter(t=>t.userId===session.user.id).forEach(t=>{
+      const lastStaffMsg = [...t.messages].reverse().find(m=>m.from==='staff');
+      if(lastStaffMsg){
+        const lastRead = seen.ticketsLastRead[t.id] || 0;
+        if(new Date(lastStaffMsg.at).getTime() > new Date(lastRead).getTime()){
+          items.push({ icon:'ticket', text:`New reply on "${t.subject}"`, link:'support.html', ts:lastStaffMsg.at, key:'ticket'+t.id+lastStaffMsg.at });
+        }
+      }
+    });
+  }catch(e){}
+
+  try{
+    const apps = await window.ATL_SESSION.loadStore('applications', []);
+    apps.filter(a=>a.username && a.username.toLowerCase()===session.user.username.toLowerCase() && a.status!=='pending').forEach((a,i)=>{
+      const appKey = a.id || (a.username+i);
+      if(seen.appsSeen[appKey] !== a.status){
+        items.push({ icon:'app', text:`Your ${a.track} application was ${a.status}`, link: a.track==='staff' ? 'staff-applications.html' : 'staff-applications.html', ts:a.submitted, key:'app'+appKey });
+      }
+    });
+  }catch(e){}
+
+  items.sort((a,b)=> new Date(b.ts) - new Date(a.ts));
+  return items;
+}
+
+function markAllNotifsRead(session, items){
+  const seen = loadNotifSeen();
+  seen.ticketsLastRead = seen.ticketsLastRead || {};
+  seen.appsSeen = seen.appsSeen || {};
+  window.ATL_SESSION.loadStore('tier_log', []).then(tierLog=>{
+    const mine = tierLog.filter(t => t.player && t.player.toLowerCase() === session.user.username.toLowerCase());
+    seen.tierLogCount = mine.length;
+    saveNotifSeen(seen);
+  });
+  window.ATL_SESSION.loadStore('tickets', []).then(tickets=>{
+    tickets.filter(t=>t.userId===session.user.id).forEach(t=>{
+      const lastMsg = t.messages[t.messages.length-1];
+      if(lastMsg) seen.ticketsLastRead[t.id] = lastMsg.at;
+    });
+    saveNotifSeen(seen);
+  });
+  window.ATL_SESSION.loadStore('applications', []).then(apps=>{
+    apps.filter(a=>a.username && a.username.toLowerCase()===session.user.username.toLowerCase()).forEach((a,i)=>{
+      const appKey = a.id || (a.username+i);
+      seen.appsSeen[appKey] = a.status;
+    });
+    saveNotifSeen(seen);
+  });
+}
 
 window.ATL_initShell = function(activePage){
   const session = window.ATL_SESSION.current();
@@ -129,6 +208,17 @@ window.ATL_initShell = function(activePage){
       </a>
       <div class="nav-links">${linksHtml}</div>
       <div class="nav-actions">
+        ${session.authenticated ? `
+        <div class="theme-switcher" style="position:relative;">
+          <button class="theme-toggle" id="notifToggle" aria-label="Notifications">${bellIconSvg()}<span class="notif-dot hidden" id="notifDot"></span></button>
+          <div class="glass theme-dropdown" id="notifDropdown" style="width:300px;">
+            <div class="flex-between" style="padding:4px 6px 8px;">
+              <span class="eyebrow" style="padding:0;">Notifications</span>
+              <button class="btn btn-ghost btn-sm" id="notifMarkRead" style="text-transform:none; padding:4px 8px; font-size:11px;">Mark all read</button>
+            </div>
+            <div id="notifList" style="max-height:280px; overflow-y:auto;"></div>
+          </div>
+        </div>` : ''}
         <div class="theme-switcher" style="position:relative;">
           <button class="theme-toggle" id="themeToggle" aria-label="Switch theme">${paletteIconSvg()}</button>
           <div class="glass theme-dropdown" id="themeDropdown">
@@ -153,6 +243,41 @@ window.ATL_initShell = function(activePage){
     ${themeOptionsHtml('-drawer')}
   </div>`;
   document.body.prepend(nav);
+
+  if(session.authenticated){
+    const notifToggle = document.getElementById('notifToggle');
+    const notifDropdown = document.getElementById('notifDropdown');
+    const notifDot = document.getElementById('notifDot');
+    const notifList = document.getElementById('notifList');
+    let currentNotifs = [];
+
+    const NOTIF_ICON = {
+      tier: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2l7 4v6c0 5-3.5 8-7 10-3.5-2-7-5-7-10V6z"/></svg>',
+      ticket: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+      app: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>'
+    };
+
+    async function refreshNotifs(){
+      currentNotifs = await computeNotifications(session);
+      notifDot.classList.toggle('hidden', currentNotifs.length===0);
+      notifList.innerHTML = currentNotifs.length ? currentNotifs.map(n=>`
+        <a href="${n.link}" class="theme-option" style="align-items:flex-start;">
+          <span style="width:16px;height:16px;flex-shrink:0;margin-top:2px;">${NOTIF_ICON[n.icon]}</span>
+          <span style="color:var(--text-1); font-weight:500;">${n.text}</span>
+        </a>
+      `).join('') : '<p class="text-sm text-muted" style="padding:10px 6px;">Nothing new.</p>';
+    }
+    refreshNotifs();
+    setInterval(refreshNotifs, 15000);
+
+    notifToggle.addEventListener('click', (e)=>{ e.stopPropagation(); notifDropdown.classList.toggle('open'); });
+    document.addEventListener('click', (e)=>{ if(!notifDropdown.contains(e.target) && e.target!==notifToggle && !notifToggle.contains(e.target)) notifDropdown.classList.remove('open'); });
+    document.getElementById('notifMarkRead').addEventListener('click', ()=>{
+      markAllNotifsRead(session, currentNotifs);
+      notifDot.classList.add('hidden');
+      notifList.innerHTML = '<p class="text-sm text-muted" style="padding:10px 6px;">Nothing new.</p>';
+    });
+  }
 
   function applyTheme(id){
     document.documentElement.dataset.theme = id;
@@ -215,7 +340,7 @@ window.ATL_initShell = function(activePage){
   </div>`;
   document.body.appendChild(footer);
 
-  const discordServerHref = 'https://discord.gg/5TrdqnKYy/';
+  const discordServerHref = 'https://discord.com/';
   const fdl = document.getElementById('footerDiscordLink');
   if(fdl) fdl.href = discordServerHref;
 
