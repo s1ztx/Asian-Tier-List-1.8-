@@ -340,6 +340,10 @@ table.dt tbody tr:last-child td{ border-bottom:none; }
 }
 .theme-toggle:hover{ border-color: var(--glass-brd-strong); }
 .theme-toggle svg{ width:17px; height:17px; color: var(--text-2); }
+.notif-dot{
+  position:absolute; top:6px; right:7px; width:8px; height:8px; border-radius:50%;
+  background: var(--red-500); border:2px solid var(--panel-2); box-shadow: 0 0 0 2px var(--red-glow);
+}
 .theme-dropdown{
   position:absolute; top:calc(100% + 10px); right:0; z-index:600; width:200px; padding:10px;
   display:none;
