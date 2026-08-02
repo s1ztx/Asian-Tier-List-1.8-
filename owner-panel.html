@@ -269,6 +269,7 @@ async function renderStaff(){
       <div class="modal-head"><h3>${existing?'Edit Staff':'Add Staff'}</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
       <div class="field"><label>Discord username</label><input class="input" id="fUsername" value="${existing?existing.username:''}" placeholder="e.g. moon_mod"></div>
       <div class="field"><label>Display name</label><input class="input" id="fDisplay" value="${existing?existing.display||'':''}" placeholder="e.g. Moon"></div>
+      <div class="field"><label>Minecraft username (optional)</label><input class="input" id="fMc" value="${existing?existing.mcUsername||'':''}" placeholder="For their skin avatar"></div>
       <div class="field"><label>Staff role</label><select class="select" id="fRole">${ATL_DATA.STAFF_ROLES.map(r=>`<option ${existing&&existing.role===r?'selected':''}>${r}</option>`).join('')}</select></div>
       <div class="field"><label>Assign Discord role (server sync)</label><input class="input" id="fDiscordRole" value="${existing?existing.discordRole||existing.role:''}" placeholder="Discord role name to sync"><p class="hint">Written to the member's server roles once connected to the bot.</p></div>
       <button class="btn btn-primary btn-block" id="saveStaff">${existing?'Save changes':'Add Staff'}</button>
@@ -278,6 +279,7 @@ async function renderStaff(){
       if(!username){ ATL_toast('Enter a Discord username.', 'error'); return; }
       const entry = {
         username, display: document.getElementById('fDisplay').value.trim() || username,
+        mcUsername: document.getElementById('fMc').value.trim(),
         role: document.getElementById('fRole').value,
         discordRole: document.getElementById('fDiscordRole').value.trim(),
         added: existing ? existing.added : new Date().toISOString().slice(0,10)
@@ -427,6 +429,7 @@ async function renderTesters(){
       <div class="modal-head"><h3>${existing?'Edit Tester':'Add Tester'}</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
       <div class="field"><label>Discord username</label><input class="input" id="tUsername" value="${existing?existing.username:''}" placeholder="e.g. nyx_tests"></div>
       <div class="field"><label>Display name</label><input class="input" id="tDisplay" value="${existing?existing.display||'':''}" placeholder="e.g. Nyx"></div>
+      <div class="field"><label>Minecraft username (optional)</label><input class="input" id="tMc" value="${existing?existing.mcUsername||'':''}" placeholder="For their skin avatar"></div>
       <div class="field"><label>Tester rank</label><select class="select" id="tRank">${ATL_DATA.TESTER_RANKS.map(r=>`<option ${existing&&existing.rank===r?'selected':''}>${r}</option>`).join('')}</select></div>
       <div class="field"><label>Assign gamemodes</label>
         <div style="display:flex; flex-wrap:wrap; gap:8px;">
@@ -441,7 +444,7 @@ async function renderTesters(){
       const username = document.getElementById('tUsername').value.trim();
       if(!username){ ATL_toast('Enter a Discord username.', 'error'); return; }
       const gamemodes = Array.from(document.querySelectorAll('#formModalInner input[type=checkbox]:checked')).map(c=>c.value);
-      const entry = { username, display: document.getElementById('tDisplay').value.trim()||username, rank: document.getElementById('tRank').value, gamemodes };
+      const entry = { username, display: document.getElementById('tDisplay').value.trim()||username, mcUsername: document.getElementById('tMc').value.trim(), rank: document.getElementById('tRank').value, gamemodes };
       let list = await ATL_SESSION.loadStore('testers', []);
       if(existing!=null && idx!=null) list[idx]=entry; else list.push(entry);
       const ok = await ATL_SESSION.saveStore('testers', list);
