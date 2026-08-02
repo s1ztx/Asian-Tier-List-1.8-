@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Support — Asian Tier List [1.8+]</title>
 <meta name="description" content="Open a private support ticket with staff — tier disputes, player reports, bugs, and more.">
+<link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="assets/css/main.css">
 </head>
 <body>
@@ -170,7 +171,7 @@
     // if a ticket is open, refresh its chat contents too (for live-ish updates)
     if(activeTicketId){
       const t = all.find(x=>x.id===activeTicketId);
-      if(t) renderChat(t); else { activeTicketId=null; renderEmptyChat(); }
+      if(t) await renderChat(t); else { activeTicketId=null; renderEmptyChat(); }
     }
   }
 
@@ -180,10 +181,10 @@
     const t = all.find(x=>x.id===id);
     if(!t) return;
     document.querySelectorAll('.ticket-item').forEach(el=> el.classList.toggle('active', el.dataset.id===id));
-    renderChat(t);
+    await renderChat(t);
   }
 
-  function renderChat(t){
+  async function renderChat(t){
     const panel = document.getElementById('chatPanel');
     const canClose = isStaff || t.userId === session.user.id;
     panel.innerHTML = `
@@ -204,10 +205,13 @@
       </div>`;
 
     const msgsEl = document.getElementById('chatMessages');
+    for(const m of t.messages){
+      m._avatar = await ATL_SESSION.resolveAvatar({ discordId: m.authorId, discordUsername: m.authorName, discordAvatar: m.authorAvatar });
+    }
     msgsEl.innerHTML = t.messages.map(m=>{
       const mine = m.authorId === session.user.id;
       return `<div class="msg-row ${mine?'mine':''} ${m.from==='staff'&&!mine?'staff-msg':''}">
-        <img src="${m.authorAvatar || avatarFor(m.authorName)}">
+        <img src="${m._avatar}" style="object-fit:cover;">
         <div>
           <div class="msg-bubble">${m.body}</div>
           <div class="msg-meta">${m.authorName}${m.from==='staff'?' · staff':''} · ${timeAgo(m.at)}</div>
