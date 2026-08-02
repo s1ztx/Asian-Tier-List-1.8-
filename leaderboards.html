@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Leaderboards — Asian Tier List [1.8+]</title>
+<link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="assets/css/main.css">
 </head>
 <body>
@@ -54,6 +55,9 @@
     } else {
       const tierOrder = ATL_DATA.TIERS.map(t=>t.id);
       const sorted = board.slice().sort((a,b)=> tierOrder.indexOf(a.tier) - tierOrder.indexOf(b.tier));
+      for(const p of sorted){
+        p._avatar = await ATL_SESSION.resolveAvatar({ mcUsername: p.mcUsername, discordUsername: p.player });
+      }
       tableWrap.innerHTML = `
         <table class="dt">
           <thead><tr><th>#</th><th>Player</th><th>Tier</th><th>Tested by</th><th>Date</th></tr></thead>
@@ -61,7 +65,7 @@
             ${sorted.map((p,i)=>`
               <tr class="${i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':''}">
                 <td><span class="rank-num">${i+1}</span></td>
-                <td>${p.player}</td>
+                <td><div style="display:flex; align-items:center; gap:10px;"><img src="${p._avatar}" style="width:30px;height:30px;border-radius:50%;object-fit:cover; border:1px solid var(--glass-brd);">${p.player}</div></td>
                 <td>${ATL_hex(p.tier,'sm')}</td>
                 <td class="text-muted">${p.tester}</td>
                 <td class="mono text-muted">${p.date}</td>
