@@ -69,7 +69,7 @@
   cursor:pointer; transition: border-color .15s;
 }
 .user-chip:hover{ border-color: var(--glass-brd-strong); }
-.user-chip img{ width:30px; height:30px; border-radius:50%; border:2px solid var(--panel-3); }
+.user-chip img{ width:30px; height:30px; border-radius: var(--avatar-radius); border:2px solid var(--panel-3); image-rendering: pixelated; }
 .user-chip .u-name{ font-family: var(--f-sub); font-weight:700; font-size:13.5px; color: var(--text-0); }
 .user-chip .u-role{ font-size:9.5px; letter-spacing:.08em; text-transform:uppercase; color: var(--text-3); }
 
@@ -324,7 +324,7 @@ table.dt tbody tr:last-child td{ border-bottom:none; }
 .chat-input-row{ padding:14px; border-top:1px solid var(--glass-brd); display:flex; gap:10px; align-items:flex-end; }
 .msg-row{ display:flex; gap:10px; max-width:78%; }
 .msg-row.mine{ align-self:flex-end; flex-direction:row-reverse; }
-.msg-row img{ width:30px; height:30px; border-radius:50%; flex-shrink:0; }
+.msg-row img{ width:30px; height:30px; border-radius: var(--avatar-radius); flex-shrink:0; image-rendering: pixelated; }
 .msg-bubble{ padding:10px 14px; border-radius: var(--r-sm); font-size:13.5px; line-height:1.5; }
 .msg-row:not(.mine) .msg-bubble{ background: var(--panel-2); border:1px solid var(--glass-brd); color: var(--text-1); border-bottom-left-radius:3px; }
 .msg-row.mine .msg-bubble{ background: linear-gradient(135deg, var(--blue-500), var(--blue-700)); color:#fff; border-bottom-right-radius:3px; }
@@ -358,3 +358,72 @@ table.dt tbody tr:last-child td{ border-bottom:none; }
 .theme-option.active{ background: rgba(255,255,255,.06); color: var(--text-0); }
 .theme-swatch{ width:20px; height:20px; border-radius:50%; flex-shrink:0; border:1px solid rgba(255,255,255,.2); }
 .theme-option.active .theme-swatch{ box-shadow: 0 0 0 2px var(--bg), 0 0 0 3px currentColor; }
+
+/* ---------- custom cursor ---------- */
+.atl-custom-cursor, .atl-custom-cursor *{ cursor:none !important; }
+.atl-cursor-dot, .atl-cursor-ring{
+  position:fixed; top:0; left:0; z-index:9999; pointer-events:none;
+  border-radius:50%; opacity:0; transition: opacity .2s;
+}
+.atl-cursor-dot{
+  width:6px; height:6px; margin:-3px 0 0 -3px;
+  background: var(--red-500);
+  box-shadow: 0 0 8px 1px var(--red-glow);
+}
+.atl-cursor-ring{
+  width:32px; height:32px; margin:-16px 0 0 -16px;
+  border:1.5px solid var(--blue-400);
+  transition: opacity .2s, width .18s var(--ease), height .18s var(--ease), margin .18s var(--ease), border-color .18s;
+}
+.atl-cursor-dot.visible, .atl-cursor-ring.visible{ opacity:1; }
+.atl-cursor-ring.hover{
+  width:52px; height:52px; margin:-26px 0 0 -26px;
+  border-color: var(--red-400);
+  background: rgba(230,57,70,.08);
+}
+.atl-cursor-ring.press{ width:24px; height:24px; margin:-12px 0 0 -12px; }
+@media (max-width: 900px){ .atl-cursor-dot, .atl-cursor-ring{ display:none; } }
+
+/* ============================================================
+   VOXEL / SKIN SIGNATURE
+   Minecraft identity is cubic. Every avatar on the site uses a
+   blocky square corner instead of a circle, and hero panels get a
+   stepped pixel-cut corner instead of a rounded one, tying the whole
+   platform back to the thing it's actually about.
+   ============================================================ */
+.avatar-sq{ border-radius: var(--avatar-radius) !important; }
+
+.pixel-frame{
+  clip-path: polygon(
+    0 var(--pixel-unit), var(--pixel-unit) var(--pixel-unit), var(--pixel-unit) 0,
+    calc(100% - var(--pixel-unit)) 0, calc(100% - var(--pixel-unit)) var(--pixel-unit), 100% var(--pixel-unit),
+    100% calc(100% - var(--pixel-unit)), calc(100% - var(--pixel-unit)) calc(100% - var(--pixel-unit)), calc(100% - var(--pixel-unit)) 100%,
+    var(--pixel-unit) 100%, var(--pixel-unit) calc(100% - var(--pixel-unit)), 0 calc(100% - var(--pixel-unit))
+  );
+  border-radius: 0;
+}
+
+/* Profile hero: the Minecraft skin is the focal signature element */
+.skin-hero{
+  position: relative;
+  width: 168px; height: 168px;
+  display:flex; align-items:flex-end; justify-content:center;
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.01));
+  border: 1px solid var(--glass-brd-strong);
+  box-shadow: var(--block-shadow);
+  flex-shrink:0;
+  overflow:hidden;
+}
+.skin-hero img{ height: 190px; image-rendering: pixelated; position:relative; top:4px; }
+.skin-hero .skin-empty{
+  display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%;
+  color: var(--text-3); gap:8px; padding:12px; text-align:center;
+}
+.skin-hero .skin-empty svg{ width:34px; height:34px; }
+.discord-badge-corner{
+  position:absolute; bottom:-4px; right:-4px; width:34px; height:34px;
+  border:2px solid var(--panel); background: var(--panel-2);
+}
+
+/* small consistent skin thumbnail wrapper used in tables/cards */
+.skin-thumb{ image-rendering: pixelated; flex-shrink:0; }
