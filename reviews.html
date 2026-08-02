@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Reviews — Asian Tier List [1.8+]</title>
+<link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="assets/css/main.css">
 </head>
 <body>
@@ -63,11 +64,14 @@
           <p>Be the first signed-in member to share your experience with testing and the platform.</p>
         </div>`;
     } else {
+      for(const r of reviews){
+        r._avatar = await ATL_SESSION.resolveAvatar({ discordId: r.userId, discordUsername: r.username, discordAvatar: r.avatar });
+      }
       listEl.innerHTML = reviews.slice().reverse().map(r=>`
         <div class="glass card">
           <div class="flex-between" style="align-items:flex-start;">
             <div style="display:flex; gap:10px; align-items:center;">
-              <img src="${r.avatar || `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(r.username)}&backgroundColor=141a29`}" style="width:36px;height:36px;border-radius:50%;">
+              <img src="${r._avatar}" style="width:36px;height:36px;border-radius:50%; object-fit:cover;">
               <div>
                 <div style="font-family:var(--f-sub); font-weight:700; color:var(--text-0);">${r.display}</div>
                 <span class="text-sm text-muted mono">${r.date}</span>
@@ -144,7 +148,7 @@
       const rating = parseInt(document.getElementById('ratingSelect').value,10);
       const current = await loadReviews();
       let reviews = current.filter(r=>r.userId!==session.user.id);
-      reviews.push({ userId:session.user.id, username:session.user.username, display:session.user.display, avatar:null, rating, body, date:new Date().toISOString().slice(0,10) });
+      reviews.push({ userId:session.user.id, username:session.user.username, display:session.user.display, avatar:session.user.avatar||null, rating, body, date:new Date().toISOString().slice(0,10) });
       await saveReviews(reviews);
       await renderComposer(); await renderList();
       ATL_toast(existing?'Review updated.':'Review posted.', 'success');
