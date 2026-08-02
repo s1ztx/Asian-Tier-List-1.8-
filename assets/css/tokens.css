@@ -87,6 +87,16 @@
   --nav-h: 76px;
   --container: 1280px;
   --ease: cubic-bezier(.16,.84,.44,1);
+
+  /* --- voxel / pixel signature ---
+     Minecraft identity is cubic, not circular, and its surfaces are
+     built from stepped pixel edges, not smooth curves. These tokens
+     carry that into the UI: blocky avatar corners instead of circles,
+     a stepped "pixel-cut" corner for hero panels instead of a rounded
+     corner, and a hard drop-shadow instead of a soft blurred one. */
+  --pixel-unit: 10px;
+  --avatar-radius: 8px;
+  --block-shadow: 4px 4px 0 rgba(0,0,0,.35);
 }
 
 /* ============================================================
