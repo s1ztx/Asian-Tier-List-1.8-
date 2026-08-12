@@ -1,108 +1,490 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Testers — Asian Tier List [1.8+]</title>
-<link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="assets/css/main.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Testers · Asian Tier List [1.8+]</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>">
+    <link rel="stylesheet" href="assets/css/tokens.css">
+    <link rel="stylesheet" href="assets/css/components.css">
+    <link rel="stylesheet" href="assets/css/main.css">
+    <style>
+        .testers-hero {
+            text-align: center;
+            padding: 30px 20px 20px;
+        }
+        .testers-hero h1 {
+            font-size: clamp(2rem, 4vw, 3.2rem);
+            font-weight: var(--font-weight-extrabold);
+            background: var(--gradient-brand);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .testers-hero p {
+            color: var(--color-text-secondary);
+            font-size: 1.1rem;
+            margin-top: 4px;
+        }
+
+        .testers-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px 40px;
+        }
+
+        .tester-section {
+            margin-bottom: var(--spacing-2xl);
+        }
+        .tester-section h2 {
+            font-size: 1.3rem;
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--spacing-md);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+        .tester-section h2 .badge {
+            font-size: 0.7rem;
+            background: var(--color-blue);
+            color: white;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .testers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: var(--spacing-lg);
+        }
+
+        .tester-card {
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            border: 1px solid var(--color-border);
+            backdrop-filter: blur(10px);
+            text-align: center;
+            transition: all var(--transition-normal);
+        }
+        .tester-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--color-border-light);
+            box-shadow: var(--shadow-lg);
+        }
+        .tester-card .avatar {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            margin: 0 auto var(--spacing-sm);
+            overflow: hidden;
+            border: 3px solid var(--color-border);
+            image-rendering: pixelated;
+        }
+        .tester-card .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .tester-card .name {
+            font-size: 1.05rem;
+            font-weight: var(--font-weight-bold);
+        }
+        .tester-card .discord {
+            font-size: 0.8rem;
+            color: var(--color-text-secondary);
+        }
+        .tester-card .rank {
+            display: inline-block;
+            margin-top: var(--spacing-xs);
+            padding: 3px 12px;
+            border-radius: var(--radius-full);
+            font-size: 0.7rem;
+            font-weight: var(--font-weight-semibold);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .tester-card .gamemodes {
+            margin-top: var(--spacing-sm);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            justify-content: center;
+        }
+        .tester-card .gamemodes .gm-tag {
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            background: var(--color-background);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-full);
+            color: var(--color-text-secondary);
+        }
+        .tester-card .minecraft {
+            margin-top: var(--spacing-sm);
+            font-size: 0.85rem;
+            color: var(--color-text-secondary);
+        }
+        .tester-card .minecraft .skin-mini {
+            display: inline-block;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            overflow: hidden;
+            vertical-align: middle;
+            margin-right: 6px;
+            image-rendering: pixelated;
+            border: 1px solid var(--color-border);
+        }
+        .tester-card .minecraft .skin-mini img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .rank-testing-manager .rank { background: #06b6d4; color: white; }
+        .rank-senior-tester .rank { background: #ec4899; color: white; }
+        .rank-tester .rank { background: #f472b6; color: white; opacity: 0.7; }
+
+        .no-testers {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--color-text-secondary);
+        }
+        .no-testers .icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            opacity: 0.5;
+        }
+
+        .loading-spinner {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        .loading-spinner .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--color-border);
+            border-top-color: var(--color-blue);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 12px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Test Request Form */
+        .test-request {
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            border: 1px solid var(--color-border);
+            backdrop-filter: blur(10px);
+            margin-top: var(--spacing-2xl);
+        }
+        .test-request h2 {
+            font-size: 1.2rem;
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--spacing-md);
+        }
+        .test-request .form-group {
+            margin-bottom: var(--spacing-md);
+        }
+        .test-request .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: 4px;
+            color: var(--color-text-secondary);
+        }
+        .test-request .form-group input,
+        .test-request .form-group select,
+        .test-request .form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--color-background);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            color: var(--color-text);
+            font-family: var(--font-family);
+            font-size: 0.95rem;
+            transition: border-color var(--transition-fast);
+        }
+        .test-request .form-group input:focus,
+        .test-request .form-group select:focus,
+        .test-request .form-group textarea:focus {
+            outline: none;
+            border-color: var(--color-blue);
+        }
+        .test-request .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        .test-request .submit-btn {
+            padding: 12px 32px;
+            background: var(--gradient-brand);
+            border: none;
+            border-radius: var(--radius-full);
+            color: white;
+            font-weight: var(--font-weight-bold);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            font-size: 1rem;
+        }
+        .test-request .submit-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 20px rgba(230, 57, 70, 0.3);
+        }
+        .test-request .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        @media (max-width: 768px) {
+            .testers-grid {
+                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            }
+        }
+        @media (max-width: 480px) {
+            .testers-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-<main>
-  <section class="page-hero">
-    <div class="container">
-      <div class="eyebrow">Verified evaluators</div>
-      <h1 class="h-title" style="font-size:clamp(32px,5vw,52px);">Testers</h1>
-      <p class="h-sub">Testers evaluate candidates and issue official tiers. Every tester is assigned specific gamemodes they're certified to test.</p>
-    </div>
-  </section>
+    <div id="app">
+        <nav id="main-nav"></nav>
 
-  <section class="section">
-    <div class="container" style="display:grid; grid-template-columns: 1fr 340px; gap:28px; align-items:flex-start;">
-      <div id="testerContainer"></div>
-
-      <div class="glass card" style="position:sticky; top:calc(var(--nav-h)+20px);">
-        <div class="eyebrow">Get ranked</div>
-        <h3 style="margin-top:8px;">Request a test</h3>
-        <p class="text-sm text-muted">Pick a gamemode and submit a request. A tester certified for that mode will pick it up.</p>
-        <div class="field mt-16">
-          <label for="gmSelect">Gamemode</label>
-          <select class="select" id="gmSelect"></select>
+        <div class="testers-hero">
+            <h1>🎯 Testers</h1>
+            <p>Our certified testers who rank players across all gamemodes</p>
         </div>
-        <div class="field">
-          <label for="reqNote">Note to tester (optional)</label>
-          <textarea class="textarea" id="reqNote" placeholder="Preferred time, your in-game name, past tier, etc."></textarea>
-        </div>
-        <button class="btn btn-primary btn-block" id="submitReq">Submit Request</button>
-        <p class="text-sm text-muted mt-16" id="reqGate"></p>
-      </div>
-    </div>
-  </section>
-</main>
 
-<script src="assets/js/data.js"></script>
-<script src="assets/js/session.js"></script>
-<script src="assets/js/nav.js"></script>
-<script src="assets/js/backgrounds.js"></script>
-<script type="module">
-  ATL_mountBackground('testers');
-  const session = ATL_initShell('testers.html');
-
-  document.getElementById('gmSelect').innerHTML = ATL_DATA.GAMEMODES.map(g=>`<option value="${g.id}">${g.label}</option>`).join('');
-
-  const testers = await ATL_SESSION.loadStore('testers', []);
-  const container = document.getElementById('testerContainer');
-  if(testers.length === 0){
-    container.innerHTML = `
-      <div class="glass empty-state">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 2l3 6 6 1-4.5 4.5L18 20l-6-3-6 3 1.5-6.5L3 9l6-1z"/></svg>
-        <h3>No testers assigned yet</h3>
-        <p>The Owner Panel hasn't assigned anyone as a tester. Once testers are added and given gamemodes, they'll appear here.</p>
-      </div>`;
-  } else {
-    const groups = ATL_DATA.TESTER_RANKS.map(rank => ({ rank, members: testers.filter(t=>t.rank===rank) })).filter(g=>g.members.length);
-    for(const g of groups){
-      for(const m of g.members){
-        m._avatar = await ATL_SESSION.resolveAvatar({ mcUsername: m.mcUsername, discordUsername: m.username });
-      }
-    }
-    container.innerHTML = groups.map(g=>`
-      <div class="mt-32">
-        <div class="eyebrow" style="margin-bottom:14px;">${g.rank} · ${g.members.length}</div>
-        <div class="grid-2">
-          ${g.members.map(m=>`
-            <div class="glass card">
-              <div style="display:flex; align-items:center; gap:12px;">
-                <img src="${m._avatar}" style="width:48px;height:48px;border-radius:50%;border:2px solid var(--panel-3); object-fit:cover;">
-                <div>
-                  <div style="font-family:var(--f-sub); font-weight:700; color:var(--text-0);">${m.display || m.username}</div>
-                  ${ATL_roleBadge(m.rank)}
+        <div class="testers-container">
+            <div id="testers-content">
+                <div class="loading-spinner" id="testers-loading">
+                    <div class="spinner"></div>
+                    <p>Loading testers...</p>
                 </div>
-              </div>
-              <div class="mt-16" style="display:flex; flex-wrap:wrap; gap:6px;">
-                ${(m.gamemodes||[]).map(gm=>`<span class="pill pill-blue">${(ATL_DATA.GAMEMODES.find(x=>x.id===gm)||{label:gm}).label}</span>`).join('') || '<span class="text-sm text-muted">No gamemodes assigned</span>'}
-              </div>
+                <!-- Filled by JS -->
             </div>
-          `).join('')}
-        </div>
-      </div>
-    `).join('');
-  }
 
-  const gate = document.getElementById('reqGate');
-  const submitBtn = document.getElementById('submitReq');
-  if(!session.authenticated){
-    gate.textContent = 'Login with Discord to submit a test request.';
-    submitBtn.disabled = true;
-  }
-  submitBtn.addEventListener('click', async ()=>{
-    const gm = document.getElementById('gmSelect').value;
-    const requests = await ATL_SESSION.loadStore('test_requests', []);
-    requests.push({ id: Date.now(), user: session.user.username, gamemode: gm, note: document.getElementById('reqNote').value, status:'pending', date: new Date().toISOString().slice(0,10) });
-    await ATL_SESSION.saveStore('test_requests', requests);
-    document.getElementById('reqNote').value = '';
-    ATL_toast('Test request submitted. A tester will reach out.', 'success');
-  });
-</script>
+            <!-- Test Request Form -->
+            <div class="test-request" id="test-request-form">
+                <h2>📝 Request a Test</h2>
+                <p style="color: var(--color-text-secondary); font-size: 0.9rem; margin-bottom: var(--spacing-md);">
+                    Submit a test request and one of our testers will review your gameplay.
+                </p>
+                <form id="test-request-submit">
+                    <div class="form-group">
+                        <label for="test-minecraft">Minecraft Username</label>
+                        <input type="text" id="test-minecraft" placeholder="Enter your Minecraft username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="test-gamemode">Gamemode</label>
+                        <select id="test-gamemode" required>
+                            <option value="">Select a gamemode...</option>
+                            <option value="bedwars">BedWars</option>
+                            <option value="fireball">Fireball Fight</option>
+                            <option value="sumo">Sumo</option>
+                            <option value="nodebuff">Nodebuff</option>
+                            <option value="boxing">Boxing</option>
+                            <option value="buhc">BUHC</option>
+                            <option value="bridges">Bridges</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="test-notes">Notes (optional)</label>
+                        <textarea id="test-notes" placeholder="Any additional information for the tester..."></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn" id="test-submit-btn">Submit Request</button>
+                </form>
+            </div>
+        </div>
+
+        <footer id="main-footer"></footer>
+    </div>
+
+    <script src="assets/js/data.js"></script>
+    <script src="assets/js/session.js"></script>
+    <script src="assets/js/nav.js"></script>
+    <script src="assets/js/backgrounds.js"></script>
+    <script>
+        // ============================================================
+        // TESTERS LOGIC
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            const loading = document.getElementById('testers-loading');
+            const content = document.getElementById('testers-content');
+
+            const RANK_ORDER = {
+                'Testing Manager': 0,
+                'Senior Tester': 1,
+                'Tester': 2
+            };
+
+            async function loadTesters() {
+                try {
+                    const testers = await window.ATL_SESSION.loadStore('testers', []);
+                    
+                    loading.style.display = 'none';
+
+                    if (!testers || testers.length === 0) {
+                        content.innerHTML = `
+                            <div class="no-testers">
+                                <div class="icon">🎯</div>
+                                <p>No testers have been added yet.</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    // Group by rank
+                    const grouped = {};
+                    testers.forEach(t => {
+                        const rank = t.rank || 'Tester';
+                        if (!grouped[rank]) grouped[rank] = [];
+                        grouped[rank].push(t);
+                    });
+
+                    // Sort ranks by hierarchy
+                    const sortedRanks = Object.keys(grouped).sort((a, b) => 
+                        (RANK_ORDER[a] ?? 99) - (RANK_ORDER[b] ?? 99)
+                    );
+
+                    let html = '';
+                    sortedRanks.forEach(rank => {
+                        const members = grouped[rank];
+                        const count = members.length;
+                        const rankClass = rank.toLowerCase().replace(/\s+/g, '-');
+
+                        html += `
+                            <div class="tester-section">
+                                <h2>${rank} <span class="badge">${count}</span></h2>
+                                <div class="testers-grid">
+                                    ${members.map(tester => {
+                                        const avatarUrl = tester.discordAvatar || 
+                                            `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(tester.discord || tester.name)}&backgroundColor=141a29`;
+                                        const skinUrl = tester.minecraft ? 
+                                            window.ATL_DATA.getSkinUrl(tester.minecraft, 24) : 
+                                            null;
+                                        const gamemodes = tester.gamemodes || [];
+
+                                        return `
+                                            <div class="tester-card rank-${rankClass}">
+                                                <div class="avatar">
+                                                    <img src="${avatarUrl}" alt="${tester.name}'s avatar">
+                                                </div>
+                                                <div class="name">${tester.name}</div>
+                                                <div class="discord">${tester.discord || ''}</div>
+                                                <div class="rank">${tester.rank}</div>
+                                                ${tester.minecraft ? `
+                                                    <div class="minecraft">
+                                                        <span class="skin-mini">
+                                                            <img src="${skinUrl}" 
+                                                                 alt="Minecraft skin of ${tester.minecraft}"
+                                                                 onerror="this.src='${window.ATL_DATA.getSkinFallback()}'">
+                                                        </span>
+                                                        ${tester.minecraft}
+                                                    </div>
+                                                ` : ''}
+                                                ${gamemodes.length > 0 ? `
+                                                    <div class="gamemodes">
+                                                        ${gamemodes.map(gm => `
+                                                            <span class="gm-tag">${window.ATL_DATA.getGamemodeIcon(gm)} ${window.ATL_DATA.getGamemodeLabel(gm)}</span>
+                                                        `).join('')}
+                                                    </div>
+                                                ` : ''}
+                                                ${tester.bio ? `<p style="margin-top: var(--spacing-sm); font-size: 0.8rem; color: var(--color-text-secondary);">${tester.bio}</p>` : ''}
+                                            </div>
+                                        `;
+                                    }).join('')}
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    content.innerHTML = html;
+
+                } catch (error) {
+                    console.error('Error loading testers:', error);
+                    loading.innerHTML = `
+                        <div class="error-message" style="text-align:center; padding:30px; color: var(--color-red);">
+                            <div class="icon" style="font-size:2.5rem; margin-bottom:10px;">❌</div>
+                            <p>Failed to load testers: ${error.message}</p>
+                        </div>
+                    `;
+                }
+            }
+
+            loadTesters();
+
+            // --- Test Request Form ---
+            const form = document.getElementById('test-request-submit');
+            const submitBtn = document.getElementById('test-submit-btn');
+
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const session = window.ATL_SESSION.current();
+
+                if (!session.authenticated) {
+                    window.ATL_toast('Please login with Discord first', 'error');
+                    return;
+                }
+
+                const minecraft = document.getElementById('test-minecraft').value.trim();
+                const gamemode = document.getElementById('test-gamemode').value;
+                const notes = document.getElementById('test-notes').value.trim();
+
+                if (!minecraft || !gamemode) {
+                    window.ATL_toast('Please fill in all required fields', 'error');
+                    return;
+                }
+
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Submitting...';
+
+                try {
+                    const tickets = await window.ATL_SESSION.loadStore('tickets', []);
+                    const ticket = {
+                        id: Date.now().toString(),
+                        type: 'test-request',
+                        userId: session.user.id,
+                        username: session.user.display || session.user.username,
+                        minecraft: minecraft,
+                        gamemode: gamemode,
+                        notes: notes,
+                        status: 'pending',
+                        date: new Date().toISOString(),
+                        messages: [{
+                            from: 'user',
+                            text: `Test request for ${minecraft} in ${window.ATL_DATA.getGamemodeLabel(gamemode)}${notes ? ': ' + notes : ''}`,
+                            at: new Date().toISOString()
+                        }]
+                    };
+
+                    tickets.push(ticket);
+                    await window.ATL_SESSION.saveStore('tickets', tickets);
+
+                    window.ATL_toast('Test request submitted successfully! 🎯', 'success');
+                    form.reset();
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Submit Request';
+
+                } catch (error) {
+                    console.error('Error submitting test request:', error);
+                    window.ATL_toast('Failed to submit request: ' + error.message, 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Submit Request';
+                }
+            });
+
+            // Reload on session update
+            window.addEventListener('session-update', loadTesters);
+        });
+    </script>
 </body>
 </html>
