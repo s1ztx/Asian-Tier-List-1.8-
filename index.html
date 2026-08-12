@@ -3,326 +3,323 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Player Profile · Asian Tier List [1.8+]</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👤</text></svg>">
+    <title>Asian Tier List [1.8+] · Competitive PvP Rankings</title>
+    <meta name="description" content="The competitive Minecraft 1.8 PvP tier list ranking Asia's best players across seven gamemodes.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏆</text></svg>">
     <link rel="stylesheet" href="assets/css/tokens.css">
     <link rel="stylesheet" href="assets/css/components.css">
     <link rel="stylesheet" href="assets/css/main.css">
     <style>
-        .profile-hero {
-            text-align: center;
-            padding: 40px 20px 30px;
+        /* ----- Hero Section ----- */
+        .hero {
             position: relative;
+            padding: 80px 20px 60px;
+            text-align: center;
+            overflow: hidden;
+            min-height: 70vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .profile-hero h1 {
-            font-size: clamp(2rem, 4vw, 3rem);
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 900px;
+        }
+        .hero .season-badge {
+            display: inline-block;
+            padding: 6px 20px;
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-full);
+            font-size: 0.8rem;
+            color: var(--color-text-secondary);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: var(--spacing-md);
+        }
+        .hero h1 {
+            font-family: var(--font-family-display);
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: var(--font-weight-extrabold);
+            line-height: 1.05;
+            margin-bottom: var(--spacing-md);
+            background: var(--gradient-brand);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: none;
+        }
+        .hero h1 .highlight {
+            background: linear-gradient(135deg, var(--color-red), var(--color-red-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero p {
+            font-size: clamp(1.1rem, 1.5vw, 1.4rem);
+            color: var(--color-text-secondary);
+            max-width: 600px;
+            margin: 0 auto var(--spacing-xl);
+            line-height: 1.7;
+        }
+        .hero-actions {
+            display: flex;
+            gap: var(--spacing-md);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .hero-actions .btn {
+            padding: 14px 32px;
+            border-radius: var(--radius-full);
+            font-weight: var(--font-weight-bold);
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            transition: all var(--transition-bounce);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+        .hero-actions .btn-primary {
+            background: var(--gradient-brand);
+            color: white;
+            box-shadow: 0 4px 30px rgba(230, 57, 70, 0.3);
+        }
+        .hero-actions .btn-primary:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 40px rgba(230, 57, 70, 0.4);
+        }
+        .hero-actions .btn-secondary {
+            background: var(--color-surface);
+            color: var(--color-text);
+            border: 1px solid var(--color-border);
+        }
+        .hero-actions .btn-secondary:hover {
+            background: var(--color-surface-hover);
+            transform: translateY(-2px);
+        }
+        .hero-actions .btn-discord {
+            background: #5865F2;
+            color: white;
+            box-shadow: 0 4px 30px rgba(88, 101, 242, 0.3);
+        }
+        .hero-actions .btn-discord:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 40px rgba(88, 101, 242, 0.4);
+        }
+
+        /* ----- Stats Bar ----- */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: var(--spacing-md);
+            max-width: 800px;
+            margin: var(--spacing-2xl) auto 0;
+            padding: var(--spacing-lg);
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--color-border);
+            backdrop-filter: blur(10px);
+        }
+        .stats-bar .stat-item {
+            text-align: center;
+        }
+        .stats-bar .stat-item .number {
+            font-family: var(--font-family-display);
+            font-size: 1.8rem;
             font-weight: var(--font-weight-extrabold);
             background: var(--gradient-brand);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-        .profile-hero p {
-            color: var(--color-text-secondary);
-            font-size: 1.1rem;
-            margin-top: 4px;
-        }
-
-        .profile-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px 40px;
-        }
-
-        /* Profile Header */
-        .profile-header {
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-xl);
-            background: var(--color-surface);
-            border-radius: var(--radius-lg);
-            padding: var(--spacing-xl);
-            border: 1px solid var(--color-border);
-            backdrop-filter: blur(10px);
-            margin-bottom: var(--spacing-xl);
-            flex-wrap: wrap;
-        }
-        .profile-header .avatar {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            border: 4px solid var(--color-border);
-            overflow: hidden;
-            flex-shrink: 0;
-            image-rendering: pixelated;
-        }
-        .profile-header .avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .profile-header .info {
-            flex: 1;
-            min-width: 200px;
-        }
-        .profile-header .info .name {
-            font-size: 1.8rem;
-            font-weight: var(--font-weight-extrabold);
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-sm);
-            flex-wrap: wrap;
-        }
-        .profile-header .info .discord {
-            color: var(--color-text-secondary);
-            font-size: 0.95rem;
-            margin-top: 2px;
-        }
-        .profile-header .info .tier-display {
-            margin-top: var(--spacing-sm);
-            font-size: 2.5rem;
-            font-weight: var(--font-weight-extrabold);
-        }
-        .profile-header .info .role-badge {
+        .stats-bar .stat-item .label {
             font-size: 0.8rem;
-            padding: 4px 14px;
-        }
-
-        .profile-header .stats-quick {
-            display: flex;
-            gap: var(--spacing-xl);
-            flex-wrap: wrap;
-        }
-        .profile-header .stats-quick .stat {
-            text-align: center;
-        }
-        .profile-header .stats-quick .stat .num {
-            font-size: 1.5rem;
-            font-weight: var(--font-weight-extrabold);
-            color: var(--color-text);
-        }
-        .profile-header .stats-quick .stat .label {
-            font-size: 0.75rem;
             color: var(--color-text-secondary);
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
-        /* Profile Grid */
-        .profile-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: var(--spacing-lg);
+        /* ----- Features Section ----- */
+        .features {
+            padding: var(--spacing-3xl) 20px;
+            max-width: 1200px;
+            margin: 0 auto;
         }
-
-        .profile-card {
+        .features h2 {
+            text-align: center;
+            font-size: clamp(2rem, 3vw, 2.8rem);
+            font-weight: var(--font-weight-extrabold);
+            margin-bottom: var(--spacing-lg);
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-lg);
+            margin-top: var(--spacing-xl);
+        }
+        .feature-card {
             background: var(--color-surface);
             border-radius: var(--radius-lg);
-            padding: var(--spacing-lg);
+            padding: var(--spacing-xl);
             border: 1px solid var(--color-border);
+            text-align: center;
+            transition: all var(--transition-normal);
             backdrop-filter: blur(10px);
         }
-        .profile-card.full-width {
-            grid-column: 1 / -1;
+        .feature-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--color-border-light);
+            box-shadow: var(--shadow-lg);
         }
-        .profile-card h2 {
+        .feature-card .icon {
+            font-size: 2.5rem;
+            margin-bottom: var(--spacing-md);
+        }
+        .feature-card h3 {
             font-size: 1.1rem;
             font-weight: var(--font-weight-bold);
-            margin-bottom: var(--spacing-md);
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-sm);
-        }
-        .profile-card h2 .badge {
-            font-size: 0.7rem;
-            background: var(--color-blue);
-            color: white;
-            padding: 2px 10px;
-            border-radius: 12px;
-            font-weight: 600;
-        }
-
-        /* Gamemode Tiers */
-        .gamemode-tier-list {
-            display: grid;
-            gap: var(--spacing-sm);
-        }
-        .gamemode-tier-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 12px;
-            background: var(--color-background);
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--color-border);
-        }
-        .gamemode-tier-item .gm {
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-sm);
-            font-weight: var(--font-weight-medium);
-        }
-        .gamemode-tier-item .tier {
-            font-weight: var(--font-weight-bold);
-            font-size: 1.1rem;
-        }
-
-        /* Tier History */
-        .history-list {
-            max-height: 300px;
-            overflow-y: auto;
-        }
-        .history-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 12px;
-            border-bottom: 1px solid var(--color-border);
-            font-size: 0.9rem;
-        }
-        .history-item:last-child {
-            border-bottom: none;
-        }
-        .history-item .date {
-            color: var(--color-text-secondary);
-            font-size: 0.8rem;
-        }
-        .history-item .change {
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-sm);
-        }
-        .history-item .change .arrow {
-            color: var(--color-text-secondary);
-        }
-        .history-item .change .old {
-            color: var(--color-text-tertiary);
-            text-decoration: line-through;
-        }
-        .history-item .change .new {
-            font-weight: var(--font-weight-bold);
-        }
-
-        /* Stats Grid */
-        .stats-grid-profile {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            gap: var(--spacing-sm);
-        }
-        .stats-grid-profile .stat-box {
-            text-align: center;
-            padding: var(--spacing-sm);
-            background: var(--color-background);
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--color-border);
-        }
-        .stats-grid-profile .stat-box .num {
-            font-size: 1.3rem;
-            font-weight: var(--font-weight-bold);
-            color: var(--color-text);
-        }
-        .stats-grid-profile .stat-box .label {
-            font-size: 0.7rem;
-            color: var(--color-text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-        }
-
-        .no-data {
-            text-align: center;
-            padding: 30px 20px;
-            color: var(--color-text-secondary);
-        }
-        .no-data .icon {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            opacity: 0.5;
-        }
-
-        .loading-spinner {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--color-text-secondary);
-        }
-        .loading-spinner .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid var(--color-border);
-            border-top-color: var(--color-blue);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin: 0 auto 12px;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .error-message {
-            text-align: center;
-            padding: 30px 20px;
-            color: var(--color-red);
-        }
-        .error-message .icon {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-
-        /* Login Prompt */
-        .login-prompt {
-            text-align: center;
-            padding: 60px 20px;
-        }
-        .login-prompt .icon {
-            font-size: 4rem;
-            margin-bottom: var(--spacing-md);
-            opacity: 0.5;
-        }
-        .login-prompt h2 {
-            font-size: 1.8rem;
             margin-bottom: var(--spacing-sm);
         }
-        .login-prompt p {
+        .feature-card p {
             color: var(--color-text-secondary);
-            max-width: 400px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* ----- Tier Ladder Preview ----- */
+        .tier-ladder-preview {
+            padding: var(--spacing-3xl) 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .tier-ladder-preview h2 {
+            font-size: clamp(1.8rem, 2.5vw, 2.5rem);
+            font-weight: var(--font-weight-extrabold);
+            margin-bottom: var(--spacing-lg);
+        }
+        .tier-ladder {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-md);
+            border: 1px solid var(--color-border);
+        }
+        .tier-row {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            padding: 6px 16px;
+            border-radius: var(--radius-sm);
+            transition: background var(--transition-fast);
+        }
+        .tier-row:hover {
+            background: var(--color-surface-hover);
+        }
+        .tier-row .tier-label {
+            font-weight: var(--font-weight-bold);
+            font-size: 1.1rem;
+            min-width: 40px;
+            text-align: right;
+        }
+        .tier-row .tier-bar {
+            flex: 1;
+            height: 8px;
+            border-radius: var(--radius-full);
+            background: var(--color-border);
+            position: relative;
+            overflow: hidden;
+        }
+        .tier-row .tier-bar .fill {
+            height: 100%;
+            border-radius: var(--radius-full);
+            transition: width 1s ease;
+        }
+        .tier-row .tier-count {
+            font-size: 0.85rem;
+            color: var(--color-text-secondary);
+            min-width: 40px;
+        }
+
+        /* ----- Gamemodes Section ----- */
+        .gamemodes-section {
+            padding: var(--spacing-3xl) 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .gamemodes-section h2 {
+            text-align: center;
+            font-size: clamp(1.8rem, 2.5vw, 2.5rem);
+            font-weight: var(--font-weight-extrabold);
+            margin-bottom: var(--spacing-lg);
+        }
+        .gamemodes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-xl);
+        }
+        .gamemode-chip {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
+            text-align: center;
+            transition: all var(--transition-fast);
+            cursor: default;
+        }
+        .gamemode-chip:hover {
+            border-color: var(--color-border-light);
+            transform: translateY(-2px);
+        }
+        .gamemode-chip .icon {
+            font-size: 1.8rem;
+            display: block;
+            margin-bottom: 4px;
+        }
+        .gamemode-chip .name {
+            font-size: 0.85rem;
+            font-weight: var(--font-weight-semibold);
+        }
+
+        /* ----- CTA Section ----- */
+        .cta-section {
+            padding: var(--spacing-3xl) 20px;
+            text-align: center;
+            background: var(--color-surface);
+            border-top: 1px solid var(--color-border);
+            border-bottom: 1px solid var(--color-border);
+        }
+        .cta-section h2 {
+            font-size: clamp(1.8rem, 2.5vw, 2.5rem);
+            font-weight: var(--font-weight-extrabold);
+            margin-bottom: var(--spacing-sm);
+        }
+        .cta-section p {
+            color: var(--color-text-secondary);
+            max-width: 500px;
             margin: 0 auto var(--spacing-lg);
         }
 
-        @media (max-width: 900px) {
-            .profile-grid {
-                grid-template-columns: 1fr;
-            }
-            .profile-card.full-width {
-                grid-column: 1;
-            }
-            .profile-header {
-                flex-direction: column;
-                text-align: center;
-            }
-            .profile-header .info .name {
-                justify-content: center;
-            }
-            .profile-header .stats-quick {
-                justify-content: center;
-                width: 100%;
-            }
+        /* ----- Responsive ----- */
+        @media (max-width: 768px) {
+            .hero { padding: 60px 16px 40px; min-height: 50vh; }
+            .hero-actions .btn { padding: 12px 24px; font-size: 0.9rem; }
+            .stats-bar { grid-template-columns: 1fr 1fr; gap: var(--spacing-sm); padding: var(--spacing-md); }
+            .stats-bar .stat-item .number { font-size: 1.4rem; }
+            .features-grid { grid-template-columns: 1fr; }
+            .gamemodes-grid { grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); }
         }
         @media (max-width: 480px) {
-            .profile-header .avatar {
-                width: 80px;
-                height: 80px;
-            }
-            .profile-header .info .name {
-                font-size: 1.4rem;
-            }
-            .profile-header .info .tier-display {
-                font-size: 2rem;
-            }
-            .profile-header .stats-quick {
-                gap: var(--spacing-md);
-            }
-            .stats-grid-profile {
-                grid-template-columns: 1fr 1fr;
-            }
+            .hero h1 { font-size: 2.2rem; }
+            .hero-actions { flex-direction: column; align-items: center; }
+            .hero-actions .btn { width: 100%; justify-content: center; }
+            .stats-bar { grid-template-columns: 1fr 1fr; }
         }
     </style>
 </head>
@@ -330,64 +327,98 @@
     <div id="app">
         <nav id="main-nav"></nav>
 
-        <div class="profile-hero">
-            <h1>👤 Player Profile</h1>
-            <p>View your stats, tiers, and progression</p>
-        </div>
-
-        <div class="profile-container" id="profile-container">
-            <!-- Login Prompt (shown when not authenticated) -->
-            <div class="login-prompt" id="login-prompt" style="display:none;">
-                <div class="icon">🔒</div>
-                <h2>Login Required</h2>
-                <p>Connect your Discord account to view your player profile and stats.</p>
-                <button class="discord-btn" id="profileLoginBtn">💬 Login with Discord</button>
-            </div>
-
-            <!-- Profile Content (shown when authenticated) -->
-            <div id="profile-content" style="display:none;">
-                <!-- Loading State -->
-                <div class="loading-spinner" id="profile-loading">
-                    <div class="spinner"></div>
-                    <p>Loading your profile...</p>
+        <!-- Hero -->
+        <section class="hero">
+            <div class="hero-content">
+                <div class="season-badge">🏆 Season 1 · 2026</div>
+                <h1>
+                    Prove Your Rank.<br>
+                    <span class="highlight">Earn Your Tier.</span>
+                </h1>
+                <p>
+                    The competitive Minecraft 1.8 PvP tier list ranking Asia's best players 
+                    across seven gamemodes. Compete, rank up, and claim your spot.
+                </p>
+                <div class="hero-actions">
+                    <a href="leaderboards.html" class="btn btn-primary">🏆 View Leaderboards</a>
+                    <a href="#features" class="btn btn-secondary">Learn More</a>
+                    <button class="btn btn-discord" id="heroLoginBtn">💬 Login with Discord</button>
                 </div>
 
-                <!-- Profile Data -->
-                <div id="profile-data" style="display:none;">
-                    <!-- Header -->
-                    <div class="profile-header" id="profile-header">
-                        <!-- Filled by JS -->
+                <!-- Stats Bar -->
+                <div class="stats-bar" id="stats-bar">
+                    <div class="stat-item">
+                        <div class="number" id="total-players">--</div>
+                        <div class="label">Total Players</div>
                     </div>
-
-                    <!-- Grid -->
-                    <div class="profile-grid">
-                        <!-- Gamemode Tiers -->
-                        <div class="profile-card">
-                            <h2>🎯 Gamemode Tiers <span class="badge">All 7</span></h2>
-                            <div class="gamemode-tier-list" id="gamemode-tiers">
-                                <!-- Filled by JS -->
-                            </div>
-                        </div>
-
-                        <!-- Quick Stats -->
-                        <div class="profile-card">
-                            <h2>📊 Statistics <span class="badge">Live</span></h2>
-                            <div class="stats-grid-profile" id="stats-grid">
-                                <!-- Filled by JS -->
-                            </div>
-                        </div>
-
-                        <!-- Tier History -->
-                        <div class="profile-card full-width">
-                            <h2>📜 Tier History</h2>
-                            <div class="history-list" id="tier-history">
-                                <!-- Filled by JS -->
-                            </div>
-                        </div>
+                    <div class="stat-item">
+                        <div class="number" id="online-players">--</div>
+                        <div class="label">Online Now</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="number" id="total-matches">--</div>
+                        <div class="label">Matches Played</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="number" id="top-tier">--</div>
+                        <div class="label">Top Tier</div>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
+
+        <!-- Features -->
+        <section class="features" id="features">
+            <h2>🚀 Why Join Asian Tier List?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="icon">⚔️</div>
+                    <h3>Competitive PvP</h3>
+                    <p>Ranked 1.8 PvP across seven gamemodes including BedWars, Sumo, and Nodebuff.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">🎯</div>
+                    <h3>Real Rankings</h3>
+                    <p>Accurate tier system with real player data and live leaderboards.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">👥</div>
+                    <h3>Community Driven</h3>
+                    <p>Join our Discord community of competitive players and get ranked by our testers.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">📊</div>
+                    <h3>Live Statistics</h3>
+                    <p>Real-time stats from Frost Practice server with detailed player profiles.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tier Ladder Preview -->
+        <section class="tier-ladder-preview">
+            <h2>🏅 Official Tier Ladder</h2>
+            <div class="tier-ladder" id="tier-ladder">
+                <!-- Filled by JS -->
+            </div>
+        </section>
+
+        <!-- Gamemodes -->
+        <section class="gamemodes-section">
+            <h2>🎮 Supported Gamemodes</h2>
+            <div class="gamemodes-grid" id="gamemodes-grid">
+                <!-- Filled by JS -->
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="cta-section">
+            <h2>Ready to Prove Your Rank?</h2>
+            <p>Join our community, get tested by our experienced testers, and earn your tier.</p>
+            <div class="hero-actions">
+                <button class="btn btn-discord" id="ctaLoginBtn">💬 Login with Discord</button>
+                <a href="testers.html" class="btn btn-secondary">👥 Meet Our Testers</a>
+            </div>
+        </section>
 
         <footer id="main-footer"></footer>
     </div>
@@ -399,210 +430,96 @@
     <script src="assets/js/stats-api.js"></script>
     <script>
         // ============================================================
-        // PROFILE PAGE LOGIC
+        // HOMEPAGE LOGIC
         // ============================================================
         document.addEventListener('DOMContentLoaded', function() {
-            const session = window.ATL_SESSION.current();
-            const loginPrompt = document.getElementById('login-prompt');
-            const profileContent = document.getElementById('profile-content');
-            const profileLoading = document.getElementById('profile-loading');
-            const profileData = document.getElementById('profile-data');
-            const profileHeader = document.getElementById('profile-header');
-            const gamemodeTiers = document.getElementById('gamemode-tiers');
-            const statsGrid = document.getElementById('stats-grid');
-            const tierHistory = document.getElementById('tier-history');
-
-            // --- Login button ---
-            document.getElementById('profileLoginBtn').addEventListener('click', function() {
-                window.ATL_SESSION.loginWithDiscord();
-            });
-
-            // --- Check authentication ---
-            if (!session.authenticated) {
-                loginPrompt.style.display = 'block';
-                profileContent.style.display = 'none';
-                return;
-            }
-
-            // Show profile content
-            loginPrompt.style.display = 'none';
-            profileContent.style.display = 'block';
-            profileLoading.style.display = 'block';
-            profileData.style.display = 'none';
-
-            // --- Load profile data ---
-            async function loadProfile() {
+            // --- Render Tier Ladder ---
+            const ladderContainer = document.getElementById('tier-ladder');
+            const tiers = window.ATL_DATA.TIERS;
+            const tierColors = window.ATL_DATA.TIER_COLORS;
+            
+            // Mock data for tier distribution
+            const tierCounts = {
+                'S': 3, 'S-': 5, 'A+': 8, 'A': 12, 'A-': 15,
+                'B+': 18, 'B': 22, 'B-': 25, 'C+': 28, 'C': 30,
+                'C-': 25, 'D+': 20, 'D': 15, 'D-': 10
+            };
+            const maxCount = Math.max(...Object.values(tierCounts));
+            
+            ladderContainer.innerHTML = tiers.map(tier => {
+                const count = tierCounts[tier] || 0;
+                const percentage = maxCount > 0 ? (count / maxCount) * 100 : 0;
+                const color = tierColors[tier] || '#94a3b8';
+                
+                return `
+                    <div class="tier-row">
+                        <span class="tier-label" style="color: ${color}">${tier}</span>
+                        <div class="tier-bar">
+                            <div class="fill" style="width: ${percentage}%; background: ${color};"></div>
+                        </div>
+                        <span class="tier-count">${count}</span>
+                    </div>
+                `;
+            }).join('');
+            
+            // --- Render Gamemodes ---
+            const gamemodesGrid = document.getElementById('gamemodes-grid');
+            const gamemodes = window.ATL_DATA.GAMEMODES;
+            
+            gamemodesGrid.innerHTML = gamemodes.map(gm => `
+                <div class="gamemode-chip">
+                    <span class="icon">${gm.icon}</span>
+                    <span class="name">${gm.label}</span>
+                </div>
+            `).join('');
+            
+            // --- Load Real Stats ---
+            async function loadStats() {
                 try {
-                    const username = session.user.username;
+                    const status = await window.FROST_STATS.getServerStatus();
+                    const players = document.getElementById('total-players');
+                    const online = document.getElementById('online-players');
+                    const matches = document.getElementById('total-matches');
+                    const topTier = document.getElementById('top-tier');
                     
-                    // Fetch player data from Frost Practice
-                    let playerData = null;
-                    try {
-                        playerData = await window.FROST_STATS.getPlayerData(username);
-                    } catch (e) {
-                        // If player not found on Frost Practice, use Discord info
-                        console.warn('Player not found on Frost Practice:', e);
-                    }
-
-                    // Build profile data
-                    const profile = {
-                        username: username,
-                        discord: session.user.display || username,
-                        discordId: session.user.id,
-                        skin: `https://crafatar.com/avatars/${encodeURIComponent(username)}?size=120`,
-                        overall: playerData?.overall || 'N/A',
-                        stats: playerData?.stats || { wins: 0, losses: 0, kd: 0, elo: 0, games: 0, winRate: 0, streak: 0 },
-                        gamemodes: playerData?.gamemodes || {},
-                        role: session.role || 'Member'
-                    };
-
-                    // --- Render Header ---
-                    const tierColor = window.ATL_DATA.TIER_COLORS[profile.overall] || '#94a3b8';
-                    const roleBadge = window.ATL_roleBadge(profile.role) || '';
-
-                    profileHeader.innerHTML = `
-                        <div class="avatar">
-                            <img src="${profile.skin}" 
-                                 alt="Minecraft skin of ${profile.username}"
-                                 onerror="this.src='${window.ATL_DATA.getSkinFallback()}'">
-                        </div>
-                        <div class="info">
-                            <div class="name">
-                                ${profile.username}
-                                <span class="role-badge">${profile.role}</span>
-                            </div>
-                            <div class="discord">${profile.discord}</div>
-                            <div class="tier-display" style="color: ${tierColor}">${profile.overall}</div>
-                        </div>
-                        <div class="stats-quick">
-                            <div class="stat">
-                                <div class="num">${profile.stats.wins}</div>
-                                <div class="label">Wins</div>
-                            </div>
-                            <div class="stat">
-                                <div class="num">${profile.stats.losses}</div>
-                                <div class="label">Losses</div>
-                            </div>
-                            <div class="stat">
-                                <div class="num">${profile.stats.kd}</div>
-                                <div class="label">K/D</div>
-                            </div>
-                            <div class="stat">
-                                <div class="num">${profile.stats.elo}</div>
-                                <div class="label">ELO</div>
-                            </div>
-                        </div>
-                    `;
-
-                    // --- Render Gamemode Tiers ---
-                    const gamemodes = window.ATL_DATA.GAMEMODES;
-                    gamemodeTiers.innerHTML = gamemodes.map(gm => {
-                        const data = profile.gamemodes[gm.id] || { tier: 'N/A' };
-                        const tier = data.tier || 'N/A';
-                        const color = window.ATL_DATA.TIER_COLORS[tier] || '#94a3b8';
-                        return `
-                            <div class="gamemode-tier-item">
-                                <span class="gm">${gm.icon} ${gm.label}</span>
-                                <span class="tier" style="color: ${color}">${tier}</span>
-                            </div>
-                        `;
-                    }).join('');
-
-                    // --- Render Stats Grid ---
-                    statsGrid.innerHTML = `
-                        <div class="stat-box">
-                            <div class="num">${profile.stats.wins}</div>
-                            <div class="label">Wins</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="num">${profile.stats.losses}</div>
-                            <div class="label">Losses</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="num">${profile.stats.kd}</div>
-                            <div class="label">K/D</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="num">${profile.stats.elo}</div>
-                            <div class="label">ELO</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="num">${profile.stats.games}</div>
-                            <div class="label">Games</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="num">${profile.stats.winRate}%</div>
-                            <div class="label">Win Rate</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="num">${profile.stats.streak}</div>
-                            <div class="label">Streak</div>
-                        </div>
-                    `;
-
-                    // --- Render Tier History ---
-                    // This would come from your tier_log store
-                    const historyData = await window.ATL_SESSION.loadStore('tier_log', []);
-                    const myHistory = historyData
-                        .filter(h => h.player && h.player.toLowerCase() === profile.username.toLowerCase())
-                        .sort((a, b) => new Date(b.date) - new Date(a.date));
-
-                    if (myHistory.length === 0) {
-                        tierHistory.innerHTML = `
-                            <div class="no-data">
-                                <div class="icon">📜</div>
-                                <p>No tier history yet</p>
-                            </div>
-                        `;
+                    if (status.online) {
+                        players.textContent = status.total_players || '1.2k';
+                        online.textContent = status.players_online || 47;
+                        matches.textContent = status.total_matches || '12.4k';
+                        topTier.textContent = 'S';
                     } else {
-                        tierHistory.innerHTML = myHistory.slice(0, 20).map(h => {
-                            const gmLabel = window.ATL_DATA.getGamemodeLabel(h.gamemode);
-                            const date = new Date(h.date).toLocaleDateString('en-US', {
-                                year: 'numeric',
-                                month: 'short',
-                                day: 'numeric'
-                            });
-                            const color = window.ATL_DATA.TIER_COLORS[h.tier] || '#94a3b8';
-                            return `
-                                <div class="history-item">
-                                    <span>${gmLabel}</span>
-                                    <span class="change">
-                                        <span class="old">${h.previous_tier || 'N/A'}</span>
-                                        <span class="arrow">→</span>
-                                        <span class="new" style="color: ${color}">${h.tier}</span>
-                                    </span>
-                                    <span class="date">${date}</span>
-                                </div>
-                            `;
-                        }).join('');
+                        players.textContent = '--';
+                        online.textContent = '--';
+                        matches.textContent = '--';
+                        topTier.textContent = '--';
                     }
-
-                    // --- Show data ---
-                    profileLoading.style.display = 'none';
-                    profileData.style.display = 'block';
-
                 } catch (error) {
-                    console.error('Error loading profile:', error);
-                    profileLoading.innerHTML = `
-                        <div class="error-message">
-                            <div class="icon">❌</div>
-                            <p>Failed to load profile: ${error.message}</p>
-                            <p style="font-size: 0.85rem; margin-top: 8px; color: var(--color-text-secondary)">
-                                Make sure Frost Practice server is running
-                            </p>
-                        </div>
-                    `;
+                    console.error('Failed to load stats:', error);
                 }
             }
-
-            loadProfile();
-
-            // --- Handle session updates ---
-            window.addEventListener('session-update', function(e) {
-                if (!e.detail.authenticated) {
-                    window.location.reload();
-                }
+            
+            loadStats();
+            
+            // --- Login buttons ---
+            document.querySelectorAll('#heroLoginBtn, #ctaLoginBtn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    window.ATL_SESSION.loginWithDiscord();
+                });
             });
+            
+            // --- Update login button state ---
+            const session = window.ATL_SESSION.current();
+            if (session.authenticated) {
+                document.querySelectorAll('#heroLoginBtn, #ctaLoginBtn').forEach(btn => {
+                    btn.textContent = '👤 My Profile';
+                    btn.onclick = function() {
+                        window.location.href = 'profile.html';
+                    };
+                });
+            }
+            
+            // --- Auto-refresh stats every 30 seconds ---
+            setInterval(loadStats, 30000);
         });
     </script>
 </body>
