@@ -162,10 +162,13 @@ function markAllNotifsRead(session, items){
   });
 }
 
-// Custom cursor implementation
+// ============================================================
+// CUSTOM CURSOR
+// ============================================================
 function initCustomCursor() {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   if (window.matchMedia('(pointer: coarse)').matches) return;
+  if (window.innerWidth < 769) return;
   
   const cursor = document.createElement('div');
   cursor.className = 'custom-cursor';
@@ -187,33 +190,54 @@ function initCustomCursor() {
   });
   
   function animateRing() {
-    ringX += (mouseX - ringX) * 0.15;
-    ringY += (mouseY - ringY) * 0.15;
+    ringX += (mouseX - ringX) * 0.12;
+    ringY += (mouseY - ringY) * 0.12;
     ring.style.transform = `translate(${ringX - 15}px, ${ringY - 15}px)`;
     requestAnimationFrame(animateRing);
   }
   animateRing();
   
-  // Hover effects
-  document.querySelectorAll('a, button, .clickable, .nav-link, .brand, .discord-btn, .theme-option').forEach(el => {
-    el.addEventListener('mouseenter', () => {
-      ring.style.transform = `translate(${ringX - 22}px, ${ringY - 22}px) scale(1.4)`;
-      ring.style.borderColor = 'var(--color-blue)';
-    });
-    el.addEventListener('mouseleave', () => {
-      ring.style.transform = `translate(${ringX - 15}px, ${ringY - 15}px) scale(1)`;
-      ring.style.borderColor = 'var(--color-border)';
-    });
+  const hoverTargets = document.querySelectorAll(
+    'a, button, .clickable, .nav-link, .brand, .discord-btn, ' +
+    '.theme-option, .tab, .submit-btn, .btn, .user-chip, ' +
+    '.theme-toggle, .nav-menu-toggle, .modal-close, .example'
+  );
+  
+  hoverTargets.forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+    el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
   });
   
-  // Click effect
-  document.addEventListener('mousedown', () => {
-    dot.style.transform = `translate(${mouseX - 4}px, ${mouseY - 4}px) scale(1.6)`;
-    ring.style.transform = `translate(${ringX - 15}px, ${ringY - 15}px) scale(0.8)`;
+  document.addEventListener('mousedown', () => cursor.classList.add('click'));
+  document.addEventListener('mouseup', () => cursor.classList.remove('click'));
+  
+  // Handle dynamically added elements
+  const observer = new MutationObserver(() => {
+    document.querySelectorAll(
+      'a, button, .clickable, .nav-link, .brand, .discord-btn, ' +
+      '.theme-option, .tab, .submit-btn, .btn, .user-chip, ' +
+      '.theme-toggle, .nav-menu-toggle, .modal-close, .example'
+    ).forEach(el => {
+      if (!el.dataset.cursorAttached) {
+        el.dataset.cursorAttached = 'true';
+        el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+        el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+      }
+    });
   });
-  document.addEventListener('mouseup', () => {
-    dot.style.transform = `translate(${mouseX - 4}px, ${mouseY - 4}px) scale(1)`;
-    ring.style.transform = `translate(${ringX - 15}px, ${ringY - 15}px) scale(1)`;
+  observer.observe(document.body, { childList: true, subtree: true });
+  
+  // Handle resize
+  let resizeTimeout;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+      if (window.innerWidth < 769) {
+        cursor.style.display = 'none';
+      } else {
+        cursor.style.display = 'block';
+      }
+    }, 200);
   });
 }
 
@@ -244,39 +268,6 @@ window.ATL_initShell = function(activePage){
       <span class="theme-swatch" style="background:linear-gradient(135deg, ${t.colors[0]}, ${t.colors[1]})"></span>
       <span style="color:var(--text-1);">${t.label}</span>
     </div>`).join('');
-
-  // Add custom cursor CSS
-  const cursorStyle = document.createElement('style');
-  cursorStyle.textContent = `
-    .custom-cursor {
-      pointer-events: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 99999;
-    }
-    .cursor-dot {
-      width: 8px;
-      height: 8px;
-      background: var(--color-blue);
-      border-radius: 50%;
-      position: absolute;
-      transition: transform 0.1s ease;
-    }
-    .cursor-ring {
-      width: 30px;
-      height: 30px;
-      border: 2px solid var(--color-border);
-      border-radius: 50%;
-      position: absolute;
-      transition: all 0.15s ease;
-      opacity: 0.6;
-    }
-    @media (pointer: coarse), (prefers-reduced-motion: reduce) {
-      .custom-cursor { display: none !important; }
-    }
-  `;
-  document.head.appendChild(cursorStyle);
 
   const nav = document.createElement('div');
   nav.innerHTML = `
