@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Compare Players · Asian Tier List [1.8+]</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏆</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚔️</text></svg>">
     <link rel="stylesheet" href="assets/css/tokens.css">
     <link rel="stylesheet" href="assets/css/components.css">
     <link rel="stylesheet" href="assets/css/main.css">
@@ -47,6 +47,7 @@
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            min-height: 400px;
         }
         .player-card.blue {
             border-color: var(--color-blue);
@@ -217,6 +218,11 @@
         .search-section .search-box button:hover {
             transform: scale(1.03);
         }
+        .search-section .search-box button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
         
         .search-examples {
             text-align: center;
@@ -238,13 +244,41 @@
         
         .no-player {
             text-align: center;
-            padding: 40px 20px;
+            padding: 60px 20px;
             color: var(--color-text-secondary);
         }
         .no-player .icon {
             font-size: 3rem;
             margin-bottom: 12px;
             opacity: 0.5;
+        }
+        
+        .loading-spinner {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--color-text-secondary);
+        }
+        .loading-spinner .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--color-border);
+            border-top-color: var(--color-blue);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 12px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--color-red);
+        }
+        .error-message .icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
         }
         
         @media (max-width: 900px) {
@@ -291,7 +325,7 @@
         <div class="search-section">
             <div class="search-box">
                 <input type="text" id="compare-search" placeholder="Search a player to compare... e.g., sheluvs1ztx, shizeen, svynzz">
-                <button onclick="searchPlayer()">Compare</button>
+                <button onclick="searchPlayer()" id="search-btn">Compare</button>
             </div>
             <div class="search-examples">
                 Try: 
@@ -302,7 +336,6 @@
         </div>
         
         <div class="compare-container" id="compare-container">
-            <!-- Player A (Blue) -->
             <div class="player-card blue" id="player-a-card">
                 <div class="no-player">
                     <div class="icon">👤</div>
@@ -315,7 +348,6 @@
                 <div class="line"></div>
             </div>
             
-            <!-- Player B (Red) -->
             <div class="player-card red" id="player-b-card">
                 <div class="no-player">
                     <div class="icon">👤</div>
@@ -332,111 +364,21 @@
     <script src="assets/js/nav.js"></script>
     <script src="assets/js/backgrounds.js"></script>
     <script>
-        // Compare logic
-        let currentPlayerA = null;
-        let currentPlayerB = null;
-        
-        // Mock player data - replace with real API calls
-        const playerData = {
-            'sheluvs1ztx': {
-                username: 'sheluvs1ztx',
-                discord: 'sheluvs1ztx#0001',
-                skin: 'https://crafatar.com/avatars/sheluvs1ztx?size=100',
-                overall: 'S',
-                stats: { wins: 1247, losses: 832, kd: 1.5, elo: 1842, games: 2079, winRate: 60 },
-                gamemodes: {
-                    'BedWars': 'S-',
-                    'Fireball Fight': 'A+',
-                    'Sumo': 'A',
-                    'Nodebuff': 'S-',
-                    'Boxing': 'B+',
-                    'BUHC': 'A+',
-                    'Bridges': 'S'
-                }
-            },
-            'shizeen': {
-                username: 'shizeen',
-                discord: 'shizeen#0002',
-                skin: 'https://crafatar.com/avatars/shizeen?size=100',
-                overall: 'A+',
-                stats: { wins: 1102, losses: 789, kd: 1.4, elo: 1795, games: 1891, winRate: 58 },
-                gamemodes: {
-                    'BedWars': 'A+',
-                    'Fireball Fight': 'A',
-                    'Sumo': 'S-',
-                    'Nodebuff': 'A',
-                    'Boxing': 'B+',
-                    'BUHC': 'A+',
-                    'Bridges': 'A'
-                }
-            },
-            'svynzz': {
-                username: 'svynzz',
-                discord: 'svynzz#0003',
-                skin: 'https://crafatar.com/avatars/svynzz?size=100',
-                overall: 'A',
-                stats: { wins: 987, losses: 723, kd: 1.36, elo: 1723, games: 1710, winRate: 57 },
-                gamemodes: {
-                    'BedWars': 'A',
-                    'Fireball Fight': 'B+',
-                    'Sumo': 'A+',
-                    'Nodebuff': 'A-',
-                    'Boxing': 'B',
-                    'BUHC': 'A',
-                    'Bridges': 'A+'
-                }
+        // ============================================================
+        // FROST PRACTICE API CONFIGURATION
+        // ============================================================
+        const FROST_API = {
+            baseUrl: 'http://localhost:8080', // CHANGE THIS TO YOUR SERVER
+            endpoints: {
+                player: '/api/stats?player=',
+                tier: '/api/tier?player='
             }
         };
+        // ============================================================
         
-        function renderPlayerCard(playerId, data) {
-            const card = document.getElementById(playerId);
-            if (!data) {
-                card.innerHTML = `
-                    <div class="no-player">
-                        <div class="icon">👤</div>
-                        <p>Select a player to compare</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            const isA = playerId === 'player-a-card';
-            const tierColor = getTierColor(data.overall);
-            
-            let gamemodeHTML = '';
-            const gamemodes = ['BedWars', 'Fireball Fight', 'Sumo', 'Nodebuff', 'Boxing', 'BUHC', 'Bridges'];
-            gamemodes.forEach(gm => {
-                const tier = data.gamemodes[gm] || 'N/A';
-                gamemodeHTML += `
-                    <div class="gamemode-tier-row">
-                        <span class="gm">${gm}</span>
-                        <span class="tier" style="color: ${getTierColor(tier)}">${tier}</span>
-                    </div>
-                `;
-            });
-            
-            card.innerHTML = `
-                <div class="skin-display">
-                    <img src="${data.skin}" alt="Minecraft skin of ${data.username}" loading="lazy">
-                </div>
-                <div class="player-name">${data.username}</div>
-                <div class="player-discord">${data.discord}</div>
-                <div class="overall-tier" style="color: ${tierColor}">${data.overall}</div>
-                
-                <div class="stat-grid">
-                    <div class="stat-item"><span class="label">Wins</span><span class="value">${data.stats.wins}</span></div>
-                    <div class="stat-item"><span class="label">Losses</span><span class="value">${data.stats.losses}</span></div>
-                    <div class="stat-item"><span class="label">K/D</span><span class="value">${data.stats.kd}</span></div>
-                    <div class="stat-item"><span class="label">ELO</span><span class="value">${data.stats.elo}</span></div>
-                    <div class="stat-item"><span class="label">Games</span><span class="value">${data.stats.games}</span></div>
-                    <div class="stat-item"><span class="label">Win Rate</span><span class="value">${data.stats.winRate}%</span></div>
-                </div>
-                
-                <div class="gamemode-tiers">
-                    ${gamemodeHTML}
-                </div>
-            `;
-        }
+        let currentPlayerA = null;
+        let currentPlayerB = null;
+        let isLoading = false;
         
         function getTierColor(tier) {
             const colors = {
@@ -458,53 +400,168 @@
             return colors[tier] || '#ffffff';
         }
         
-        function searchPlayer() {
-            const input = document.getElementById('compare-search');
-            const query = input.value.trim().toLowerCase();
-            if (!query) return;
-            
-            // Try to find player
-            let player = null;
-            for (const [key, data] of Object.entries(playerData)) {
-                if (key.toLowerCase() === query || key.toLowerCase().includes(query)) {
-                    player = data;
-                    break;
+        async function fetchPlayerData(username) {
+            try {
+                // Fetch stats from Frost Practice server
+                const statsResponse = await fetch(`${FROST_API.baseUrl}${FROST_API.endpoints.player}${encodeURIComponent(username)}`);
+                if (!statsResponse.ok) {
+                    throw new Error(`Server returned ${statsResponse.status}`);
                 }
+                const stats = await statsResponse.json();
+                
+                // Fetch tier data
+                const tierResponse = await fetch(`${FROST_API.baseUrl}${FROST_API.endpoints.tier}${encodeURIComponent(username)}`);
+                let tiers = {};
+                if (tierResponse.ok) {
+                    tiers = await tierResponse.json();
+                }
+                
+                return {
+                    username: stats.username || username,
+                    discord: stats.discord || `${username}#0000`,
+                    skin: `https://crafatar.com/avatars/${encodeURIComponent(username)}?size=100`,
+                    overall: tiers.overall || 'N/A',
+                    stats: {
+                        wins: stats.wins || 0,
+                        losses: stats.losses || 0,
+                        kd: stats.kd || 0,
+                        elo: stats.elo || 0,
+                        games: stats.games || 0,
+                        winRate: stats.winRate || 0
+                    },
+                    gamemodes: tiers.gamemodes || {}
+                };
+            } catch (error) {
+                console.error('Error fetching player data:', error);
+                throw error;
             }
-            
-            if (!player) {
-                // Player not found - show error
-                document.getElementById('player-a-card').innerHTML = `
+        }
+        
+        function renderPlayerCard(cardId, data) {
+            const card = document.getElementById(cardId);
+            if (!data) {
+                card.innerHTML = `
                     <div class="no-player">
-                        <div class="icon">❌</div>
-                        <p>Player "${query}" not found</p>
-                        <p style="font-size: 0.85rem; margin-top: 8px;">Try: sheluvs1ztx, shizeen, svynzz</p>
+                        <div class="icon">👤</div>
+                        <p>Select a player to compare</p>
                     </div>
                 `;
                 return;
             }
             
-            // Set as Player A, shift B if needed
-            if (!currentPlayerA) {
-                currentPlayerA = player;
-                renderPlayerCard('player-a-card', player);
-            } else if (!currentPlayerB) {
-                currentPlayerB = player;
-                renderPlayerCard('player-b-card', player);
-            } else {
-                // Both filled - replace A, shift B
-                currentPlayerA = currentPlayerB;
-                currentPlayerB = player;
-                renderPlayerCard('player-a-card', currentPlayerA);
-                renderPlayerCard('player-b-card', currentPlayerB);
+            const tierColor = getTierColor(data.overall);
+            
+            // Define gamemodes order
+            const gamemodes = ['BedWars', 'Fireball Fight', 'Sumo', 'Nodebuff', 'Boxing', 'BUHC', 'Bridges'];
+            let gamemodeHTML = '';
+            gamemodes.forEach(gm => {
+                const tier = data.gamemodes[gm] || 'N/A';
+                const color = getTierColor(tier);
+                gamemodeHTML += `
+                    <div class="gamemode-tier-row">
+                        <span class="gm">${gm}</span>
+                        <span class="tier" style="color: ${color}">${tier}</span>
+                    </div>
+                `;
+            });
+            
+            card.innerHTML = `
+                <div class="skin-display">
+                    <img src="${data.skin}" alt="Minecraft skin of ${data.username}" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22%3E%3Crect width=%22100%22 height=%22100%22 fill=%22%23333%22/%3E%3Ctext x=%2250%22 y=%2255%22 text-anchor=%22middle%22 fill=%22%23666%22 font-size=%2240%22%3E?%3C/text%3E%3C/svg%3E'">
+                </div>
+                <div class="player-name">${data.username}</div>
+                <div class="player-discord">${data.discord}</div>
+                <div class="overall-tier" style="color: ${tierColor}">${data.overall}</div>
+                
+                <div class="stat-grid">
+                    <div class="stat-item"><span class="label">Wins</span><span class="value">${data.stats.wins}</span></div>
+                    <div class="stat-item"><span class="label">Losses</span><span class="value">${data.stats.losses}</span></div>
+                    <div class="stat-item"><span class="label">K/D</span><span class="value">${data.stats.kd}</span></div>
+                    <div class="stat-item"><span class="label">ELO</span><span class="value">${data.stats.elo}</span></div>
+                    <div class="stat-item"><span class="label">Games</span><span class="value">${data.stats.games}</span></div>
+                    <div class="stat-item"><span class="label">Win Rate</span><span class="value">${data.stats.winRate}%</span></div>
+                </div>
+                
+                <div class="gamemode-tiers">
+                    ${gamemodeHTML}
+                </div>
+            `;
+        }
+        
+        function showLoading(cardId) {
+            const card = document.getElementById(cardId);
+            card.innerHTML = `
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                    <p>Loading player data...</p>
+                </div>
+            `;
+        }
+        
+        function showError(cardId, message) {
+            const card = document.getElementById(cardId);
+            card.innerHTML = `
+                <div class="error-message">
+                    <div class="icon">❌</div>
+                    <p>${message}</p>
+                    <p style="font-size: 0.85rem; margin-top: 8px; color: var(--color-text-secondary)">Try: sheluvs1ztx, shizeen, svynzz</p>
+                </div>
+            `;
+        }
+        
+        async function searchPlayer() {
+            if (isLoading) return;
+            
+            const input = document.getElementById('compare-search');
+            const query = input.value.trim();
+            if (!query) return;
+            
+            const btn = document.getElementById('search-btn');
+            btn.disabled = true;
+            btn.textContent = 'Searching...';
+            isLoading = true;
+            
+            try {
+                const playerData = await fetchPlayerData(query);
+                
+                // Check if player exists
+                if (!playerData || playerData.stats.games === 0) {
+                    showError('player-a-card', `Player "${query}" not found on Frost Practice`);
+                    btn.disabled = false;
+                    btn.textContent = 'Compare';
+                    isLoading = false;
+                    return;
+                }
+                
+                // Assign to slots
+                if (!currentPlayerA) {
+                    currentPlayerA = playerData;
+                    renderPlayerCard('player-a-card', playerData);
+                } else if (!currentPlayerB) {
+                    currentPlayerB = playerData;
+                    renderPlayerCard('player-b-card', playerData);
+                } else {
+                    // Both filled - shift: B becomes A, new player becomes B
+                    currentPlayerA = currentPlayerB;
+                    currentPlayerB = playerData;
+                    renderPlayerCard('player-a-card', currentPlayerA);
+                    renderPlayerCard('player-b-card', currentPlayerB);
+                }
+                
+                input.value = '';
+            } catch (error) {
+                console.error('Search error:', error);
+                showError('player-a-card', `Failed to fetch player data: ${error.message}`);
             }
             
-            input.value = '';
+            btn.disabled = false;
+            btn.textContent = 'Compare';
+            isLoading = false;
         }
         
         function loadExample(username) {
             document.getElementById('compare-search').value = username;
-            // Clear current players
+            // Reset comparison
             currentPlayerA = null;
             currentPlayerB = null;
             renderPlayerCard('player-a-card', null);
@@ -515,6 +572,14 @@
         // Enter key support
         document.getElementById('compare-search').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') searchPlayer();
+        });
+        
+        // Initialize with example on load
+        window.addEventListener('load', function() {
+            // Load first example automatically
+            setTimeout(() => {
+                loadExample('sheluvs1ztx');
+            }, 500);
         });
     </script>
 </body>
