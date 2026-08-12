@@ -1,287 +1,482 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Support — Asian Tier List [1.8+]</title>
-<meta name="description" content="Open a private support ticket with staff — tier disputes, player reports, bugs, and more.">
-<link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="assets/css/main.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support · Asian Tier List [1.8+]</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💬</text></svg>">
+    <link rel="stylesheet" href="assets/css/tokens.css">
+    <link rel="stylesheet" href="assets/css/components.css">
+    <link rel="stylesheet" href="assets/css/main.css">
+    <style>
+        .support-hero {
+            text-align: center;
+            padding: 30px 20px 20px;
+        }
+        .support-hero h1 {
+            font-size: clamp(2rem, 4vw, 3.2rem);
+            font-weight: var(--font-weight-extrabold);
+            background: var(--gradient-brand);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .support-hero p {
+            color: var(--color-text-secondary);
+            font-size: 1.1rem;
+            margin-top: 4px;
+        }
+
+        .support-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 20px 40px;
+        }
+
+        .support-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-lg);
+        }
+
+        .support-card {
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            border: 1px solid var(--color-border);
+            backdrop-filter: blur(10px);
+            text-align: center;
+            transition: all var(--transition-normal);
+        }
+        .support-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--color-border-light);
+            box-shadow: var(--shadow-lg);
+        }
+        .support-card .icon {
+            font-size: 2.5rem;
+            margin-bottom: var(--spacing-sm);
+        }
+        .support-card h3 {
+            font-size: 1.1rem;
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--spacing-sm);
+        }
+        .support-card p {
+            color: var(--color-text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        .support-card .btn {
+            display: inline-block;
+            margin-top: var(--spacing-md);
+            padding: 8px 24px;
+            border-radius: var(--radius-full);
+            background: var(--gradient-brand);
+            color: white;
+            text-decoration: none;
+            font-weight: var(--font-weight-bold);
+            transition: all var(--transition-fast);
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .support-card .btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 20px rgba(230, 57, 70, 0.3);
+        }
+        .support-card .btn.discord-btn {
+            background: #5865F2;
+        }
+        .support-card .btn.discord-btn:hover {
+            box-shadow: 0 4px 20px rgba(88, 101, 242, 0.3);
+        }
+
+        .support-card.full-width {
+            grid-column: 1 / -1;
+        }
+
+        /* Ticket System */
+        .ticket-section {
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            border: 1px solid var(--color-border);
+            backdrop-filter: blur(10px);
+            margin-top: var(--spacing-xl);
+        }
+        .ticket-section h2 {
+            font-size: 1.2rem;
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .form-group {
+            margin-bottom: var(--spacing-md);
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: 4px;
+            color: var(--color-text-secondary);
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--color-background);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            color: var(--color-text);
+            font-family: var(--font-family);
+            font-size: 0.95rem;
+            transition: border-color var(--transition-fast);
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--color-blue);
+        }
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .submit-btn {
+            padding: 12px 32px;
+            background: var(--gradient-brand);
+            border: none;
+            border-radius: var(--radius-full);
+            color: white;
+            font-weight: var(--font-weight-bold);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            font-size: 1rem;
+        }
+        .submit-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 20px rgba(230, 57, 70, 0.3);
+        }
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .ticket-list {
+            margin-top: var(--spacing-md);
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .ticket-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--color-border);
+        }
+        .ticket-item:last-child {
+            border-bottom: none;
+        }
+        .ticket-item .info .subject {
+            font-weight: var(--font-weight-semibold);
+        }
+        .ticket-item .info .meta {
+            font-size: 0.8rem;
+            color: var(--color-text-secondary);
+        }
+        .ticket-item .status {
+            padding: 2px 12px;
+            border-radius: var(--radius-full);
+            font-size: 0.7rem;
+            font-weight: var(--font-weight-semibold);
+            text-transform: uppercase;
+        }
+        .ticket-item .status.pending { background: #f59e0b; color: white; }
+        .ticket-item .status.resolved { background: #22c55e; color: white; }
+        .ticket-item .status.closed { background: var(--color-text-tertiary); color: white; }
+
+        .login-prompt {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        .login-prompt .icon {
+            font-size: 3rem;
+            margin-bottom: var(--spacing-md);
+            opacity: 0.5;
+        }
+
+        .no-tickets {
+            text-align: center;
+            padding: 20px;
+            color: var(--color-text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .support-grid {
+                grid-template-columns: 1fr;
+            }
+            .support-card.full-width {
+                grid-column: 1;
+            }
+        }
+        @media (max-width: 480px) {
+            .support-card {
+                padding: var(--spacing-md);
+            }
+            .ticket-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 6px;
+            }
+        }
+    </style>
 </head>
 <body>
-<main>
-  <section class="page-hero">
-    <div class="container">
-      <div class="eyebrow">We're here to help</div>
-      <h1 class="h-title" style="font-size:clamp(32px,5vw,52px);">Support</h1>
-      <p class="h-sub" style="max-width:640px;">Open a private ticket with staff for tier disputes, player reports, bugs, or anything else. Only you and staff can see it.</p>
+    <div id="app">
+        <nav id="main-nav"></nav>
+
+        <div class="support-hero">
+            <h1>💬 Support</h1>
+            <p>Get help and submit support tickets</p>
+        </div>
+
+        <div class="support-container">
+            <!-- Support Options -->
+            <div class="support-grid">
+                <div class="support-card">
+                    <div class="icon">📖</div>
+                    <h3>FAQ & Rules</h3>
+                    <p>Check the rules page for common questions and guidelines.</p>
+                    <a href="rules.html" class="btn">View Rules</a>
+                </div>
+                <div class="support-card">
+                    <div class="icon">💬</div>
+                    <h3>Discord Server</h3>
+                    <p>Join our Discord for real-time support and community help.</p>
+                    <a href="#" class="btn discord-btn" id="support-discord-btn">Join Discord</a>
+                </div>
+                <div class="support-card full-width">
+                    <div class="icon">📧</div>
+                    <h3>Submit a Ticket</h3>
+                    <p>Create a support ticket and our team will get back to you.</p>
+                </div>
+            </div>
+
+            <!-- Ticket System -->
+            <div class="ticket-section" id="ticket-section">
+                <h2>🎫 Support Tickets</h2>
+
+                <!-- Login Prompt -->
+                <div id="ticket-login-prompt" style="display:none;">
+                    <div class="login-prompt">
+                        <div class="icon">🔒</div>
+                        <p>Login with Discord to submit and view tickets.</p>
+                        <button class="discord-btn" onclick="window.ATL_SESSION.loginWithDiscord()">
+                            💬 Login with Discord
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Ticket Form -->
+                <div id="ticket-form-container" style="display:none;">
+                    <form id="ticket-form">
+                        <div class="form-group">
+                            <label for="ticket-subject">Subject <span style="color: var(--color-red);">*</span></label>
+                            <input type="text" id="ticket-subject" placeholder="Brief summary of your issue" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="ticket-category">Category <span style="color: var(--color-red);">*</span></label>
+                            <select id="ticket-category" required>
+                                <option value="">Select a category...</option>
+                                <option value="general">General</option>
+                                <option value="tier">Tier/Ranking Issue</option>
+                                <option value="tester">Tester Related</option>
+                                <option value="appeal">Appeal</option>
+                                <option value="bug">Bug Report</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="ticket-message">Message <span style="color: var(--color-red);">*</span></label>
+                            <textarea id="ticket-message" placeholder="Describe your issue in detail..." required></textarea>
+                        </div>
+                        <button type="submit" class="submit-btn" id="ticket-submit-btn">Submit Ticket</button>
+                    </form>
+                </div>
+
+                <!-- Ticket List -->
+                <div id="ticket-list-container" style="display:none;">
+                    <h3 style="font-size:1rem; margin-bottom:var(--spacing-md);">Your Tickets</h3>
+                    <div id="ticket-list" class="ticket-list">
+                        <div class="no-tickets">No tickets submitted yet.</div>
+                    </div>
+                </div>
+
+                <!-- Success Message -->
+                <div id="ticket-success" style="display:none; text-align:center; padding:20px;">
+                    <div style="font-size:2.5rem;">✅</div>
+                    <p style="font-weight:var(--font-weight-bold); margin-top:8px;">Ticket submitted successfully!</p>
+                    <p style="color: var(--color-text-secondary); font-size:0.9rem;">A staff member will respond shortly.</p>
+                </div>
+            </div>
+        </div>
+
+        <footer id="main-footer"></footer>
     </div>
-  </section>
 
-  <section class="section" style="padding-top:0;">
-    <div class="container" id="supportRoot"></div>
-  </section>
-</main>
+    <script src="assets/js/data.js"></script>
+    <script src="assets/js/session.js"></script>
+    <script src="assets/js/nav.js"></script>
+    <script src="assets/js/backgrounds.js"></script>
+    <script>
+        // ============================================================
+        // SUPPORT LOGIC
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            const session = window.ATL_SESSION.current();
+            
+            const loginPrompt = document.getElementById('ticket-login-prompt');
+            const formContainer = document.getElementById('ticket-form-container');
+            const listContainer = document.getElementById('ticket-list-container');
+            const ticketList = document.getElementById('ticket-list');
 
-<div class="modal-backdrop" id="newTicketModal">
-  <div class="glass modal">
-    <div class="modal-head">
-      <h3>New support ticket</h3>
-      <button class="modal-close" id="ntClose">✕</button>
-    </div>
-    <div class="field"><label>Category</label>
-      <select class="select" id="ntCategory">
-        <option>General</option>
-        <option>Report a Player</option>
-        <option>Tier Dispute</option>
-        <option>Bug Report</option>
-        <option>Staff Application Help</option>
-        <option>Other</option>
-      </select>
-    </div>
-    <div class="field"><label>Subject</label><input class="input" id="ntSubject" placeholder="Short summary of your issue"></div>
-    <div class="field"><label>Message</label><textarea class="textarea" id="ntMessage" placeholder="Describe your issue in detail..."></textarea></div>
-    <button class="btn btn-primary btn-block" id="ntSubmit">Open Ticket</button>
-  </div>
-</div>
+            // Discord server link
+            document.getElementById('support-discord-btn').addEventListener('click', function(e) {
+                e.preventDefault();
+                window.open('https://discord.com/', '_blank');
+            });
 
-<script src="assets/js/data.js"></script>
-<script src="assets/js/session.js"></script>
-<script src="assets/js/nav.js"></script>
-<script src="assets/js/backgrounds.js"></script>
-<script type="module">
-  ATL_mountBackground('support');
-  const session = ATL_initShell('support.html');
-  const root = document.getElementById('supportRoot');
+            // Check authentication
+            if (!session.authenticated) {
+                loginPrompt.style.display = 'block';
+                formContainer.style.display = 'none';
+                listContainer.style.display = 'none';
+                return;
+            }
 
-  const POLL_MS = 4000;
-  let pollTimer = null;
-  let activeTicketId = null;
-  let viewMode = 'mine'; // 'mine' | 'all' (staff only)
-  let isStaff = false;
+            loginPrompt.style.display = 'none';
+            formContainer.style.display = 'block';
+            listContainer.style.display = 'block';
 
-  async function checkStaff(){
-    if(!session.authenticated) return false;
-    if(ATL_DATA.hasAtLeast(session.role, 'Owner')) return true;
-    const staff = await ATL_SESSION.loadStore('staff', []);
-    return staff.some(s => s.username && s.username.toLowerCase() === session.user.username.toLowerCase());
-  }
+            // --- Load tickets ---
+            async function loadTickets() {
+                try {
+                    const tickets = await window.ATL_SESSION.loadStore('tickets', []);
+                    const myTickets = tickets.filter(t => t.userId === session.user.id);
 
-  function timeAgo(iso){
-    const diff = Date.now() - new Date(iso).getTime();
-    const mins = Math.floor(diff/60000);
-    if(mins < 1) return 'just now';
-    if(mins < 60) return `${mins}m ago`;
-    const hrs = Math.floor(mins/60);
-    if(hrs < 24) return `${hrs}h ago`;
-    return `${Math.floor(hrs/24)}d ago`;
-  }
+                    if (myTickets.length === 0) {
+                        ticketList.innerHTML = '<div class="no-tickets">No tickets submitted yet.</div>';
+                        return;
+                    }
 
-  function avatarFor(name){
-    return `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(name)}&backgroundColor=141a29`;
-  }
+                    // Sort by date (newest first)
+                    const sorted = myTickets.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-  if(!session.authenticated){
-    root.innerHTML = `
-      <div class="glass empty-state">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        <h3>Sign in to open a ticket</h3>
-        <p>Support tickets are private and tied to your Discord account. Login to view or open one.</p>
-        <button class="btn btn-primary mt-16" id="supportLogin">Login with Discord</button>
-      </div>`;
-    document.getElementById('supportLogin').addEventListener('click', ATL_SESSION.loginWithDiscord);
-  } else {
-    isStaff = await checkStaff();
-    buildShell();
-    await refreshList();
-    pollTimer = setInterval(refreshList, POLL_MS);
-    window.addEventListener('beforeunload', ()=> clearInterval(pollTimer));
-  }
+                    ticketList.innerHTML = sorted.map(t => {
+                        const statusClass = t.status || 'pending';
+                        const date = new Date(t.date).toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric'
+                        });
+                        return `
+                            <div class="ticket-item">
+                                <div class="info">
+                                    <div class="subject">${t.subject}</div>
+                                    <div class="meta">${t.category || 'General'} · ${date}</div>
+                                </div>
+                                <span class="status ${statusClass}">${statusClass}</span>
+                            </div>
+                        `;
+                    }).join('');
 
-  function buildShell(){
-    root.innerHTML = `
-      <div class="flex-between" style="margin-bottom:18px;">
-        <div style="display:flex; gap:8px;">
-          <button class="btn btn-secondary btn-sm" id="tabMine" style="text-transform:none;">My Tickets</button>
-          ${isStaff ? '<button class="btn btn-ghost btn-sm" id="tabAll" style="text-transform:none;">All Tickets (Staff)</button>' : ''}
-        </div>
-        <button class="btn btn-primary btn-sm" id="openNewTicket" style="text-transform:none;">+ New Ticket</button>
-      </div>
-      <div class="ticket-shell">
-        <div class="glass card" style="padding:12px;">
-          <div class="ticket-list" id="ticketList"></div>
-        </div>
-        <div class="glass chat-panel" id="chatPanel">
-          <div class="empty-state" style="height:100%; justify-content:center;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            <h3>Select a ticket</h3>
-            <p>Pick a ticket on the left, or open a new one.</p>
-          </div>
-        </div>
-      </div>`;
+                } catch (error) {
+                    console.error('Error loading tickets:', error);
+                    ticketList.innerHTML = `
+                        <div style="text-align:center; padding:20px; color: var(--color-red);">
+                            Failed to load tickets: ${error.message}
+                        </div>
+                    `;
+                }
+            }
 
-    document.getElementById('openNewTicket').addEventListener('click', ()=> document.getElementById('newTicketModal').classList.add('open'));
-    document.getElementById('tabMine').addEventListener('click', ()=>{ viewMode='mine'; activeTicketId=null; setTabActive(); refreshList(); renderEmptyChat(); });
-    const tabAll = document.getElementById('tabAll');
-    if(tabAll) tabAll.addEventListener('click', ()=>{ viewMode='all'; activeTicketId=null; setTabActive(); refreshList(); renderEmptyChat(); });
-    setTabActive();
-  }
+            loadTickets();
 
-  function setTabActive(){
-    const m = document.getElementById('tabMine'), a = document.getElementById('tabAll');
-    if(m) m.className = 'btn btn-sm ' + (viewMode==='mine' ? 'btn-secondary' : 'btn-ghost');
-    if(a) a.className = 'btn btn-sm ' + (viewMode==='all' ? 'btn-secondary' : 'btn-ghost');
-    if(m) m.style.textTransform='none'; if(a) a.style.textTransform='none';
-  }
+            // --- Submit ticket ---
+            const form = document.getElementById('ticket-form');
+            const submitBtn = document.getElementById('ticket-submit-btn');
+            const successDiv = document.getElementById('ticket-success');
 
-  function renderEmptyChat(){
-    document.getElementById('chatPanel').innerHTML = `
-      <div class="empty-state" style="height:100%; justify-content:center;">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        <h3>Select a ticket</h3>
-        <p>Pick a ticket on the left, or open a new one.</p>
-      </div>`;
-  }
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
 
-  async function refreshList(){
-    const all = await ATL_SESSION.loadStore('tickets', []);
-    const mine = all.filter(t => t.userId === session.user.id);
-    const visible = viewMode === 'all' ? all : mine;
+                const subject = document.getElementById('ticket-subject').value.trim();
+                const category = document.getElementById('ticket-category').value;
+                const message = document.getElementById('ticket-message').value.trim();
 
-    const listEl = document.getElementById('ticketList');
-    if(!listEl) return;
+                if (!subject || !category || !message) {
+                    window.ATL_toast('Please fill in all fields', 'error');
+                    return;
+                }
 
-    if(visible.length === 0){
-      listEl.innerHTML = `<p class="text-sm text-muted" style="padding:12px;">${viewMode==='all' ? 'No tickets have been opened yet.' : "You haven't opened a ticket yet."}</p>`;
-    } else {
-      listEl.innerHTML = visible.slice().sort((a,b)=> new Date(b.updatedAt)-new Date(a.updatedAt)).map(t=>{
-        const last = t.messages[t.messages.length-1];
-        return `<div class="ticket-item ${t.id===activeTicketId?'active':''}" data-id="${t.id}">
-          <div class="ti-top">
-            <span class="ti-subject">${t.subject}</span>
-            <span class="pill ${t.status==='open'?'pill-teal':'pill-red'}" style="flex-shrink:0;">${t.status}</span>
-          </div>
-          <div class="ti-meta">${t.category} ${viewMode==='all' ? '· '+t.display : ''} · ${timeAgo(t.updatedAt)}</div>
-          <div class="ti-preview">${last ? (last.from==='staff'?'Staff: ':'')+last.body : ''}</div>
-        </div>`;
-      }).join('');
-      listEl.querySelectorAll('[data-id]').forEach(el=> el.addEventListener('click', ()=> openTicket(el.dataset.id)));
-    }
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Submitting...';
 
-    // if a ticket is open, refresh its chat contents too (for live-ish updates)
-    if(activeTicketId){
-      const t = all.find(x=>x.id===activeTicketId);
-      if(t) await renderChat(t); else { activeTicketId=null; renderEmptyChat(); }
-    }
-  }
+                try {
+                    const tickets = await window.ATL_SESSION.loadStore('tickets', []);
+                    const ticket = {
+                        id: Date.now().toString(),
+                        userId: session.user.id,
+                        username: session.user.display || session.user.username,
+                        subject: subject,
+                        category: category,
+                        status: 'pending',
+                        date: new Date().toISOString(),
+                        messages: [{
+                            from: 'user',
+                            text: message,
+                            at: new Date().toISOString()
+                        }]
+                    };
 
-  async function openTicket(id){
-    activeTicketId = id;
-    const all = await ATL_SESSION.loadStore('tickets', []);
-    const t = all.find(x=>x.id===id);
-    if(!t) return;
-    document.querySelectorAll('.ticket-item').forEach(el=> el.classList.toggle('active', el.dataset.id===id));
-    await renderChat(t);
-  }
+                    tickets.push(ticket);
+                    await window.ATL_SESSION.saveStore('tickets', tickets);
 
-  async function renderChat(t){
-    const panel = document.getElementById('chatPanel');
-    const canClose = isStaff || t.userId === session.user.id;
-    panel.innerHTML = `
-      <div class="chat-header">
-        <div>
-          <div style="font-family:var(--f-sub); font-weight:700; color:var(--text-0);">${t.subject}</div>
-          <div class="text-sm text-muted">${t.category} ${isStaff||viewMode==='all' ? '· opened by '+t.display : ''}</div>
-        </div>
-        <div style="display:flex; align-items:center; gap:10px;">
-          <span class="pill ${t.status==='open'?'pill-teal':'pill-red'}">${t.status}</span>
-          ${canClose && t.status==='open' ? '<button class="btn btn-outline-red btn-sm" id="closeTicketBtn" style="text-transform:none;">Close Ticket</button>' : ''}
-        </div>
-      </div>
-      <div class="chat-messages" id="chatMessages"></div>
-      <div class="chat-input-row">
-        <textarea class="textarea" id="chatInput" placeholder="${t.status==='closed'?'This ticket is closed.':'Type a message...'}" style="min-height:44px; max-height:120px;" ${t.status==='closed'?'disabled':''}></textarea>
-        <button class="btn btn-primary" id="chatSend" ${t.status==='closed'?'disabled':''}>Send</button>
-      </div>`;
+                    // Show success
+                    form.style.display = 'none';
+                    successDiv.style.display = 'block';
+                    window.ATL_toast('Ticket submitted successfully! 🎫', 'success');
 
-    const msgsEl = document.getElementById('chatMessages');
-    for(const m of t.messages){
-      m._avatar = await ATL_SESSION.resolveAvatar({ discordId: m.authorId, discordUsername: m.authorName, discordAvatar: m.authorAvatar });
-    }
-    msgsEl.innerHTML = t.messages.map(m=>{
-      const mine = m.authorId === session.user.id;
-      return `<div class="msg-row ${mine?'mine':''} ${m.from==='staff'&&!mine?'staff-msg':''}">
-        <img src="${m._avatar}" style="object-fit:cover;">
-        <div>
-          <div class="msg-bubble">${m.body}</div>
-          <div class="msg-meta">${m.authorName}${m.from==='staff'?' · staff':''} · ${timeAgo(m.at)}</div>
-        </div>
-      </div>`;
-    }).join('') || '<p class="text-sm text-muted">No messages yet.</p>';
-    msgsEl.scrollTop = msgsEl.scrollHeight;
+                    // Reload tickets after delay
+                    setTimeout(() => {
+                        form.style.display = 'block';
+                        successDiv.style.display = 'none';
+                        form.reset();
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Submit Ticket';
+                        loadTickets();
+                    }, 3000);
 
-    const closeBtn = document.getElementById('closeTicketBtn');
-    if(closeBtn) closeBtn.addEventListener('click', async ()=>{
-      const all = await ATL_SESSION.loadStore('tickets', []);
-      const idx = all.findIndex(x=>x.id===t.id);
-      if(idx>=0){ all[idx].status='closed'; all[idx].updatedAt = new Date().toISOString(); await ATL_SESSION.saveStore('tickets', all); }
-      ATL_toast('Ticket closed.', 'success');
-      openTicket(t.id); refreshList();
-    });
+                } catch (error) {
+                    console.error('Error submitting ticket:', error);
+                    window.ATL_toast('Failed to submit ticket: ' + error.message, 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Submit Ticket';
+                }
+            });
 
-    const sendBtn = document.getElementById('chatSend');
-    if(sendBtn) sendBtn.addEventListener('click', async ()=>{
-      const input = document.getElementById('chatInput');
-      const body = input.value.trim();
-      if(!body) return;
-      const all = await ATL_SESSION.loadStore('tickets', []);
-      const idx = all.findIndex(x=>x.id===t.id);
-      if(idx<0) return;
-      all[idx].messages.push({
-        id: Date.now(),
-        from: isStaff && t.userId !== session.user.id ? 'staff' : 'user',
-        authorId: session.user.id,
-        authorName: session.user.display,
-        authorAvatar: session.user.avatar,
-        body,
-        at: new Date().toISOString()
-      });
-      all[idx].updatedAt = new Date().toISOString();
-      await ATL_SESSION.saveStore('tickets', all);
-      input.value = '';
-      openTicket(t.id); refreshList();
-    });
-  }
-
-  document.getElementById('ntClose').addEventListener('click', ()=> document.getElementById('newTicketModal').classList.remove('open'));
-  document.getElementById('newTicketModal').addEventListener('click', e=>{ if(e.target.id==='newTicketModal') e.currentTarget.classList.remove('open'); });
-  document.getElementById('ntSubmit').addEventListener('click', async ()=>{
-    if(!session.authenticated){ ATL_toast('Login first.', 'error'); return; }
-    const subject = document.getElementById('ntSubject').value.trim();
-    const message = document.getElementById('ntMessage').value.trim();
-    if(!subject || !message){ ATL_toast('Fill in a subject and message.', 'error'); return; }
-    const category = document.getElementById('ntCategory').value;
-    const all = await ATL_SESSION.loadStore('tickets', []);
-    const now = new Date().toISOString();
-    const ticket = {
-      id: 'tk_' + Date.now(),
-      userId: session.user.id,
-      username: session.user.username,
-      display: session.user.display,
-      avatar: session.user.avatar,
-      subject, category, status: 'open',
-      createdAt: now, updatedAt: now,
-      messages: [{ id: Date.now(), from:'user', authorId: session.user.id, authorName: session.user.display, authorAvatar: session.user.avatar, body: message, at: now }]
-    };
-    all.push(ticket);
-    await ATL_SESSION.saveStore('tickets', all);
-    document.getElementById('newTicketModal').classList.remove('open');
-    document.getElementById('ntSubject').value=''; document.getElementById('ntMessage').value='';
-    ATL_toast('Ticket opened.', 'success');
-    viewMode='mine'; setTabActive();
-    await refreshList();
-    openTicket(ticket.id);
-  });
-</script>
+            // --- Handle session updates ---
+            window.addEventListener('session-update', function() {
+                const newSession = window.ATL_SESSION.current();
+                if (!newSession.authenticated) {
+                    window.location.reload();
+                }
+            });
+        });
+    </script>
 </body>
 </html>
