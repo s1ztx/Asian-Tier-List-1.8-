@@ -1,576 +1,845 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Owner Panel — Asian Tier List [1.8+]</title>
-<link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="assets/css/main.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Owner Panel · Asian Tier List [1.8+]</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👑</text></svg>">
+    <link rel="stylesheet" href="assets/css/tokens.css">
+    <link rel="stylesheet" href="assets/css/components.css">
+    <link rel="stylesheet" href="assets/css/main.css">
+    <style>
+        .panel-hero {
+            text-align: center;
+            padding: 30px 20px 20px;
+        }
+        .panel-hero h1 {
+            font-size: clamp(2rem, 4vw, 3.2rem);
+            font-weight: var(--font-weight-extrabold);
+            background: var(--gradient-brand);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .panel-hero p {
+            color: var(--color-text-secondary);
+            font-size: 1.1rem;
+            margin-top: 4px;
+        }
+
+        .panel-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px 40px;
+        }
+
+        .owner-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-lg);
+        }
+
+        .owner-card {
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            border: 1px solid var(--color-border);
+            backdrop-filter: blur(10px);
+        }
+        .owner-card.full-width {
+            grid-column: 1 / -1;
+        }
+        .owner-card h2 {
+            font-size: 1.1rem;
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--spacing-md);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+        .owner-card h2 .badge {
+            font-size: 0.7rem;
+            background: var(--color-blue);
+            color: white;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: var(--spacing-md);
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: 4px;
+            color: var(--color-text-secondary);
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--color-background);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            color: var(--color-text);
+            font-family: var(--font-family);
+            font-size: 0.95rem;
+            transition: border-color var(--transition-fast);
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--color-blue);
+        }
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .submit-btn {
+            padding: 10px 24px;
+            background: var(--gradient-brand);
+            border: none;
+            border-radius: var(--radius-full);
+            color: white;
+            font-weight: var(--font-weight-bold);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            font-size: 0.95rem;
+        }
+        .submit-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 20px rgba(230, 57, 70, 0.3);
+        }
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .submit-btn.secondary {
+            background: var(--color-surface);
+            color: var(--color-text);
+            border: 1px solid var(--color-border);
+        }
+        .submit-btn.danger {
+            background: #e63946;
+        }
+        .submit-btn.danger:hover {
+            box-shadow: 0 4px 20px rgba(230, 57, 70, 0.4);
+        }
+
+        .item-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .item-entry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--color-border);
+            font-size: 0.9rem;
+        }
+        .item-entry:last-child {
+            border-bottom: none;
+        }
+        .item-entry .actions {
+            display: flex;
+            gap: 6px;
+        }
+        .item-entry .actions button {
+            padding: 2px 10px;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: var(--font-weight-semibold);
+            transition: all var(--transition-fast);
+        }
+        .item-entry .actions .edit-btn {
+            background: var(--color-blue);
+            color: white;
+        }
+        .item-entry .actions .edit-btn:hover {
+            opacity: 0.8;
+        }
+        .item-entry .actions .delete-btn {
+            background: #e63946;
+            color: white;
+        }
+        .item-entry .actions .delete-btn:hover {
+            opacity: 0.8;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 20px;
+            color: var(--color-text-secondary);
+        }
+        .no-data .icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            opacity: 0.5;
+        }
+
+        .access-denied {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        .access-denied .icon {
+            font-size: 4rem;
+            margin-bottom: var(--spacing-md);
+            opacity: 0.5;
+        }
+        .access-denied h2 {
+            font-size: 1.8rem;
+            margin-bottom: var(--spacing-sm);
+        }
+        .access-denied p {
+            color: var(--color-text-secondary);
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .stats-grid-owner {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: var(--spacing-sm);
+        }
+        .stats-grid-owner .stat-box {
+            text-align: center;
+            padding: var(--spacing-md);
+            background: var(--color-background);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--color-border);
+        }
+        .stats-grid-owner .stat-box .num {
+            font-size: 1.5rem;
+            font-weight: var(--font-weight-extrabold);
+            color: var(--color-text);
+        }
+        .stats-grid-owner .stat-box .label {
+            font-size: 0.7rem;
+            color: var(--color-text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        @media (max-width: 900px) {
+            .owner-grid {
+                grid-template-columns: 1fr;
+            }
+            .owner-card.full-width {
+                grid-column: 1;
+            }
+        }
+        @media (max-width: 480px) {
+            .owner-card {
+                padding: var(--spacing-md);
+            }
+            .item-entry {
+                flex-direction: column;
+                gap: 6px;
+                align-items: flex-start;
+            }
+        }
+    </style>
 </head>
 <body>
-<main>
-  <section class="page-hero" style="padding-bottom:24px;">
-    <div class="container">
-      <div class="eyebrow">Command center</div>
-      <h1 class="h-title" style="font-size:clamp(30px,4.6vw,44px);">Owner Panel</h1>
-      <p class="h-sub">Full control over staff, testers, content, and platform settings. Visible to Owner and Founder only.</p>
-    </div>
-  </section>
-  <section class="section" style="padding-top:0;">
-    <div class="container" id="panelRoot"></div>
-  </section>
-</main>
+    <div id="app">
+        <nav id="main-nav"></nav>
 
-<div class="modal-backdrop" id="formModal">
-  <div class="glass modal" id="formModalInner"></div>
-</div>
-
-<script src="assets/js/data.js"></script>
-<script src="assets/js/session.js"></script>
-<script src="assets/js/nav.js"></script>
-<script src="assets/js/backgrounds.js"></script>
-<script type="module">
-ATL_mountBackground('owner-panel');
-const session = ATL_initShell('owner-panel.html');
-const root = document.getElementById('panelRoot');
-
-if(!ATL_DATA.hasAtLeast(session.role, 'Owner')){
-  root.innerHTML = `
-    <div class="glass empty-state">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
-      <h3>Owner access required</h3>
-      <p>This panel is restricted to Owner and Founder. ${session.authenticated ? "Your current role is "+session.role+"." : "Login with Discord to check your role."}</p>
-      ${!session.authenticated ? '<button class="btn btn-primary mt-16" id="opLogin">Login with Discord</button>' : ''}
-    </div>`;
-  const b = document.getElementById('opLogin'); if(b) b.addEventListener('click', ATL_SESSION.loginWithDiscord);
-} else {
-  buildPanel();
-}
-
-async function audit(action, detail){
-  const log = await ATL_SESSION.loadStore('audit_log', []);
-  log.push({ action, detail, actor: session.user.display, date: new Date().toLocaleString() });
-  await ATL_SESSION.saveStore('audit_log', log);
-}
-function openModal(html){ document.getElementById('formModalInner').innerHTML = html; document.getElementById('formModal').classList.add('open'); }
-function closeModal(){ document.getElementById('formModal').classList.remove('open'); }
-document.getElementById('formModal').addEventListener('click', e=>{ if(e.target.id==='formModal') closeModal(); });
-
-function buildPanel(){
-  root.innerHTML = `
-  <div class="panel-shell">
-    <nav class="glass panel-nav">
-      <div class="panel-nav-group"><h5>Overview</h5>
-        <div class="panel-tab active" data-view="dashboard">Dashboard</div>
-        <div class="panel-tab" data-view="analytics">Analytics</div>
-        <div class="panel-tab" data-view="statistics">Statistics</div>
-      </div>
-      <div class="panel-nav-group"><h5>People</h5>
-        <div class="panel-tab" data-view="staff">Manage Staff</div>
-        <div class="panel-tab" data-view="staffApps">Staff Applications</div>
-        <div class="panel-tab" data-view="testers">Manage Testers</div>
-      </div>
-      <div class="panel-nav-group"><h5>Content</h5>
-        <div class="panel-tab" data-view="announcements">Announcements</div>
-        <div class="panel-tab" data-view="reviews">Reviews</div>
-        <div class="panel-tab" data-view="leaderboards">Leaderboards</div>
-        <div class="panel-tab" data-view="rules">Rules</div>
-      </div>
-      <div class="panel-nav-group"><h5>System</h5>
-        <div class="panel-tab" data-view="settings">Website Settings</div>
-        <div class="panel-tab" data-view="audit">Audit Logs</div>
-      </div>
-    </nav>
-    <div>
-      <div class="panel-view active" id="view-dashboard"></div>
-      <div class="panel-view" id="view-analytics"></div>
-      <div class="panel-view" id="view-statistics"></div>
-      <div class="panel-view" id="view-staff"></div>
-      <div class="panel-view" id="view-staffApps"></div>
-      <div class="panel-view" id="view-testers"></div>
-      <div class="panel-view" id="view-announcements"></div>
-      <div class="panel-view" id="view-reviews"></div>
-      <div class="panel-view" id="view-leaderboards"></div>
-      <div class="panel-view" id="view-rules"></div>
-      <div class="panel-view" id="view-settings"></div>
-      <div class="panel-view" id="view-audit"></div>
-    </div>
-  </div>`;
-
-  const OP_TAB_TITLES = { dashboard:'Dashboard', analytics:'Analytics', statistics:'Statistics', staff:'Manage Staff', staffApps:'Staff Applications', testers:'Manage Testers', announcements:'Announcements', reviews:'Reviews', leaderboards:'Leaderboards', rules:'Rules', settings:'Website Settings', audit:'Audit Logs' };
-  root.querySelectorAll('.panel-tab').forEach(t=> t.addEventListener('click', ()=>{
-    root.querySelectorAll('.panel-tab').forEach(x=>x.classList.toggle('active', x===t));
-    root.querySelectorAll('.panel-view').forEach(v=>v.classList.toggle('active', v.id==='view-'+t.dataset.view));
-    document.title = `${OP_TAB_TITLES[t.dataset.view]||'Dashboard'} · Owner Panel — Asian Tier List [1.8+]`;
-    renderView(t.dataset.view);
-  }));
-
-  renderView('dashboard');
-}
-
-async function counts(){
-  const apps = await ATL_SESSION.loadStore('applications', []);
-  const staff = await ATL_SESSION.loadStore('staff', []);
-  const testers = await ATL_SESSION.loadStore('testers', []);
-  const announcements = await ATL_SESSION.loadStore('announcements', []);
-  const reviews = await ATL_SESSION.loadStore('reviews', []);
-  const requests = await ATL_SESSION.loadStore('test_requests', []);
-  const tierLog = await ATL_SESSION.loadStore('tier_log', []);
-  const auditLog = await ATL_SESSION.loadStore('audit_log', []);
-  return {
-    staff: staff.length,
-    testers: testers.length,
-    announcements: announcements.length,
-    reviews: reviews.length,
-    requests: requests.length,
-    tiersLogged: tierLog.length,
-    audit: auditLog.length,
-    pendingStaffApps: apps.filter(a=>a.track==='staff' && a.status==='pending').length,
-  };
-}
-
-async function renderView(view){
-  const c = await counts();
-  if(view==='dashboard'){
-    document.getElementById('view-dashboard').innerHTML = `
-      <div class="grid-4">
-        <div class="glass stat-card"><div class="s-val">${c.staff}</div><div class="s-label">Staff members</div></div>
-        <div class="glass stat-card"><div class="s-val">${c.testers}</div><div class="s-label">Testers</div></div>
-        <div class="glass stat-card"><div class="s-val">${c.requests}</div><div class="s-label">Test requests</div></div>
-        <div class="glass stat-card"><div class="s-val">${c.pendingStaffApps}</div><div class="s-label">Pending staff applications</div></div>
-      </div>
-      <div class="glass card mt-24">
-        <div class="eyebrow">Quick actions</div>
-        <div class="mt-16" style="display:flex; gap:12px; flex-wrap:wrap;">
-          <button class="btn btn-primary btn-sm" style="text-transform:none;" data-goto="staff">+ Add staff</button>
-          <button class="btn btn-secondary btn-sm" style="text-transform:none;" data-goto="testers">+ Add tester</button>
-          <button class="btn btn-ghost btn-sm" style="text-transform:none;" data-goto="staffApps">Review applications</button>
-          <button class="btn btn-ghost btn-sm" style="text-transform:none;" data-goto="announcements">+ Post announcement</button>
-          <button class="btn btn-ghost btn-sm" style="text-transform:none;" data-goto="settings">Website settings</button>
+        <div class="panel-hero">
+            <h1>👑 Owner Panel</h1>
+            <p>Administration command center</p>
         </div>
-      </div>
-      <div class="glass card mt-24">
-        <div class="eyebrow">Recent activity</div>
-        <div class="mt-16" id="dashRecent"></div>
-      </div>`;
-    const fullAudit = await ATL_SESSION.loadStore('audit_log', []);
-    const recent = fullAudit.slice(-5).reverse();
-    document.getElementById('dashRecent').innerHTML = recent.length ? recent.map(a=>`<div class="rule-item" style="border-bottom:1px solid var(--hairline); padding:10px 0;"><span class="text-sm">${a.action} — <span class="text-muted">${a.detail}</span></span><span class="text-sm text-muted mono" style="margin-left:auto;">${a.date}</span></div>`).join('') : '<p class="text-sm text-muted">No actions logged yet this session.</p>';
-    document.getElementById('view-dashboard').querySelectorAll('[data-goto]').forEach(b=> b.addEventListener('click', ()=>{
-      const tab = root.querySelector(`.panel-tab[data-view="${b.dataset.goto}"]`); if(tab) tab.click();
-    }));
-  }
 
-  if(view==='analytics'){
-    document.getElementById('view-analytics').innerHTML = `
-      <div class="glass card">
-        <div class="eyebrow">Platform analytics</div>
-        <h3 class="mt-8">Requests by gamemode</h3>
-        <div class="mt-24" id="analyticsBars" style="display:flex; flex-direction:column; gap:12px;"></div>
-      </div>`;
-    const requests = await ATL_SESSION.loadStore('test_requests', []);
-    const max = Math.max(1, ...ATL_DATA.GAMEMODES.map(g=> requests.filter(r=>r.gamemode===g.id).length));
-    document.getElementById('analyticsBars').innerHTML = ATL_DATA.GAMEMODES.map(g=>{
-      const n = requests.filter(r=>r.gamemode===g.id).length;
-      const pct = Math.round((n/max)*100);
-      return `<div>
-        <div class="flex-between text-sm"><span>${g.label}</span><span class="text-muted mono">${n}</span></div>
-        <div style="height:8px; border-radius:6px; background:var(--panel-3); margin-top:6px; overflow:hidden;">
-          <div style="height:100%; width:${pct}%; background:linear-gradient(90deg, var(--red-500), var(--blue-500));"></div>
+        <div class="panel-container">
+            <!-- Access Denied -->
+            <div id="access-denied" style="display:none;">
+                <div class="access-denied">
+                    <div class="icon">🔒</div>
+                    <h2>Access Denied</h2>
+                    <p>You need to be an Owner or Founder to access this panel.</p>
+                    <button class="discord-btn" onclick="window.ATL_SESSION.loginWithDiscord()" style="margin-top: var(--spacing-md);">
+                        💬 Login with Discord
+                    </button>
+                </div>
+            </div>
+
+            <!-- Panel Content -->
+            <div id="panel-content" style="display:none;">
+                <!-- Stats -->
+                <div class="owner-card full-width">
+                    <h2>📊 Dashboard <span class="badge">Live</span></h2>
+                    <div class="stats-grid-owner" id="dashboard-stats">
+                        <div class="stat-box">
+                            <div class="num" id="stat-staff">0</div>
+                            <div class="label">Staff</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="num" id="stat-testers">0</div>
+                            <div class="label">Testers</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="num" id="stat-announcements">0</div>
+                            <div class="label">Announcements</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="num" id="stat-reviews">0</div>
+                            <div class="label">Reviews</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="num" id="stat-tests">0</div>
+                            <div class="label">Tests</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="num" id="stat-applications">0</div>
+                            <div class="label">Applications</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="owner-grid">
+                    <!-- Staff Management -->
+                    <div class="owner-card">
+                        <h2>👔 Staff Management <span class="badge">CRUD</span></h2>
+                        <div id="staff-list">
+                            <div class="no-data">
+                                <div class="icon">👔</div>
+                                <p>No staff members</p>
+                            </div>
+                        </div>
+                        <div style="margin-top: var(--spacing-md);">
+                            <h3 style="font-size:0.9rem; margin-bottom:var(--spacing-sm);">Add Staff</h3>
+                            <div class="form-group">
+                                <input type="text" id="staff-name" placeholder="Name">
+                            </div>
+                            <div class="form-group">
+                                <input type="text" id="staff-discord" placeholder="Discord username">
+                            </div>
+                            <div class="form-group">
+                                <select id="staff-rank">
+                                    <option value="Trial Moderator">Trial Moderator</option>
+                                    <option value="Moderator">Moderator</option>
+                                    <option value="Senior Moderator">Senior Moderator</option>
+                                    <option value="Admin">Admin</option>
+                                    <option value="Manager">Manager</option>
+                                    <option value="Owner">Owner</option>
+                                    <option value="Founder">Founder</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <input type="text" id="staff-minecraft" placeholder="Minecraft username (optional)">
+                            </div>
+                            <div class="form-group">
+                                <textarea id="staff-bio" placeholder="Bio (optional)" rows="2"></textarea>
+                            </div>
+                            <button class="submit-btn" id="staff-add-btn">Add Staff</button>
+                        </div>
+                    </div>
+
+                    <!-- Tester Management -->
+                    <div class="owner-card">
+                        <h2>🎯 Tester Management <span class="badge">CRUD</span></h2>
+                        <div id="tester-list">
+                            <div class="no-data">
+                                <div class="icon">🎯</div>
+                                <p>No testers</p>
+                            </div>
+                        </div>
+                        <div style="margin-top: var(--spacing-md);">
+                            <h3 style="font-size:0.9rem; margin-bottom:var(--spacing-sm);">Add Tester</h3>
+                            <div class="form-group">
+                                <input type="text" id="tester-name" placeholder="Name">
+                            </div>
+                            <div class="form-group">
+                                <input type="text" id="tester-discord" placeholder="Discord username">
+                            </div>
+                            <div class="form-group">
+                                <select id="tester-rank">
+                                    <option value="Tester">Tester</option>
+                                    <option value="Senior Tester">Senior Tester</option>
+                                    <option value="Testing Manager">Testing Manager</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <input type="text" id="tester-minecraft" placeholder="Minecraft username (optional)">
+                            </div>
+                            <div class="form-group">
+                                <select id="tester-gamemodes" multiple style="height:80px;">
+                                    <option value="bedwars">BedWars</option>
+                                    <option value="fireball">Fireball Fight</option>
+                                    <option value="sumo">Sumo</option>
+                                    <option value="nodebuff">Nodebuff</option>
+                                    <option value="boxing">Boxing</option>
+                                    <option value="buhc">BUHC</option>
+                                    <option value="bridges">Bridges</option>
+                                </select>
+                                <small style="color: var(--color-text-secondary);">Hold Ctrl/Cmd to select multiple</small>
+                            </div>
+                            <button class="submit-btn" id="tester-add-btn">Add Tester</button>
+                        </div>
+                    </div>
+
+                    <!-- Announcements -->
+                    <div class="owner-card">
+                        <h2>📢 Announcements <span class="badge">CRUD</span></h2>
+                        <div id="announcement-list">
+                            <div class="no-data">
+                                <div class="icon">📢</div>
+                                <p>No announcements</p>
+                            </div>
+                        </div>
+                        <div style="margin-top: var(--spacing-md);">
+                            <h3 style="font-size:0.9rem; margin-bottom:var(--spacing-sm);">Create Announcement</h3>
+                            <div class="form-group">
+                                <input type="text" id="announcement-title" placeholder="Title">
+                            </div>
+                            <div class="form-group">
+                                <select id="announcement-category">
+                                    <option value="general">General</option>
+                                    <option value="update">Update</option>
+                                    <option value="event">Event</option>
+                                    <option value="important">Important</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <textarea id="announcement-content" placeholder="Content" rows="3"></textarea>
+                            </div>
+                            <button class="submit-btn" id="announcement-add-btn">Post Announcement</button>
+                        </div>
+                    </div>
+
+                    <!-- Rules Management -->
+                    <div class="owner-card">
+                        <h2>📜 Rules Management <span class="badge">Edit</span></h2>
+                        <div class="form-group">
+                            <label for="rules-content">Rules Content</label>
+                            <textarea id="rules-content" rows="8" placeholder="Enter the rules content..."></textarea>
+                        </div>
+                        <button class="submit-btn" id="rules-save-btn">Save Rules</button>
+                        <div id="rules-status" style="margin-top: var(--spacing-sm);"></div>
+                    </div>
+
+                    <!-- Statistics -->
+                    <div class="owner-card full-width">
+                        <h2>📈 Server Statistics <span class="badge">Frost Practice</span></h2>
+                        <div id="server-stats">
+                            <div class="no-data">
+                                <div class="icon">📊</div>
+                                <p>Loading server stats...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>`;
-    }).join('');
-  }
 
-  if(view==='statistics'){
-    document.getElementById('view-statistics').innerHTML = `
-      <div class="grid-3">
-        <div class="glass stat-card"><div class="s-val">${c.announcements}</div><div class="s-label">Announcements posted</div></div>
-        <div class="glass stat-card"><div class="s-val">${c.reviews}</div><div class="s-label">Reviews submitted</div></div>
-        <div class="glass stat-card"><div class="s-val">${c.audit}</div><div class="s-label">Logged owner actions</div></div>
-      </div>
-      <div class="glass card mt-24">
-        <div class="eyebrow">Tier distribution</div>
-        <div class="mt-16" style="display:flex; gap:6px; flex-wrap:wrap;" id="tierDist"></div>
-      </div>`;
-    const log = await ATL_SESSION.loadStore('tier_log', []);
-    document.getElementById('tierDist').innerHTML = ATL_DATA.TIERS.map(t=>{
-      const n = log.filter(l=>l.tier===t.id).length;
-      return `<div style="text-align:center;">${ATL_hex(t.id,'sm')}<div class="text-sm text-muted mono mt-8">${n}</div></div>`;
-    }).join('');
-  }
-
-  if(view==='staff') renderStaff();
-  if(view==='staffApps') renderStaffApplications();
-  if(view==='testers') renderTesters();
-  if(view==='announcements') renderAnnouncements();
-  if(view==='reviews') renderReviewsMod();
-  if(view==='leaderboards') renderLeaderboardsMod();
-  if(view==='rules') renderRulesMod();
-  if(view==='settings') renderSettings();
-  if(view==='audit') renderAudit();
-}
-
-/* ---------------- STAFF ---------------- */
-async function renderStaff(){
-  const staff = await ATL_SESSION.loadStore('staff', []);
-  const el = document.getElementById('view-staff');
-  el.innerHTML = `
-    <div class="flex-between mt-8" style="margin-bottom:16px;">
-      <h3 style="margin:0;">Manage Staff</h3>
-      <button class="btn btn-primary btn-sm" id="addStaffBtn" style="text-transform:none;">+ Add Staff</button>
+        <footer id="main-footer"></footer>
     </div>
-    <div class="table-wrap glass" id="staffTableWrap"></div>`;
-  const wrap = document.getElementById('staffTableWrap');
-  if(staff.length===0){
-    wrap.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg><h3>No staff yet</h3><p>Add your first staff member to populate the Staff page.</p></div>`;
-  } else {
-    wrap.innerHTML = `<table class="dt"><thead><tr><th>Member</th><th>Role</th><th>Added</th><th>Actions</th></tr></thead>
-    <tbody>${staff.map((s,i)=>`
-      <tr>
-        <td>${s.display||s.username}</td>
-        <td>${ATL_roleBadge(s.role)}</td>
-        <td class="mono text-muted">${s.added}</td>
-        <td style="display:flex; gap:6px; flex-wrap:wrap;">
-          <button class="btn btn-ghost btn-sm" data-edit="${i}" style="text-transform:none;">Edit</button>
-          <button class="btn btn-ghost btn-sm" data-promote="${i}" style="text-transform:none;">Promote</button>
-          <button class="btn btn-ghost btn-sm" data-demote="${i}" style="text-transform:none;">Demote</button>
-          <button class="btn btn-outline-red btn-sm" data-delete="${i}" style="text-transform:none;">Delete</button>
-        </td>
-      </tr>`).join('')}</tbody></table>`;
-  }
 
-  document.getElementById('addStaffBtn').addEventListener('click', ()=> staffForm());
-  wrap.querySelectorAll('[data-edit]').forEach(b=> b.addEventListener('click', ()=> staffForm(staff[+b.dataset.edit], +b.dataset.edit)));
-  wrap.querySelectorAll('[data-delete]').forEach(b=> b.addEventListener('click', async ()=>{
-    const s = staff[+b.dataset.delete];
-    const updated = staff.filter((_,i)=>i!==+b.dataset.delete);
-    await ATL_SESSION.saveStore('staff', updated);
-    await audit('Deleted staff', s.display||s.username);
-    ATL_toast('Staff member removed.', 'success');
-    renderStaff();
-  }));
-  wrap.querySelectorAll('[data-promote]').forEach(b=> b.addEventListener('click', ()=> shiftRole(+b.dataset.promote, -1)));
-  wrap.querySelectorAll('[data-demote]').forEach(b=> b.addEventListener('click', ()=> shiftRole(+b.dataset.demote, 1)));
+    <script src="assets/js/data.js"></script>
+    <script src="assets/js/session.js"></script>
+    <script src="assets/js/nav.js"></script>
+    <script src="assets/js/backgrounds.js"></script>
+    <script src="assets/js/stats-api.js"></script>
+    <script>
+        // ============================================================
+        // OWNER PANEL LOGIC
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            const session = window.ATL_SESSION.current();
+            const isOwner = window.ATL_DATA.hasAtLeast(session.role, 'Owner');
 
-  async function shiftRole(idx, dir){
-    const s = staff[idx];
-    const roles = ATL_DATA.STAFF_ROLES; // index 0 = Founder (highest)
-    const newIdx = Math.min(roles.length-1, Math.max(0, roles.indexOf(s.role)+dir));
-    s.role = roles[newIdx];
-    await ATL_SESSION.saveStore('staff', staff);
-    await audit(dir<0?'Promoted staff':'Demoted staff', `${s.display||s.username} → ${s.role}`);
-    ATL_toast(`${s.display||s.username} is now ${s.role}.`, 'success');
-    renderStaff();
-  }
+            const accessDenied = document.getElementById('access-denied');
+            const panelContent = document.getElementById('panel-content');
 
-  function staffForm(existing, idx){
-    openModal(`
-      <div class="modal-head"><h3>${existing?'Edit Staff':'Add Staff'}</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
-      <div class="field"><label>Discord username</label><input class="input" id="fUsername" value="${existing?existing.username:''}" placeholder="e.g. moon_mod"></div>
-      <div class="field"><label>Display name</label><input class="input" id="fDisplay" value="${existing?existing.display||'':''}" placeholder="e.g. Moon"></div>
-      <div class="field"><label>Minecraft username (optional)</label><input class="input" id="fMc" value="${existing?existing.mcUsername||'':''}" placeholder="For their skin avatar"></div>
-      <div class="field"><label>Staff role</label><select class="select" id="fRole">${ATL_DATA.STAFF_ROLES.map(r=>`<option ${existing&&existing.role===r?'selected':''}>${r}</option>`).join('')}</select></div>
-      <div class="field"><label>Assign Discord role (server sync)</label><input class="input" id="fDiscordRole" value="${existing?existing.discordRole||existing.role:''}" placeholder="Discord role name to sync"><p class="hint">Written to the member's server roles once connected to the bot.</p></div>
-      <button class="btn btn-primary btn-block" id="saveStaff">${existing?'Save changes':'Add Staff'}</button>
-    `);
-    document.getElementById('saveStaff').addEventListener('click', async ()=>{
-      const username = document.getElementById('fUsername').value.trim();
-      if(!username){ ATL_toast('Enter a Discord username.', 'error'); return; }
-      const entry = {
-        username, display: document.getElementById('fDisplay').value.trim() || username,
-        mcUsername: document.getElementById('fMc').value.trim(),
-        role: document.getElementById('fRole').value,
-        discordRole: document.getElementById('fDiscordRole').value.trim(),
-        added: existing ? existing.added : new Date().toISOString().slice(0,10)
-      };
-      let list = await ATL_SESSION.loadStore('staff', []);
-      if(existing!=null && idx!=null) list[idx]=entry; else list.push(entry);
-      const ok = await ATL_SESSION.saveStore('staff', list);
-      if(!ok){ ATL_toast('Save failed — check the console for details.', 'error'); return; }
-      await audit(existing?'Edited staff':'Added staff', entry.display);
-      closeModal(); ATL_toast(existing?'Staff updated.':'Staff added.', 'success');
-      renderStaff();
-    });
-  }
-}
+            if (!isOwner) {
+                accessDenied.style.display = 'block';
+                panelContent.style.display = 'none';
+                return;
+            }
 
-/* ---------------- STAFF APPLICATIONS (review) ---------------- */
-async function renderStaffApplications(){
-  const all = await ATL_SESSION.loadStore('applications', []);
-  const apps = all.map((a,i)=>({ ...a, _idx: i })).filter(a=>a.track==='staff');
-  const el = document.getElementById('view-staffApps');
-  el.innerHTML = `<div class="table-wrap glass" id="staffAppsWrap"></div>`;
-  const wrap = document.getElementById('staffAppsWrap');
+            accessDenied.style.display = 'none';
+            panelContent.style.display = 'block';
 
-  if(apps.length===0){
-    wrap.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 4h16v16H4z"/></svg><h3>No staff applications</h3><p>Submissions from the Applications page will show up here for review.</p></div>`;
-    return;
-  }
+            // --- Helpers ---
+            function getTierColor(tier) {
+                return window.ATL_DATA.TIER_COLORS[tier] || '#94a3b8';
+            }
 
-  wrap.innerHTML = `<table class="dt"><thead><tr><th>Applicant</th><th>Age</th><th>Timezone</th><th>Submitted</th><th>Status</th><th>Actions</th></tr></thead>
-  <tbody>${apps.slice().reverse().map(a=>`
-    <tr>
-      <td>${a.username}</td>
-      <td class="mono">${a.age}</td>
-      <td class="mono text-muted">${a.timezone}</td>
-      <td class="mono text-muted">${a.submitted}</td>
-      <td><span class="pill ${a.status==='approved'?'pill-teal':a.status==='rejected'?'pill-red':'pill-gold'}">${a.status}</span></td>
-      <td style="display:flex; gap:6px; flex-wrap:wrap;">
-        <button class="btn btn-ghost btn-sm" data-view-app="${a._idx}" style="text-transform:none;">View</button>
-        <button class="btn btn-secondary btn-sm" data-approve="${a._idx}" style="text-transform:none;" ${a.status!=='pending'?'disabled':''}>Approve</button>
-        <button class="btn btn-outline-red btn-sm" data-reject="${a._idx}" style="text-transform:none;" ${a.status!=='pending'?'disabled':''}>Reject</button>
-      </td>
-    </tr>`).join('')}</tbody></table>`;
+            function getSkinUrl(username) {
+                return window.ATL_DATA.getSkinUrl(username, 32);
+            }
 
-  wrap.querySelectorAll('[data-view-app]').forEach(b=> b.addEventListener('click', ()=>{
-    const a = all[+b.dataset.viewApp];
-    openModal(`
-      <div class="modal-head"><h3>${a.username}'s application</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
-      <div class="field"><label>Age</label><p class="text-sm">${a.age}</p></div>
-      <div class="field"><label>Timezone</label><p class="text-sm">${a.timezone}</p></div>
-      <div class="field"><label>Why they want to join</label><p class="text-sm text-muted">${a.why||'—'}</p></div>
-      <div class="field"><label>Relevant experience</label><p class="text-sm text-muted">${a.experience||'—'}</p></div>
-      <div class="field"><label>Scenario 1</label><p class="text-sm text-muted">${a.scenario1||'—'}</p></div>
-      <div class="field"><label>Scenario 2</label><p class="text-sm text-muted">${a.scenario2||'—'}</p></div>
-    `);
-  }));
-  wrap.querySelectorAll('[data-approve]').forEach(b=> b.addEventListener('click', ()=>{
-    const idx = +b.dataset.approve;
-    const a = all[idx];
-    approveStaffApplication(a, idx, all);
-  }));
-  wrap.querySelectorAll('[data-reject]').forEach(b=> b.addEventListener('click', async ()=>{
-    const idx = +b.dataset.reject;
-    all[idx].status = 'rejected';
-    await ATL_SESSION.saveStore('applications', all);
-    await audit('Rejected staff application', all[idx].username);
-    ATL_toast('Application rejected.', 'success');
-    renderStaffApplications();
-  }));
-}
+            // --- Load Dashboard Stats ---
+            async function loadDashboardStats() {
+                try {
+                    const [staff, testers, announcements, reviews, tierLog, applications] = await Promise.all([
+                        window.ATL_SESSION.loadStore('staff', []),
+                        window.ATL_SESSION.loadStore('testers', []),
+                        window.ATL_SESSION.loadStore('announcements', []),
+                        window.ATL_SESSION.loadStore('reviews', []),
+                        window.ATL_SESSION.loadStore('tier_log', []),
+                        window.ATL_SESSION.loadStore('applications', [])
+                    ]);
 
-function approveStaffApplication(app, idx, all){
-  openModal(`
-    <div class="modal-head"><h3>Approve ${app.username}</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
-    <p class="text-sm text-muted">Choose their starting staff role. This adds them straight to the Staff roster.</p>
-    <div class="field mt-16"><label>Starting role</label>
-      <select class="select" id="approveRole">${ATL_DATA.STAFF_ROLES.slice().reverse().map(r=>`<option ${r==='Trial Moderator'?'selected':''}>${r}</option>`).join('')}</select>
-    </div>
-    <button class="btn btn-primary btn-block" id="confirmApproveStaff">Approve &amp; Add to Staff</button>
-  `);
-  document.getElementById('confirmApproveStaff').addEventListener('click', async ()=>{
-    const role = document.getElementById('approveRole').value;
-    const staff = await ATL_SESSION.loadStore('staff', []);
-    staff.push({ username: app.username, display: app.username, role, discordRole: role, added: new Date().toISOString().slice(0,10) });
-    await ATL_SESSION.saveStore('staff', staff);
-    all[idx].status = 'approved';
-    await ATL_SESSION.saveStore('applications', all);
-    await audit('Approved staff application', `${app.username} → ${role}`);
-    closeModal();
-    ATL_toast(`${app.username} added to Staff as ${role}.`, 'success');
-    renderStaffApplications();
-  });
-}
+                    document.getElementById('stat-staff').textContent = staff.length;
+                    document.getElementById('stat-testers').textContent = testers.length;
+                    document.getElementById('stat-announcements').textContent = announcements.length;
+                    document.getElementById('stat-reviews').textContent = reviews.length;
+                    document.getElementById('stat-tests').textContent = tierLog.length;
+                    document.getElementById('stat-applications').textContent = applications.length;
 
-/* ---------------- TESTERS ---------------- */
-async function renderTesters(){
-  const testers = await ATL_SESSION.loadStore('testers', []);
-  const el = document.getElementById('view-testers');
-  el.innerHTML = `
-    <div class="flex-between" style="margin-bottom:16px;">
-      <h3 style="margin:0;">Manage Testers</h3>
-      <button class="btn btn-secondary btn-sm" id="addTesterBtn" style="text-transform:none;">+ Add Tester</button>
-    </div>
-    <div class="table-wrap glass" id="testerTableWrap"></div>`;
-  const wrap = document.getElementById('testerTableWrap');
-  if(testers.length===0){
-    wrap.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 2l3 6 6 1-4.5 4.5L18 20l-6-3-6 3 1.5-6.5L3 9l6-1z"/></svg><h3>No testers yet</h3><p>Add a tester and assign gamemodes to populate the Testers page.</p></div>`;
-  } else {
-    wrap.innerHTML = `<table class="dt"><thead><tr><th>Tester</th><th>Rank</th><th>Gamemodes</th><th>Actions</th></tr></thead>
-    <tbody>${testers.map((t,i)=>`
-      <tr>
-        <td>${t.display||t.username}</td>
-        <td>${ATL_roleBadge(t.rank)}</td>
-        <td>${(t.gamemodes||[]).map(gm=>`<span class="pill pill-teal">${(ATL_DATA.GAMEMODES.find(g=>g.id===gm)||{label:gm}).label}</span>`).join(' ')||'<span class="text-muted text-sm">None</span>'}</td>
-        <td style="display:flex; gap:6px; flex-wrap:wrap;">
-          <button class="btn btn-ghost btn-sm" data-edit="${i}" style="text-transform:none;">Edit / Assign</button>
-          <button class="btn btn-ghost btn-sm" data-promote="${i}" style="text-transform:none;">Promote</button>
-          <button class="btn btn-ghost btn-sm" data-demote="${i}" style="text-transform:none;">Demote</button>
-          <button class="btn btn-outline-red btn-sm" data-remove="${i}" style="text-transform:none;">Remove</button>
-        </td>
-      </tr>`).join('')}</tbody></table>`;
-  }
-  document.getElementById('addTesterBtn').addEventListener('click', ()=> testerForm());
-  wrap.querySelectorAll('[data-edit]').forEach(b=> b.addEventListener('click', ()=> testerForm(testers[+b.dataset.edit], +b.dataset.edit)));
-  wrap.querySelectorAll('[data-remove]').forEach(b=> b.addEventListener('click', async ()=>{
-    const t = testers[+b.dataset.remove];
-    await ATL_SESSION.saveStore('testers', testers.filter((_,i)=>i!==+b.dataset.remove));
-    await audit('Removed tester', t.display||t.username);
-    ATL_toast('Tester removed.', 'success');
-    renderTesters();
-  }));
-  wrap.querySelectorAll('[data-promote]').forEach(b=> b.addEventListener('click', ()=> shiftRank(+b.dataset.promote,-1)));
-  wrap.querySelectorAll('[data-demote]').forEach(b=> b.addEventListener('click', ()=> shiftRank(+b.dataset.demote,1)));
+                } catch (error) {
+                    console.error('Error loading dashboard stats:', error);
+                }
+            }
 
-  async function shiftRank(idx, dir){
-    const t = testers[idx];
-    const ranks = ATL_DATA.TESTER_RANKS; // 0 = Testing Manager (highest)
-    const newIdx = Math.min(ranks.length-1, Math.max(0, ranks.indexOf(t.rank)+dir));
-    t.rank = ranks[newIdx];
-    await ATL_SESSION.saveStore('testers', testers);
-    await audit(dir<0?'Promoted tester':'Demoted tester', `${t.display||t.username} → ${t.rank}`);
-    ATL_toast(`${t.display||t.username} is now ${t.rank}.`, 'success');
-    renderTesters();
-  }
+            // --- Load Staff ---
+            async function loadStaff() {
+                try {
+                    const staff = await window.ATL_SESSION.loadStore('staff', []);
+                    const container = document.getElementById('staff-list');
 
-  function testerForm(existing, idx){
-    openModal(`
-      <div class="modal-head"><h3>${existing?'Edit Tester':'Add Tester'}</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
-      <div class="field"><label>Discord username</label><input class="input" id="tUsername" value="${existing?existing.username:''}" placeholder="e.g. nyx_tests"></div>
-      <div class="field"><label>Display name</label><input class="input" id="tDisplay" value="${existing?existing.display||'':''}" placeholder="e.g. Nyx"></div>
-      <div class="field"><label>Minecraft username (optional)</label><input class="input" id="tMc" value="${existing?existing.mcUsername||'':''}" placeholder="For their skin avatar"></div>
-      <div class="field"><label>Tester rank</label><select class="select" id="tRank">${ATL_DATA.TESTER_RANKS.map(r=>`<option ${existing&&existing.rank===r?'selected':''}>${r}</option>`).join('')}</select></div>
-      <div class="field"><label>Assign gamemodes</label>
-        <div style="display:flex; flex-wrap:wrap; gap:8px;">
-          ${ATL_DATA.GAMEMODES.map(g=>`<label class="checkbox-row" style="background:var(--panel-2); padding:6px 10px; border-radius:var(--r-full); border:1px solid var(--glass-brd);">
-            <input type="checkbox" value="${g.id}" ${existing&&(existing.gamemodes||[]).includes(g.id)?'checked':''}> <span>${g.label}</span>
-          </label>`).join('')}
-        </div>
-      </div>
-      <button class="btn btn-secondary btn-block mt-16" id="saveTester">${existing?'Save changes':'Add Tester'}</button>
-    `);
-    document.getElementById('saveTester').addEventListener('click', async ()=>{
-      const username = document.getElementById('tUsername').value.trim();
-      if(!username){ ATL_toast('Enter a Discord username.', 'error'); return; }
-      const gamemodes = Array.from(document.querySelectorAll('#formModalInner input[type=checkbox]:checked')).map(c=>c.value);
-      const entry = { username, display: document.getElementById('tDisplay').value.trim()||username, mcUsername: document.getElementById('tMc').value.trim(), rank: document.getElementById('tRank').value, gamemodes };
-      let list = await ATL_SESSION.loadStore('testers', []);
-      if(existing!=null && idx!=null) list[idx]=entry; else list.push(entry);
-      const ok = await ATL_SESSION.saveStore('testers', list);
-      if(!ok){ ATL_toast('Save failed — check the console for details.', 'error'); return; }
-      await audit(existing?'Edited tester':'Added tester', entry.display);
-      closeModal(); ATL_toast(existing?'Tester updated.':'Tester added.', 'success');
-      renderTesters();
-    });
-  }
-}
+                    if (staff.length === 0) {
+                        container.innerHTML = `
+                            <div class="no-data">
+                                <div class="icon">👔</div>
+                                <p>No staff members</p>
+                            </div>
+                        `;
+                        return;
+                    }
 
-/* ---------------- ANNOUNCEMENTS ---------------- */
-async function renderAnnouncements(){
-  const items = await ATL_SESSION.loadStore('announcements', []);
-  const el = document.getElementById('view-announcements');
-  el.innerHTML = `
-    <div class="glass card">
-      <div class="eyebrow">New post</div>
-      <div class="field mt-16"><label>Title</label><input class="input" id="aTitle" placeholder="Season 4 begins"></div>
-      <div class="field"><label>Tag</label><select class="select" id="aTag"><option value="update">update</option><option value="event">event</option><option value="maintenance">maintenance</option></select></div>
-      <div class="field"><label>Body</label><textarea class="textarea" id="aBody" placeholder="What's happening..."></textarea></div>
-      <button class="btn btn-primary" id="postAnn">Publish Announcement</button>
-    </div>
-    <div class="mt-24" style="display:flex; flex-direction:column; gap:12px;" id="annList"></div>`;
-  const list = document.getElementById('annList');
-  list.innerHTML = items.length ? items.slice().reverse().map((a,ri)=>{
-    const i = items.length-1-ri;
-    return `<div class="glass card"><div class="flex-between"><div><span class="pill pill-blue">${a.tag}</span><h4 class="mt-8">${a.title}</h4></div><button class="btn btn-outline-red btn-sm" data-del="${i}" style="text-transform:none;">Delete</button></div><p class="text-sm text-muted">${a.body}</p></div>`;
-  }).join('') : '<p class="text-sm text-muted">No announcements posted yet.</p>';
-  list.querySelectorAll('[data-del]').forEach(b=> b.addEventListener('click', async ()=>{
-    const updated = items.filter((_,i)=>i!==+b.dataset.del);
-    await ATL_SESSION.saveStore('announcements', updated);
-    await audit('Deleted announcement', items[+b.dataset.del].title);
-    ATL_toast('Announcement deleted.', 'success');
-    renderAnnouncements();
-  }));
-  document.getElementById('postAnn').addEventListener('click', async ()=>{
-    const title = document.getElementById('aTitle').value.trim();
-    const body = document.getElementById('aBody').value.trim();
-    if(!title||!body){ ATL_toast('Fill in a title and body.', 'error'); return; }
-    items.push({ title, body, tag: document.getElementById('aTag').value, author: session.user.display, date: new Date().toISOString().slice(0,10) });
-    await ATL_SESSION.saveStore('announcements', items);
-    await audit('Posted announcement', title);
-    ATL_toast('Announcement published.', 'success');
-    renderAnnouncements();
-  });
-}
+                    container.innerHTML = `
+                        <div class="item-list">
+                            ${staff.map((m, i) => `
+                                <div class="item-entry">
+                                    <span><strong>${m.name}</strong> · ${m.rank} · ${m.discord || ''}</span>
+                                    <div class="actions">
+                                        <button class="delete-btn" onclick="deleteStaff(${i})">Delete</button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
 
-/* ---------------- REVIEWS MODERATION ---------------- */
-async function renderReviewsMod(){
-  const reviews = await ATL_SESSION.loadStore('reviews', []);
-  const el = document.getElementById('view-reviews');
-  el.innerHTML = `<div class="table-wrap glass" id="revWrap"></div>`;
-  const wrap = document.getElementById('revWrap');
-  wrap.innerHTML = reviews.length ? `<table class="dt"><thead><tr><th>Member</th><th>Rating</th><th>Review</th><th>Date</th><th></th></tr></thead>
-  <tbody>${reviews.map((r,i)=>`<tr><td>${r.display}</td><td class="mono">${r.rating}★</td><td class="text-muted" style="max-width:260px;">${r.body}</td><td class="mono text-muted">${r.date}</td><td><button class="btn btn-outline-red btn-sm" data-del="${i}" style="text-transform:none;">Remove</button></td></tr>`).join('')}</tbody></table>`
-  : `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 17.3 6.2 20l1.1-6.5L2.5 9l6.5-1L12 2l3 6 6.5 1-4.8 4.5 1.1 6.5z"/></svg><h3>No reviews to moderate</h3><p>Reviews submitted by members will appear here.</p></div>`;
-  wrap.querySelectorAll('[data-del]').forEach(b=> b.addEventListener('click', async ()=>{
-    const removed = reviews[+b.dataset.del];
-    await ATL_SESSION.saveStore('reviews', reviews.filter((_,i)=>i!==+b.dataset.del));
-    await audit('Removed review', removed.display);
-    ATL_toast('Review removed.', 'success');
-    renderReviewsMod();
-  }));
-}
+                } catch (error) {
+                    console.error('Error loading staff:', error);
+                }
+            }
 
-/* ---------------- LEADERBOARDS MOD ---------------- */
-function renderLeaderboardsMod(){
-  const el = document.getElementById('view-leaderboards');
-  el.innerHTML = `<div id="lbGmTabs" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;"></div><div class="table-wrap glass" id="lbModWrap"></div>`;
-  let active = ATL_DATA.GAMEMODES[0].id;
-  async function draw(){
-    document.getElementById('lbGmTabs').innerHTML = ATL_DATA.GAMEMODES.map(g=>`<button class="btn ${g.id===active?'btn-secondary':'btn-ghost'} btn-sm" data-gm="${g.id}" style="text-transform:none;">${g.label}</button>`).join('');
-    document.querySelectorAll('#lbGmTabs [data-gm]').forEach(b=> b.addEventListener('click', ()=>{ active=b.dataset.gm; draw(); }));
-    const board = await ATL_SESSION.loadStore('leaderboard_'+active, []);
-    const wrap = document.getElementById('lbModWrap');
-    wrap.innerHTML = board.length ? `<table class="dt"><thead><tr><th>Player</th><th>Tier</th><th>Tester</th><th>Date</th><th></th></tr></thead>
-      <tbody>${board.map((p,i)=>`<tr><td>${p.player}</td><td>${ATL_hex(p.tier,'sm')}</td><td class="text-muted">${p.tester}</td><td class="mono text-muted">${p.date}</td><td><button class="btn btn-outline-red btn-sm" data-del="${i}" style="text-transform:none;">Remove</button></td></tr>`).join('')}</tbody></table>`
-      : `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 20V10M12 20V4M20 20v-7"/></svg><h3>Empty board</h3><p>No entries logged for ${ATL_DATA.GAMEMODES.find(g=>g.id===active).label} yet.</p></div>`;
-    wrap.querySelectorAll('[data-del]').forEach(b=> b.addEventListener('click', async ()=>{
-      const updated = board.filter((_,i)=>i!==+b.dataset.del);
-      await ATL_SESSION.saveStore('leaderboard_'+active, updated);
-      await audit('Removed leaderboard entry', active);
-      ATL_toast('Entry removed.', 'success');
-      draw();
-    }));
-  }
-  draw();
-}
+            window.deleteStaff = async function(index) {
+                if (!confirm('Delete this staff member?')) return;
+                try {
+                    const staff = await window.ATL_SESSION.loadStore('staff', []);
+                    staff.splice(index, 1);
+                    await window.ATL_SESSION.saveStore('staff', staff);
+                    loadStaff();
+                    loadDashboardStats();
+                    window.ATL_toast('Staff member deleted', 'success');
+                } catch (error) {
+                    console.error('Error deleting staff:', error);
+                    window.ATL_toast('Failed to delete staff', 'error');
+                }
+            };
 
-/* ---------------- RULES MOD ---------------- */
-function renderRulesMod(){
-  document.getElementById('view-rules').innerHTML = `
-    <div class="glass card">
-      <div class="eyebrow">Content management</div>
-      <h3 class="mt-8">Rules page</h3>
-      <p class="text-sm text-muted">Rules sections are maintained directly in the Rules page template for consistency and version control. Connect a backend endpoint here to make them editable from this panel without a redeploy.</p>
-      <a href="rules.html" class="btn btn-ghost btn-sm mt-8" style="text-transform:none;">View live Rules page →</a>
-    </div>`;
-}
+            // --- Load Testers ---
+            async function loadTesters() {
+                try {
+                    const testers = await window.ATL_SESSION.loadStore('testers', []);
+                    const container = document.getElementById('tester-list');
 
-/* ---------------- SETTINGS ---------------- */
-async function renderSettings(){
-  const s = await ATL_SESSION.loadStore('website_settings', { siteName:'Asian Tier List', maintenance:false, registrationOpen:true });
-  document.getElementById('view-settings').innerHTML = `
-    <div class="glass card" style="max-width:520px;">
-      <div class="eyebrow">Website settings</div>
-      <div class="field mt-16"><label>Site name</label><input class="input" id="stSiteName" value="${s.siteName}"></div>
-      <div class="field checkbox-row"><input type="checkbox" id="stMaint" ${s.maintenance?'checked':''}><span>Enable maintenance mode</span></div>
-      <div class="field checkbox-row"><input type="checkbox" id="stReg" ${s.registrationOpen?'checked':''}><span>Allow new test requests</span></div>
-      <button class="btn btn-primary" id="saveSettings">Save Settings</button>
-    </div>`;
-  document.getElementById('saveSettings').addEventListener('click', async ()=>{
-    const updated = { siteName: document.getElementById('stSiteName').value.trim()||'Asian Tier List', maintenance: document.getElementById('stMaint').checked, registrationOpen: document.getElementById('stReg').checked };
-    await ATL_SESSION.saveStore('website_settings', updated);
-    await audit('Updated website settings', JSON.stringify(updated));
-    ATL_toast('Settings saved.', 'success');
-  });
-}
+                    if (testers.length === 0) {
+                        container.innerHTML = `
+                            <div class="no-data">
+                                <div class="icon">🎯</div>
+                                <p>No testers</p>
+                            </div>
+                        `;
+                        return;
+                    }
 
-/* ---------------- AUDIT LOG ---------------- */
-async function renderAudit(){
-  const raw = await ATL_SESSION.loadStore('audit_log', []);
-  const log = raw.slice().reverse();
-  document.getElementById('view-audit').innerHTML = `<div class="table-wrap glass">${log.length ? `<table class="dt"><thead><tr><th>Action</th><th>Detail</th><th>Actor</th><th>When</th></tr></thead><tbody>${log.map(a=>`<tr><td>${a.action}</td><td class="text-muted">${a.detail}</td><td>${a.actor}</td><td class="mono text-muted">${a.date}</td></tr>`).join('')}</tbody></table>` : `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 12h18M3 6h18M3 18h18"/></svg><h3>No actions logged</h3><p>Every change you make in this panel is recorded here.</p></div>`}</div>`;
-}
-</script>
+                    container.innerHTML = `
+                        <div class="item-list">
+                            ${testers.map((t, i) => `
+                                <div class="item-entry">
+                                    <span><strong>${t.name}</strong> · ${t.rank} · ${t.discord || ''}</span>
+                                    <div class="actions">
+                                        <button class="delete-btn" onclick="deleteTester(${i})">Delete</button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+
+                } catch (error) {
+                    console.error('Error loading testers:', error);
+                }
+            }
+
+            window.deleteTester = async function(index) {
+                if (!confirm('Delete this tester?')) return;
+                try {
+                    const testers = await window.ATL_SESSION.loadStore('testers', []);
+                    testers.splice(index, 1);
+                    await window.ATL_SESSION.saveStore('testers', testers);
+                    loadTesters();
+                    loadDashboardStats();
+                    window.ATL_toast('Tester deleted', 'success');
+                } catch (error) {
+                    console.error('Error deleting tester:', error);
+                    window.ATL_toast('Failed to delete tester', 'error');
+                }
+            };
+
+            // --- Load Announcements ---
+            async function loadAnnouncements() {
+                try {
+                    const announcements = await window.ATL_SESSION.loadStore('announcements', []);
+                    const container = document.getElementById('announcement-list');
+
+                    if (announcements.length === 0) {
+                        container.innerHTML = `
+                            <div class="no-data">
+                                <div class="icon">📢</div>
+                                <p>No announcements</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    container.innerHTML = `
+                        <div class="item-list">
+                            ${announcements.map((a, i) => `
+                                <div class="item-entry">
+                                    <span><strong>${a.title}</strong> · ${a.category} · ${new Date(a.date).toLocaleDateString()}</span>
+                                    <div class="actions">
+                                        <button class="delete-btn" onclick="deleteAnnouncement(${i})">Delete</button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+
+                } catch (error) {
+                    console.error('Error loading announcements:', error);
+                }
+            }
+
+            window.deleteAnnouncement = async function(index) {
+                if (!confirm('Delete this announcement?')) return;
+                try {
+                    const announcements = await window.ATL_SESSION.loadStore('announcements', []);
+                    announcements.splice(index, 1);
+                    await window.ATL_SESSION.saveStore('announcements', announcements);
+                    loadAnnouncements();
+                    loadDashboardStats();
+                    window.ATL_toast('Announcement deleted', 'success');
+                } catch (error) {
+                    console.error('Error deleting announcement:', error);
+                    window.ATL_toast('Failed to delete announcement', 'error');
+                }
+            };
+
+            // --- Load Rules ---
+            async function loadRules() {
+                try {
+                    const rules = await window.ATL_SESSION.loadStore('rules', '');
+                    document.getElementById('rules-content').value = rules || 'Default rules content goes here.';
+                } catch (error) {
+                    console.error('Error loading rules:', error);
+                }
+            }
+
+            // --- Load Server Stats ---
+            async function loadServerStats() {
+                const container = document.getElementById('server-stats');
+                try {
+                    const status = await window.FROST_STATS.getServerStatus();
+                    
+                    if (status.online) {
+                        container.innerHTML = `
+                            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--spacing-md);">
+                                <div class="stat-box" style="background: var(--color-background); padding: var(--spacing-md); border-radius: var(--radius-sm); border: 1px solid var(--color-border); text-align:center;">
+                                    <div class="num" style="color: #00e676;">🟢</div>
+                                    <div class="label">Status</div>
+                                    <div style="font-size:0.85rem;">Online</div>
+                                </div>
+                                <div class="stat-box" style="background: var(--color-background); padding: var(--spacing-md); border-radius: var(--radius-sm); border: 1px solid var(--color-border); text-align:center;">
+                                    <div class="num">${status.players_online || 0}</div>
+                                    <div class="label">Online Players</div>
+                                </div>
+                                <div class="stat-box" style="background: var(--color-background); padding: var(--spacing-md); border-radius: var(--radius-sm); border: 1px solid var(--color-border); text-align:center;">
+                                    <div class="num">${status.uptime || '0h'}</div>
+                                    <div class="label">Uptime</div>
+                                </div>
+                                <div class="stat-box" style="background: var(--color-background); padding: var(--spacing-md); border-radius: var(--radius-sm); border: 1px solid var(--color-border); text-align:center;">
+                                    <div class="num">${status.version || '1.8.8'}</div>
+                                    <div class="label">Version</div>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        container.innerHTML = `
+                            <div class="no-data">
+                                <div class="icon">🔴</div>
+                                <p>Server is offline</p>
+                                <p style="font-size:0.85rem;">Make sure Frost Practice is running at ${window.FROST_STATS.CONFIG.baseUrl}</p>
+                            </div>
+                        `;
+                    }
+                } catch (error) {
+                    container.innerHTML = `
+                        <div class="no-data">
+                            <div class="icon">❌</div>
+                            <p>Failed to connect to server</p>
+                            <p style="font-size:0.85rem;">${error.message}</p>
+                        </div>
+                    `;
+                }
+            }
+
+            // --- Add Staff ---
+            document.getElementById('staff-add-btn').addEventListener('click', async function() {
+                const name = document.getElementById('staff-name').value.trim();
+                const discord = document.getElementById('staff-discord').value.trim();
+                const rank = document.getElementById('staff-rank').value;
+                const minecraft = document.getElementById('staff-minecraft').value.trim();
+                const bio = document.getElementById('staff-bio').value.trim();
+
+                if (!name) {
+                    window.ATL_toast('Please enter a name', 'error');
+                    return;
+                }
+
+                try {
+                    const staff = await window.ATL_SESSION.loadStore('staff', []);
+                    staff.push({ name, discord, rank, minecraft, bio });
+                    await window.ATL_SESSION.saveStore('staff', staff);
+                    
+                    document.getElementById('staff-name').value = '';
+                    document.getElementById('staff-discord').value = '';
+                    document.getElementById('staff-minecraft').value = '';
+                    document.getElementById('staff-bio').value = '';
+                    
+                    loadStaff();
+                    loadDashboardStats();
+                    window.ATL_toast('Staff member added!', 'success');
+                } catch (error) {
+                    console.error('Error adding staff:', error);
+                    window.ATL_toast('Failed to add staff: ' + error.message, 'error');
+                }
+            });
+
+            // --- Add Tester ---
+            document.getElementById('tester-add-btn').addEventListener('click', async function() {
+                const name = document.getElementById('tester-name').value.trim();
+                const discord = document.getElementById('tester-discord').value.trim();
+                const rank = document.getElementById('tester-rank').value;
+                const minecraft = document.getElementById('tester-minecraft').value.trim();
+                const gamemodes = Array.from(document.getElementById('tester-gamemodes').selectedOptions).map(o => o.value);
+
+                if (!name) {
+                    window.ATL_toast('Please enter a name', 'error');
+                    return;
+                }
+
+                try {
+                    const testers = await window.ATL_SESSION.loadStore('testers', []);
+                    testers.push({ name, discord, rank, minecraft, gamemodes });
+                    await window.ATL_SESSION.saveStore('testers', testers);
+                    
+                    document.getElementById('tester-name').value = '';
+                    document.getElementById('tester-discord').value = '';
+                    document.getElementById('tester-minecraft').value = '';
+                    
+                    loadTesters();
+                    loadDashboardStats();
+                    window.ATL_toast('Tester added!', 'success');
+                } catch (error) {
+                    console.error('Error adding tester:', error);
+                    window.ATL_toast('Failed to add tester: ' + error.message, 'error');
+                }
+            });
+
+            // --- Add Announcement ---
+            document.getElementById('announcement-add-btn').addEventListener('click', async function() {
+                const title = document.getElementById('announcement-title').value.trim();
+                const category = document.getElementById('announcement-category').value;
+                const content = document.getElementById('announcement-content').value.trim();
+
+                if (!title || !content) {
+                    window.ATL_toast('Please fill in title and content', 'error');
+                    return;
+                }
+
+                try {
+                    const announcements = await window.ATL_SESSION.loadStore('announcements', []);
+                    announcements.push({
+                        id: Date.now().toString(),
+                        title,
+                        category,
+                        content,
+                        author: session.user.display || session.user.username,
+                        authorId: session.user.id,
+                        date: new Date().toISOString()
+                    });
+                    await window.ATL_SESSION.saveStore('announcements', announcements);
+                    
+                    document.getElementById('announcement-title').value = '';
+                    document.getElementById('announcement-content').value = '';
+                    
+                    loadAnnouncements();
+                    loadDashboardStats();
+                    window.ATL_toast('Announcement posted!', 'success');
+                } catch (error) {
+                    console.error('Error posting announcement:', error);
+                    window.ATL_toast('Failed to post announcement: ' + error.message, 'error');
+                }
+            });
+
+            // --- Save Rules ---
+            document.getElementById('rules-save-btn').addEventListener('click', async function() {
+                const content = document.getElementById('rules-content').value;
+                const status = document.getElementById('rules-status');
+
+                try {
+                    await window.ATL_SESSION.saveStore('rules', content);
+                    status.innerHTML = '<span style="color: #00e676;">✅ Rules saved successfully!</span>';
+                    setTimeout(() => { status.innerHTML = ''; }, 3000);
+                    window.ATL_toast('Rules saved!', 'success');
+                } catch (error) {
+                    console.error('Error saving rules:', error);
+                    status.innerHTML = '<span style="color: #e63946;">❌ Failed to save rules</span>';
+                }
+            });
+
+            // --- Initial Load ---
+            loadDashboardStats();
+            loadStaff();
+            loadTesters();
+            loadAnnouncements();
+            loadRules();
+            loadServerStats();
+
+            // --- Refresh server stats every 30 seconds ---
+            setInterval(loadServerStats, 30000);
+
+            // --- Handle session updates ---
+            window.addEventListener('session-update', function() {
+                const newSession = window.ATL_SESSION.current();
+                if (!window.ATL_DATA.hasAtLeast(newSession.role, 'Owner')) {
+                    window.location.reload();
+                }
+            });
+        });
+    </script>
 </body>
 </html>
