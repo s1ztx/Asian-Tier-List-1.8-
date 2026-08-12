@@ -1,778 +1,609 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Asian Tier List [1.8+] — Competitive Minecraft PvP Rankings</title>
-<meta name="description" content="The official Asian Tier List for Minecraft 1.8 PvP. Get tested, get ranked, climb the leaderboards across BedWars, Sumo, Nodebuff, Boxing, BUHC and Bridges.">
-<link rel="stylesheet" href="assets/css/main.css">
-
-<style>
-/* ============ MUSIC PLAYER STYLES ============ */
-.music-player {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 420px;
-    background: rgba(10, 10, 26, 0.97);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 107, 0, 0.2);
-    border-radius: 16px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
-    z-index: 9999;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    color: #fff;
-    max-height: 92vh;
-}
-
-.music-player.minimized {
-    height: 50px;
-    overflow: hidden;
-    width: 240px;
-    border-radius: 25px;
-    max-height: 50px;
-}
-
-.music-player.minimized .player-body {
-    display: none;
-}
-
-.music-player.minimized .player-toggle {
-    transform: rotate(180deg);
-}
-
-.player-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 16px;
-    cursor: pointer;
-    user-select: none;
-    background: linear-gradient(90deg, rgba(255, 107, 0, 0.15), transparent);
-    border-radius: 16px 16px 0 0;
-}
-
-.player-header:hover {
-    background: linear-gradient(90deg, rgba(255, 107, 0, 0.25), transparent);
-}
-
-.player-title {
-    font-weight: 600;
-    font-size: 0.95rem;
-    color: #fff;
-    letter-spacing: 0.5px;
-}
-
-.player-title::before {
-    content: '';
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    background: #FF6B00;
-    border-radius: 50%;
-    margin-right: 10px;
-    animation: pulse-dot 1.5s ease-in-out infinite;
-}
-
-@keyframes pulse-dot {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.3; transform: scale(0.8); }
-}
-
-.player-toggle {
-    color: #888;
-    font-size: 0.8rem;
-    transition: transform 0.3s ease;
-}
-
-.player-body {
-    padding: 16px;
-    max-height: 650px;
-    overflow-y: auto;
-}
-
-.player-body::-webkit-scrollbar {
-    width: 4px;
-}
-.player-body::-webkit-scrollbar-track {
-    background: transparent;
-}
-.player-body::-webkit-scrollbar-thumb {
-    background: #FF6B00;
-    border-radius: 4px;
-}
-
-/* Spotify Embeds */
-.spotify-wrapper {
-    border-radius: 12px;
-    overflow: hidden;
-    margin-bottom: 12px;
-    background: #191414;
-    min-height: 380px;
-}
-
-.spotify-wrapper iframe {
-    display: block;
-    width: 100%;
-    height: 400px;
-    border: none;
-}
-
-.artist-tabs {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 12px;
-}
-
-.artist-tab {
-    flex: 1;
-    padding: 12px;
-    border: 2px solid rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-weight: 600;
-    font-size: 0.9rem;
-    background: transparent;
-    color: #888;
-}
-
-.artist-tab:hover {
-    border-color: rgba(255, 107, 0, 0.3);
-    color: #fff;
-    background: rgba(255, 255, 255, 0.02);
-}
-
-.artist-tab.active {
-    border-color: #FF6B00;
-    background: rgba(255, 107, 0, 0.15);
-    color: #FF6B00;
-    box-shadow: 0 0 30px rgba(255, 107, 0, 0.05);
-}
-
-.artist-tab .tab-icon {
-    display: block;
-    font-size: 1.8rem;
-    margin-bottom: 4px;
-}
-
-/* Controls */
-.controls {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 16px;
-    margin: 14px 0;
-    padding: 10px;
-    background: rgba(255, 255, 255, 0.02);
-    border-radius: 12px;
-}
-
-.ctrl-btn {
-    background: none;
-    border: none;
-    color: #fff;
-    font-size: 1.2rem;
-    cursor: pointer;
-    padding: 8px 12px;
-    border-radius: 8px;
-    transition: all 0.2s ease;
-}
-
-.ctrl-btn:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: #FF6B00;
-    transform: scale(1.05);
-}
-
-.ctrl-btn:active {
-    transform: scale(0.95);
-}
-
-.play-btn {
-    background: linear-gradient(135deg, #FF6B00, #FF8C00);
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    font-size: 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 25px rgba(255, 107, 0, 0.3);
-}
-
-.play-btn:hover {
-    transform: scale(1.08);
-    box-shadow: 0 6px 35px rgba(255, 107, 0, 0.5);
-}
-
-.ctrl-btn.active {
-    color: #FF6B00;
-    background: rgba(255, 107, 0, 0.1);
-}
-
-/* Volume */
-.volume-container {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin: 10px 0;
-    padding: 8px 12px;
-    background: rgba(255, 255, 255, 0.02);
-    border-radius: 10px;
-}
-
-.volume-container span {
-    color: #888;
-    font-size: 1rem;
-}
-
-.volume-container input[type="range"] {
-    flex: 1;
-    height: 4px;
-    -webkit-appearance: none;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 4px;
-    outline: none;
-}
-
-.volume-container input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background: #FF6B00;
-    cursor: pointer;
-    box-shadow: 0 0 20px rgba(255, 107, 0, 0.3);
-}
-
-.volume-container input[type="range"]::-moz-range-thumb {
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background: #FF6B00;
-    cursor: pointer;
-    border: none;
-}
-
-/* Now Playing */
-.now-playing-info {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 12px 14px;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 12px;
-    margin: 10px 0;
-    border: 1px solid rgba(255, 255, 255, 0.04);
-}
-
-.now-playing-info .np-icon {
-    font-size: 1.8rem;
-}
-
-.now-playing-info .np-text {
-    flex: 1;
-}
-
-.now-playing-info .np-text .np-artist {
-    font-size: 0.75rem;
-    color: #888;
-}
-
-.now-playing-info .np-text .np-song {
-    font-size: 0.95rem;
-    font-weight: 600;
-}
-
-.open-spotify-btn {
-    padding: 8px 18px;
-    background: #1DB954;
-    color: #fff;
-    border-radius: 20px;
-    text-decoration: none;
-    font-size: 0.75rem;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    white-space: nowrap;
-}
-
-.open-spotify-btn:hover {
-    background: #1ed760;
-    transform: scale(1.05);
-}
-
-/* Quick Links */
-.quick-links {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-top: 10px;
-    justify-content: center;
-}
-
-.quick-link {
-    color: #888;
-    font-size: 0.7rem;
-    text-decoration: none;
-    padding: 5px 14px;
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 20px;
-    transition: all 0.3s ease;
-}
-
-.quick-link:hover {
-    color: #FF6B00;
-    border-color: rgba(255, 107, 0, 0.3);
-    background: rgba(255, 107, 0, 0.05);
-}
-
-/* Progress Bar */
-.progress-container {
-    margin: 8px 0;
-}
-
-.progress-bar {
-    width: 100%;
-    height: 4px;
-    background: rgba(255, 255, 255, 0.06);
-    border-radius: 4px;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-}
-
-.progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #FF6B00, #FFD700);
-    border-radius: 4px;
-    transition: width 0.1s linear;
-    width: 0%;
-}
-
-.progress-bar:hover .progress-fill {
-    height: 6px;
-}
-
-.time-display {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.65rem;
-    color: #555;
-    margin-top: 4px;
-}
-
-@media (max-width: 480px) {
-    .music-player {
-        bottom: 10px;
-        right: 10px;
-        width: calc(100% - 20px);
-        max-width: 420px;
-        max-height: 95vh;
-    }
-    
-    .spotify-wrapper iframe {
-        height: 300px;
-    }
-}
-</style>
-
-</head>
-<body>
-
-<main>
-
-  <!-- HERO -->
-  <section class="page-hero">
-    <div class="container">
-      <div class="eyebrow">SEASON 4 · 1.8 PVP · ASIA SERVER GROUP</div>
-      <h1 style="font-size:clamp(38px,6.4vw,74px); line-height:1.02; margin:16px 0 18px; max-width:960px;">
-        Prove your rank.<br><span style="background:linear-gradient(90deg,var(--red-500),var(--blue-500)); -webkit-background-clip:text; background-clip:text; color:transparent;">Earn your tier.</span>
-      </h1>
-      <p class="h-sub" style="font-size:17px; max-width:560px;">
-        Asian Tier List is the region's competitive ranking authority for Minecraft 1.8 combat. Get tested by verified staff across seven gamemodes and take your placement to the leaderboard.
-      </p>
-      <div class="mt-24" style="display:flex; gap:14px; flex-wrap:wrap;">
-        <a href="testers.html" class="btn btn-primary">Request a Test</a>
-        <a href="leaderboards.html" class="btn btn-ghost">View Leaderboards</a>
-      </div>
-
-      <div class="mt-32 glass card" style="padding:26px; display:flex; flex-wrap:wrap; gap:28px; align-items:center;">
-        <span class="eyebrow" style="min-width:120px;">Tier scale</span>
-        <div style="display:flex; gap:10px; flex-wrap:wrap;" id="tierStrip"></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- STATS -->
-  <section class="section">
-    <div class="container grid-4" id="homeStats"></div>
-  </section>
-
-  <!-- GAMEMODES -->
-  <section class="section">
-    <div class="container">
-      <div class="section-head">
-        <div>
-          <div class="eyebrow">Seven ways to prove it</div>
-          <h2 class="h-title">Ranked gamemodes</h2>
-        </div>
-        <p class="h-sub">Every gamemode is tiered and tracked independently — your overall tier reflects your strongest disciplines.</p>
-      </div>
-      <div class="grid-4" id="gamemodeGrid"></div>
-    </div>
-  </section>
-
-  <!-- HOW IT WORKS -->
-  <section class="section">
-    <div class="container">
-      <div class="section-head">
-        <div>
-          <div class="eyebrow">The process</div>
-          <h2 class="h-title">How placement works</h2>
-        </div>
-      </div>
-      <div class="grid-3">
-        <div class="glass card card-hover">
-          <div class="pill pill-blue">Step 1</div>
-          <h3 class="mt-16" style="font-size:19px;">Request a test</h3>
-          <p class="text-sm text-muted">Head to the Testers page and submit a test request for the gamemode you want ranked.</p>
-        </div>
-        <div class="glass card card-hover">
-          <div class="pill pill-red">Step 2</div>
-          <h3 class="mt-16" style="font-size:19px;">Get evaluated</h3>
-          <p class="text-sm text-muted">A verified Tester plays against you and scores your mechanics, movement, and decision-making.</p>
-        </div>
-        <div class="glass card card-hover">
-          <div class="pill pill-gold">Step 3</div>
-          <h3 class="mt-16" style="font-size:19px;">Receive your tier</h3>
-          <p class="text-sm text-muted">Your result is logged to your profile and reflected instantly on the gamemode leaderboard.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- CTA -->
-  <section class="section" id="discordCtaSection">
-    <div class="container">
-      <div class="glass card" style="padding:40px; display:flex; align-items:center; justify-content:space-between; gap:24px; flex-wrap:wrap;">
-        <div>
-          <div class="eyebrow">Join the server</div>
-          <h2 class="h-title" style="font-size:28px;">Link your Discord to get tiered</h2>
-          <p class="h-sub">Your profile, roles, and tier history all sync from your Discord identity once you connect.</p>
-        </div>
-        <button class="btn btn-primary" id="ctaLogin">Login with Discord</button>
-      </div>
-    </div>
-  </section>
-
-</main>
-
-<!-- ============ FIXED MUSIC PLAYER ============ -->
-<div id="musicPlayer" class="music-player minimized">
-    <div class="player-header" onclick="togglePlayer()">
-        <span class="player-title">🎵 Spotify Player</span>
-        <span class="player-toggle">▲</span>
-    </div>
-    <div class="player-body">
-        <!-- Artist Tabs -->
-        <div class="artist-tabs">
-            <div class="artist-tab active" data-artist="neighbourhood" onclick="switchArtist('neighbourhood')">
-                <span class="tab-icon">🌆</span>
-                The Neighbourhood
-            </div>
-            <div class="artist-tab" data-artist="odetari" onclick="switchArtist('odetari')">
-                <span class="tab-icon">🎧</span>
-                Odetari
-            </div>
-        </div>
-
-        <!-- Spotify Embed -->
-        <div class="spotify-wrapper">
-            <iframe 
-                id="spotifyIframe"
-                src="https://open.spotify.com/embed/artist/77SW9BnxLY8rJ0RciFqkHh?utm_source=generator&theme=0"
-                frameborder="0" 
-                allowfullscreen="" 
-                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
-                loading="lazy">
-            </iframe>
-        </div>
-
-        <!-- Now Playing -->
-        <div class="now-playing-info">
-            <span class="np-icon">🎵</span>
-            <div class="np-text">
-                <div class="np-song" id="npSong">The Neighbourhood</div>
-                <div class="np-artist" id="npArtist">Click play on Spotify above</div>
-            </div>
-            <a href="https://open.spotify.com/artist/77SW9BnxLY8rJ0RciFqkHh" target="_blank" class="open-spotify-btn">▶ Open</a>
-        </div>
-
-        <!-- Progress Bar -->
-        <div class="progress-container">
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
-            </div>
-            <div class="time-display">
-                <span id="currentTime">0:00</span>
-                <span id="totalTime">0:00</span>
-            </div>
-        </div>
-
-        <!-- Controls -->
-        <div class="controls">
-            <button class="ctrl-btn" onclick="prevTrack()" title="Previous">⏮</button>
-            <button class="ctrl-btn play-btn" onclick="togglePlay()" id="playBtn" title="Play/Pause">▶</button>
-            <button class="ctrl-btn" onclick="nextTrack()" title="Next">⏭</button>
-            <button class="ctrl-btn" onclick="toggleLoop()" id="loopBtn" title="Loop">🔁</button>
-            <button class="ctrl-btn" onclick="toggleShuffle()" id="shuffleBtn" title="Shuffle">🔀</button>
-            <button class="ctrl-btn" onclick="refreshSpotify()" title="Refresh">🔄</button>
-        </div>
-
-        <!-- Volume -->
-        <div class="volume-container">
-            <span>🔊</span>
-            <input type="range" id="volumeSlider" min="0" max="100" value="70" oninput="changeVolume(this.value)">
-            <span id="volumeDisplay">70%</span>
-        </div>
-
-        <!-- Quick Links -->
-        <div class="quick-links">
-            <a href="https://open.spotify.com/artist/77SW9BnxLY8rJ0RciFqkHh" target="_blank" class="quick-link">🌆 The Neighbourhood</a>
-            <a href="https://open.spotify.com/artist/6h0I73noSg4k3qKXpGL87z" target="_blank" class="quick-link">🎧 Odetari</a>
-            <a href="https://open.spotify.com" target="_blank" class="quick-link">🎵 Spotify Web</a>
-        </div>
-    </div>
-</div>
-
-<script src="assets/js/data.js"></script>
-<script src="assets/js/session.js"></script>
-<script src="assets/js/nav.js"></script>
-<script src="assets/js/backgrounds.js"></script>
-
-<script>
-  ATL_mountBackground('home');
-  const session = ATL_initShell('index.html');
-  if(session.authenticated){
-    document.getElementById('discordCtaSection').classList.add('hidden');
-  }
-
-  document.getElementById('tierStrip').innerHTML = ATL_DATA.TIERS.slice(0,8).map(t=>`
-    <div style="text-align:center;">${ATL_hex(t.id,'sm')}<div class="text-sm text-muted mt-8" style="font-family:var(--f-mono); font-size:11px;">${t.id}</div></div>
-  `).join('');
-
-  document.getElementById('homeStats').innerHTML = [
-    ['7','Ranked gamemodes'],
-    ['14','Official tiers, S to D-'],
-    ['24/7','Live leaderboard sync'],
-    ['1.8','Combat version']
-  ].map(([v,l])=>`<div class="glass stat-card"><div class="s-val">${v}</div><div class="s-label">${l}</div></div>`).join('');
-
-  const gmIcons = {
-    bed: '<path d="M3 18v-6a3 3 0 0 1 3-3h12a3 3 0 0 1 3 3v6"/><path d="M3 18h18"/><path d="M7 9V6a1 1 0 0 1 1-1h3v4"/>',
-    bedfight: '<path d="M2 19v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4"/><path d="M2 19h20"/><path d="m8 8 4 4M12 8l-4 4"/><path d="m16 8 4 4M20 8l-4 4"/>',
-    fireball: '<circle cx="12" cy="12" r="7"/><path d="M12 5v-3M8 6l-1-2M16 6l1-2"/>',
-    sumo: '<circle cx="12" cy="7" r="3"/><path d="M6 21c0-4 3-7 6-7s6 3 6 21"/>',
-    sword: '<path d="M14.5 3.5 21 10l-3 3-6.5-6.5z"/><path d="M11 10 3 18v3h3l8-8"/>',
-    glove: '<path d="M7 12V6a2 2 0 0 1 4 0v4M11 10V5a2 2 0 0 1 4 0v5M15 10V7a2 2 0 0 1 4 0v7a6 6 0 0 1-6 6H10a5 5 0 0 1-5-5v-3l3-2"/>',
-    heart: '<path d="M12 21s-7-4.6-9.5-9C.9 8.6 2.6 5 6 5c2 0 3.5 1.2 4 2 0.5-.8 2-2 4-2 3.4 0 5.1 3.6 3.5 7-2.5 4.4-9.5 9-9.5 9z"/>',
-    bridge: '<path d="M2 16c2-4 6-6 10-6s8 2 10 6"/><path d="M4 20V12M20 20V12M12 20v-6"/>'
-  };
-  document.getElementById('gamemodeGrid').innerHTML = ATL_DATA.GAMEMODES.map(g=>`
-    <a href="leaderboards.html" class="glass card card-hover" style="text-align:center;">
-      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--blue-400)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 12px;">${gmIcons[g.icon]}</svg>
-      <div style="font-family:var(--f-sub); font-weight:700; font-size:15px; color:var(--text-0);">${g.label}</div>
-      <div class="text-sm text-muted mt-8">View leaderboard →</div>
-    </a>
-  `).join('');
-
-  document.getElementById('ctaLogin').addEventListener('click', ATL_SESSION.loginWithDiscord);
-
-// ============ FIXED SPOTIFY PLAYER CONTROLS ============
-let currentArtist = 'neighbourhood';
-let isLooping = false;
-let isShuffled = false;
-let isPlaying = false;
-let progressInterval = null;
-let currentProgress = 0;
-
-// Spotify Artist IDs (WORKING)
-const ARTISTS = {
-    neighbourhood: {
-        id: '77SW9BnxLY8rJ0RciFqkHh',
-        name: 'The Neighbourhood',
-        icon: '🌆'
-    },
-    odetari: {
-        id: '6h0I73noSg4k3qKXpGL87z',
-        name: 'Odetari',
-        icon: '🎧'
-    }
-};
-
-function switchArtist(artist) {
-    currentArtist = artist;
-    const iframe = document.getElementById('spotifyIframe');
-    const tabs = document.querySelectorAll('.artist-tab');
-    const npSong = document.getElementById('npSong');
-    const npArtist = document.getElementById('npArtist');
-    
-    tabs.forEach(tab => {
-        tab.classList.toggle('active', tab.dataset.artist === artist);
-    });
-    
-    const artistData = ARTISTS[artist];
-    iframe.src = `https://open.spotify.com/embed/artist/${artistData.id}?utm_source=generator&theme=0`;
-    npSong.textContent = artistData.name;
-    npArtist.textContent = 'Click play on Spotify above';
-    document.querySelector('.open-spotify-btn').href = `https://open.spotify.com/artist/${artistData.id}`;
-    
-    // Reset progress
-    currentProgress = 0;
-    document.getElementById('progressFill').style.width = '0%';
-    document.getElementById('currentTime').textContent = '0:00';
-    document.getElementById('totalTime').textContent = '0:00';
-    isPlaying = false;
-    document.getElementById('playBtn').textContent = '▶';
-    clearInterval(progressInterval);
-}
-
-function togglePlay() {
-    const iframe = document.getElementById('spotifyIframe');
-    const playBtn = document.getElementById('playBtn');
-    
-    // Reload iframe with autoplay hint
-    const currentSrc = iframe.src;
-    if (isPlaying) {
-        playBtn.textContent = '▶';
-        isPlaying = false;
-        clearInterval(progressInterval);
-        iframe.src = currentSrc.replace('&autoplay=1', '&autoplay=0');
-    } else {
-        playBtn.textContent = '⏸';
-        isPlaying = true;
-        if (currentSrc.includes('autoplay=')) {
-            iframe.src = currentSrc.replace('autoplay=0', 'autoplay=1');
-        } else {
-            iframe.src = currentSrc + (currentSrc.includes('?') ? '&' : '?') + 'autoplay=1';
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player Profile · Asian Tier List [1.8+]</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👤</text></svg>">
+    <link rel="stylesheet" href="assets/css/tokens.css">
+    <link rel="stylesheet" href="assets/css/components.css">
+    <link rel="stylesheet" href="assets/css/main.css">
+    <style>
+        .profile-hero {
+            text-align: center;
+            padding: 40px 20px 30px;
+            position: relative;
         }
-        startProgress();
-        updateNowPlaying();
-    }
-}
+        .profile-hero h1 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: var(--font-weight-extrabold);
+            background: var(--gradient-brand);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .profile-hero p {
+            color: var(--color-text-secondary);
+            font-size: 1.1rem;
+            margin-top: 4px;
+        }
 
-function startProgress() {
-    clearInterval(progressInterval);
-    let progress = 0;
-    progressInterval = setInterval(() => {
-        if (!isPlaying) return;
-        progress += 0.3;
-        if (progress >= 100) {
-            progress = 0;
-            if (isLooping) {
-                // Loop - restart
-            } else {
-                // Go to next (simulated)
-                clearInterval(progressInterval);
-                isPlaying = false;
-                document.getElementById('playBtn').textContent = '▶';
-                return;
+        .profile-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px 40px;
+        }
+
+        /* Profile Header */
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xl);
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            border: 1px solid var(--color-border);
+            backdrop-filter: blur(10px);
+            margin-bottom: var(--spacing-xl);
+            flex-wrap: wrap;
+        }
+        .profile-header .avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid var(--color-border);
+            overflow: hidden;
+            flex-shrink: 0;
+            image-rendering: pixelated;
+        }
+        .profile-header .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .profile-header .info {
+            flex: 1;
+            min-width: 200px;
+        }
+        .profile-header .info .name {
+            font-size: 1.8rem;
+            font-weight: var(--font-weight-extrabold);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            flex-wrap: wrap;
+        }
+        .profile-header .info .discord {
+            color: var(--color-text-secondary);
+            font-size: 0.95rem;
+            margin-top: 2px;
+        }
+        .profile-header .info .tier-display {
+            margin-top: var(--spacing-sm);
+            font-size: 2.5rem;
+            font-weight: var(--font-weight-extrabold);
+        }
+        .profile-header .info .role-badge {
+            font-size: 0.8rem;
+            padding: 4px 14px;
+        }
+
+        .profile-header .stats-quick {
+            display: flex;
+            gap: var(--spacing-xl);
+            flex-wrap: wrap;
+        }
+        .profile-header .stats-quick .stat {
+            text-align: center;
+        }
+        .profile-header .stats-quick .stat .num {
+            font-size: 1.5rem;
+            font-weight: var(--font-weight-extrabold);
+            color: var(--color-text);
+        }
+        .profile-header .stats-quick .stat .label {
+            font-size: 0.75rem;
+            color: var(--color-text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Profile Grid */
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-lg);
+        }
+
+        .profile-card {
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            border: 1px solid var(--color-border);
+            backdrop-filter: blur(10px);
+        }
+        .profile-card.full-width {
+            grid-column: 1 / -1;
+        }
+        .profile-card h2 {
+            font-size: 1.1rem;
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--spacing-md);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+        .profile-card h2 .badge {
+            font-size: 0.7rem;
+            background: var(--color-blue);
+            color: white;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        /* Gamemode Tiers */
+        .gamemode-tier-list {
+            display: grid;
+            gap: var(--spacing-sm);
+        }
+        .gamemode-tier-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: var(--color-background);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--color-border);
+        }
+        .gamemode-tier-item .gm {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-weight: var(--font-weight-medium);
+        }
+        .gamemode-tier-item .tier {
+            font-weight: var(--font-weight-bold);
+            font-size: 1.1rem;
+        }
+
+        /* Tier History */
+        .history-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--color-border);
+            font-size: 0.9rem;
+        }
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        .history-item .date {
+            color: var(--color-text-secondary);
+            font-size: 0.8rem;
+        }
+        .history-item .change {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+        .history-item .change .arrow {
+            color: var(--color-text-secondary);
+        }
+        .history-item .change .old {
+            color: var(--color-text-tertiary);
+            text-decoration: line-through;
+        }
+        .history-item .change .new {
+            font-weight: var(--font-weight-bold);
+        }
+
+        /* Stats Grid */
+        .stats-grid-profile {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: var(--spacing-sm);
+        }
+        .stats-grid-profile .stat-box {
+            text-align: center;
+            padding: var(--spacing-sm);
+            background: var(--color-background);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--color-border);
+        }
+        .stats-grid-profile .stat-box .num {
+            font-size: 1.3rem;
+            font-weight: var(--font-weight-bold);
+            color: var(--color-text);
+        }
+        .stats-grid-profile .stat-box .label {
+            font-size: 0.7rem;
+            color: var(--color-text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 30px 20px;
+            color: var(--color-text-secondary);
+        }
+        .no-data .icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            opacity: 0.5;
+        }
+
+        .loading-spinner {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--color-text-secondary);
+        }
+        .loading-spinner .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--color-border);
+            border-top-color: var(--color-blue);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 12px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            text-align: center;
+            padding: 30px 20px;
+            color: var(--color-red);
+        }
+        .error-message .icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        /* Login Prompt */
+        .login-prompt {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        .login-prompt .icon {
+            font-size: 4rem;
+            margin-bottom: var(--spacing-md);
+            opacity: 0.5;
+        }
+        .login-prompt h2 {
+            font-size: 1.8rem;
+            margin-bottom: var(--spacing-sm);
+        }
+        .login-prompt p {
+            color: var(--color-text-secondary);
+            max-width: 400px;
+            margin: 0 auto var(--spacing-lg);
+        }
+
+        @media (max-width: 900px) {
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
+            .profile-card.full-width {
+                grid-column: 1;
+            }
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            .profile-header .info .name {
+                justify-content: center;
+            }
+            .profile-header .stats-quick {
+                justify-content: center;
+                width: 100%;
             }
         }
-        document.getElementById('progressFill').style.width = progress + '%';
-        document.getElementById('currentTime').textContent = formatTime(progress);
-    }, 100);
-}
-
-function formatTime(progress) {
-    const totalSeconds = 180; // 3 min average
-    const current = Math.floor((progress / 100) * totalSeconds);
-    const mins = Math.floor(current / 60);
-    const secs = current % 60;
-    return mins + ':' + String(secs).padStart(2, '0');
-}
-
-function updateNowPlaying() {
-    // Simulate track change for visual feedback
-    const songs = {
-        neighbourhood: ['Sweater Weather', 'Daddy Issues', 'Afraid', 'Softcore', 'Scary Love'],
-        odetari: ['GMFU', 'Hypnotic', 'NARCISSISTIC PERSONALITY DISORDER', 'SMOKE', 'FROSTBITE']
-    };
-    const trackList = songs[currentArtist] || songs.neighbourhood;
-    const randomTrack = trackList[Math.floor(Math.random() * trackList.length)];
-    document.getElementById('npSong').textContent = randomTrack;
-    document.getElementById('npArtist').textContent = ARTISTS[currentArtist].name + ' · Spotify';
-}
-
-function nextTrack() {
-    if (!isPlaying) {
-        togglePlay();
-    }
-    updateNowPlaying();
-    currentProgress = 0;
-    document.getElementById('progressFill').style.width = '0%';
-    document.getElementById('currentTime').textContent = '0:00';
-    document.getElementById('totalTime').textContent = '3:00';
-}
-
-function prevTrack() {
-    updateNowPlaying();
-    currentProgress = 0;
-    document.getElementById('progressFill').style.width = '0%';
-    document.getElementById('currentTime').textContent = '0:00';
-    document.getElementById('totalTime').textContent = '3:00';
-}
-
-function toggleLoop() {
-    isLooping = !isLooping;
-    document.getElementById('loopBtn').classList.toggle('active');
-}
-
-function toggleShuffle() {
-    isShuffled = !isShuffled;
-    document.getElementById('shuffleBtn').classList.toggle('active');
-}
-
-function refreshSpotify() {
-    const iframe = document.getElementById('spotifyIframe');
-    const currentSrc = iframe.src;
-    iframe.src = 'about:blank';
-    setTimeout(() => {
-        iframe.src = currentSrc;
-        if (isPlaying) {
-            setTimeout(() => {
-                iframe.src = iframe.src + (iframe.src.includes('?') ? '&' : '?') + 'autoplay=1';
-            }, 500);
+        @media (max-width: 480px) {
+            .profile-header .avatar {
+                width: 80px;
+                height: 80px;
+            }
+            .profile-header .info .name {
+                font-size: 1.4rem;
+            }
+            .profile-header .info .tier-display {
+                font-size: 2rem;
+            }
+            .profile-header .stats-quick {
+                gap: var(--spacing-md);
+            }
+            .stats-grid-profile {
+                grid-template-columns: 1fr 1fr;
+            }
         }
-    }, 300);
-}
+    </style>
+</head>
+<body>
+    <div id="app">
+        <nav id="main-nav"></nav>
 
-function changeVolume(value) {
-    document.getElementById('volumeDisplay').textContent = value + '%';
-    // Volume control for iframe isn't directly accessible, but we save the value
-}
+        <div class="profile-hero">
+            <h1>👤 Player Profile</h1>
+            <p>View your stats, tiers, and progression</p>
+        </div>
 
-function togglePlayer() {
-    const player = document.getElementById('musicPlayer');
-    player.classList.toggle('minimized');
-    const toggle = document.querySelector('.player-toggle');
-    toggle.textContent = player.classList.contains('minimized') ? '▼' : '▲';
-}
+        <div class="profile-container" id="profile-container">
+            <!-- Login Prompt (shown when not authenticated) -->
+            <div class="login-prompt" id="login-prompt" style="display:none;">
+                <div class="icon">🔒</div>
+                <h2>Login Required</h2>
+                <p>Connect your Discord account to view your player profile and stats.</p>
+                <button class="discord-btn" id="profileLoginBtn">💬 Login with Discord</button>
+            </div>
 
-// Keyboard shortcuts
-document.addEventListener('keydown', (e) => {
-    if (e.target.tagName === 'INPUT') return;
-    if (e.code === 'Space') { e.preventDefault(); togglePlay(); }
-    if (e.code === 'ArrowRight') { e.preventDefault(); nextTrack(); }
-    if (e.code === 'ArrowLeft') { e.preventDefault(); prevTrack(); }
-});
+            <!-- Profile Content (shown when authenticated) -->
+            <div id="profile-content" style="display:none;">
+                <!-- Loading State -->
+                <div class="loading-spinner" id="profile-loading">
+                    <div class="spinner"></div>
+                    <p>Loading your profile...</p>
+                </div>
 
-// ============ INIT ============
-// Start with The Neighbourhood
-</script>
+                <!-- Profile Data -->
+                <div id="profile-data" style="display:none;">
+                    <!-- Header -->
+                    <div class="profile-header" id="profile-header">
+                        <!-- Filled by JS -->
+                    </div>
 
+                    <!-- Grid -->
+                    <div class="profile-grid">
+                        <!-- Gamemode Tiers -->
+                        <div class="profile-card">
+                            <h2>🎯 Gamemode Tiers <span class="badge">All 7</span></h2>
+                            <div class="gamemode-tier-list" id="gamemode-tiers">
+                                <!-- Filled by JS -->
+                            </div>
+                        </div>
+
+                        <!-- Quick Stats -->
+                        <div class="profile-card">
+                            <h2>📊 Statistics <span class="badge">Live</span></h2>
+                            <div class="stats-grid-profile" id="stats-grid">
+                                <!-- Filled by JS -->
+                            </div>
+                        </div>
+
+                        <!-- Tier History -->
+                        <div class="profile-card full-width">
+                            <h2>📜 Tier History</h2>
+                            <div class="history-list" id="tier-history">
+                                <!-- Filled by JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer id="main-footer"></footer>
+    </div>
+
+    <script src="assets/js/data.js"></script>
+    <script src="assets/js/session.js"></script>
+    <script src="assets/js/nav.js"></script>
+    <script src="assets/js/backgrounds.js"></script>
+    <script src="assets/js/stats-api.js"></script>
+    <script>
+        // ============================================================
+        // PROFILE PAGE LOGIC
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            const session = window.ATL_SESSION.current();
+            const loginPrompt = document.getElementById('login-prompt');
+            const profileContent = document.getElementById('profile-content');
+            const profileLoading = document.getElementById('profile-loading');
+            const profileData = document.getElementById('profile-data');
+            const profileHeader = document.getElementById('profile-header');
+            const gamemodeTiers = document.getElementById('gamemode-tiers');
+            const statsGrid = document.getElementById('stats-grid');
+            const tierHistory = document.getElementById('tier-history');
+
+            // --- Login button ---
+            document.getElementById('profileLoginBtn').addEventListener('click', function() {
+                window.ATL_SESSION.loginWithDiscord();
+            });
+
+            // --- Check authentication ---
+            if (!session.authenticated) {
+                loginPrompt.style.display = 'block';
+                profileContent.style.display = 'none';
+                return;
+            }
+
+            // Show profile content
+            loginPrompt.style.display = 'none';
+            profileContent.style.display = 'block';
+            profileLoading.style.display = 'block';
+            profileData.style.display = 'none';
+
+            // --- Load profile data ---
+            async function loadProfile() {
+                try {
+                    const username = session.user.username;
+                    
+                    // Fetch player data from Frost Practice
+                    let playerData = null;
+                    try {
+                        playerData = await window.FROST_STATS.getPlayerData(username);
+                    } catch (e) {
+                        // If player not found on Frost Practice, use Discord info
+                        console.warn('Player not found on Frost Practice:', e);
+                    }
+
+                    // Build profile data
+                    const profile = {
+                        username: username,
+                        discord: session.user.display || username,
+                        discordId: session.user.id,
+                        skin: `https://crafatar.com/avatars/${encodeURIComponent(username)}?size=120`,
+                        overall: playerData?.overall || 'N/A',
+                        stats: playerData?.stats || { wins: 0, losses: 0, kd: 0, elo: 0, games: 0, winRate: 0, streak: 0 },
+                        gamemodes: playerData?.gamemodes || {},
+                        role: session.role || 'Member'
+                    };
+
+                    // --- Render Header ---
+                    const tierColor = window.ATL_DATA.TIER_COLORS[profile.overall] || '#94a3b8';
+                    const roleBadge = window.ATL_roleBadge(profile.role) || '';
+
+                    profileHeader.innerHTML = `
+                        <div class="avatar">
+                            <img src="${profile.skin}" 
+                                 alt="Minecraft skin of ${profile.username}"
+                                 onerror="this.src='${window.ATL_DATA.getSkinFallback()}'">
+                        </div>
+                        <div class="info">
+                            <div class="name">
+                                ${profile.username}
+                                <span class="role-badge">${profile.role}</span>
+                            </div>
+                            <div class="discord">${profile.discord}</div>
+                            <div class="tier-display" style="color: ${tierColor}">${profile.overall}</div>
+                        </div>
+                        <div class="stats-quick">
+                            <div class="stat">
+                                <div class="num">${profile.stats.wins}</div>
+                                <div class="label">Wins</div>
+                            </div>
+                            <div class="stat">
+                                <div class="num">${profile.stats.losses}</div>
+                                <div class="label">Losses</div>
+                            </div>
+                            <div class="stat">
+                                <div class="num">${profile.stats.kd}</div>
+                                <div class="label">K/D</div>
+                            </div>
+                            <div class="stat">
+                                <div class="num">${profile.stats.elo}</div>
+                                <div class="label">ELO</div>
+                            </div>
+                        </div>
+                    `;
+
+                    // --- Render Gamemode Tiers ---
+                    const gamemodes = window.ATL_DATA.GAMEMODES;
+                    gamemodeTiers.innerHTML = gamemodes.map(gm => {
+                        const data = profile.gamemodes[gm.id] || { tier: 'N/A' };
+                        const tier = data.tier || 'N/A';
+                        const color = window.ATL_DATA.TIER_COLORS[tier] || '#94a3b8';
+                        return `
+                            <div class="gamemode-tier-item">
+                                <span class="gm">${gm.icon} ${gm.label}</span>
+                                <span class="tier" style="color: ${color}">${tier}</span>
+                            </div>
+                        `;
+                    }).join('');
+
+                    // --- Render Stats Grid ---
+                    statsGrid.innerHTML = `
+                        <div class="stat-box">
+                            <div class="num">${profile.stats.wins}</div>
+                            <div class="label">Wins</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="num">${profile.stats.losses}</div>
+                            <div class="label">Losses</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="num">${profile.stats.kd}</div>
+                            <div class="label">K/D</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="num">${profile.stats.elo}</div>
+                            <div class="label">ELO</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="num">${profile.stats.games}</div>
+                            <div class="label">Games</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="num">${profile.stats.winRate}%</div>
+                            <div class="label">Win Rate</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="num">${profile.stats.streak}</div>
+                            <div class="label">Streak</div>
+                        </div>
+                    `;
+
+                    // --- Render Tier History ---
+                    // This would come from your tier_log store
+                    const historyData = await window.ATL_SESSION.loadStore('tier_log', []);
+                    const myHistory = historyData
+                        .filter(h => h.player && h.player.toLowerCase() === profile.username.toLowerCase())
+                        .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+                    if (myHistory.length === 0) {
+                        tierHistory.innerHTML = `
+                            <div class="no-data">
+                                <div class="icon">📜</div>
+                                <p>No tier history yet</p>
+                            </div>
+                        `;
+                    } else {
+                        tierHistory.innerHTML = myHistory.slice(0, 20).map(h => {
+                            const gmLabel = window.ATL_DATA.getGamemodeLabel(h.gamemode);
+                            const date = new Date(h.date).toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric'
+                            });
+                            const color = window.ATL_DATA.TIER_COLORS[h.tier] || '#94a3b8';
+                            return `
+                                <div class="history-item">
+                                    <span>${gmLabel}</span>
+                                    <span class="change">
+                                        <span class="old">${h.previous_tier || 'N/A'}</span>
+                                        <span class="arrow">→</span>
+                                        <span class="new" style="color: ${color}">${h.tier}</span>
+                                    </span>
+                                    <span class="date">${date}</span>
+                                </div>
+                            `;
+                        }).join('');
+                    }
+
+                    // --- Show data ---
+                    profileLoading.style.display = 'none';
+                    profileData.style.display = 'block';
+
+                } catch (error) {
+                    console.error('Error loading profile:', error);
+                    profileLoading.innerHTML = `
+                        <div class="error-message">
+                            <div class="icon">❌</div>
+                            <p>Failed to load profile: ${error.message}</p>
+                            <p style="font-size: 0.85rem; margin-top: 8px; color: var(--color-text-secondary)">
+                                Make sure Frost Practice server is running
+                            </p>
+                        </div>
+                    `;
+                }
+            }
+
+            loadProfile();
+
+            // --- Handle session updates ---
+            window.addEventListener('session-update', function(e) {
+                if (!e.detail.authenticated) {
+                    window.location.reload();
+                }
+            });
+        });
+    </script>
 </body>
 </html>
