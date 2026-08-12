@@ -457,4 +457,278 @@
                 gamemodes: {
                     'BedWars': { tier: 'S-', wins: 423, losses: 312, elo: 1820 },
                     'Fireball Fight': { tier: 'A+', wins: 189, losses: 145, elo: 1755 },
-                    'Sumo': { tier: 'A', wins
+                    'Sumo': { tier: 'A', wins: 234, losses: 198, elo: 1680 },
+                    'Nodebuff': { tier: 'S-', wins: 156, losses: 98, elo: 1785 },
+                    'Boxing': { tier: 'B+', wins: 89, losses: 77, elo: 1520 },
+                    'BUHC': { tier: 'A+', wins: 87, losses: 42, elo: 1740 },
+                    'Bridges': { tier: 'S', wins: 69, losses: 30, elo: 1890 }
+                }
+            },
+            'shizeen': {
+                username: 'shizeen',
+                discord: 'shizeen#0002',
+                skin: 'https://crafatar.com/avatars/shizeen?size=100',
+                overall: 'A+',
+                stats: { wins: 1102, losses: 789, kd: 1.40, elo: 1795, games: 1891, winRate: 58, streak: 8 },
+                gamemodes: {
+                    'BedWars': { tier: 'A+', wins: 345, losses: 267, elo: 1750 },
+                    'Fireball Fight': { tier: 'A', wins: 167, losses: 134, elo: 1690 },
+                    'Sumo': { tier: 'S-', wins: 289, losses: 201, elo: 1820 },
+                    'Nodebuff': { tier: 'A', wins: 123, losses: 98, elo: 1675 },
+                    'Boxing': { tier: 'B+', wins: 78, losses: 65, elo: 1545 },
+                    'BUHC': { tier: 'A+', wins: 65, losses: 24, elo: 1720 },
+                    'Bridges': { tier: 'A', wins: 35, losses: 20, elo: 1650 }
+                }
+            },
+            'svynzz': {
+                username: 'svynzz',
+                discord: 'svynzz#0003',
+                skin: 'https://crafatar.com/avatars/svynzz?size=100',
+                overall: 'A',
+                stats: { wins: 987, losses: 723, kd: 1.36, elo: 1723, games: 1710, winRate: 57, streak: 6 },
+                gamemodes: {
+                    'BedWars': { tier: 'A', wins: 287, losses: 234, elo: 1685 },
+                    'Fireball Fight': { tier: 'B+', wins: 134, losses: 112, elo: 1590 },
+                    'Sumo': { tier: 'A+', wins: 245, losses: 189, elo: 1760 },
+                    'Nodebuff': { tier: 'A-', wins: 98, losses: 87, elo: 1625 },
+                    'Boxing': { tier: 'B', wins: 67, losses: 58, elo: 1480 },
+                    'BUHC': { tier: 'A', wins: 98, losses: 43, elo: 1695 },
+                    'Bridges': { tier: 'A+', wins: 58, losses: 28, elo: 1740 }
+                }
+            }
+        };
+        
+        function getTierColor(tier) {
+            const colors = {
+                'S': '#ff6b6b',
+                'S-': '#ff8a8a',
+                'A+': '#4ecdc4',
+                'A': '#45b7d1',
+                'A-': '#6ec8d9',
+                'B+': '#f9ca24',
+                'B': '#f6b93b',
+                'B-': '#f8a5c2',
+                'C+': '#a29bfe',
+                'C': '#6c5ce7',
+                'C-': '#fd79a8',
+                'D+': '#dfe6e9',
+                'D': '#b2bec3',
+                'D-': '#636e72'
+            };
+            return colors[tier] || '#ffffff';
+        }
+        
+        function displayPlayerStats(player) {
+            const placeholder = document.getElementById('stats-placeholder');
+            const content = document.getElementById('stats-content');
+            
+            if (!player) {
+                placeholder.style.display = 'block';
+                content.style.display = 'none';
+                return;
+            }
+            
+            placeholder.style.display = 'none';
+            content.style.display = 'block';
+            
+            const tierColor = getTierColor(player.overall);
+            
+            let gamemodeHTML = '';
+            const gamemodes = ['BedWars', 'Fireball Fight', 'Sumo', 'Nodebuff', 'Boxing', 'BUHC', 'Bridges'];
+            gamemodes.forEach(gm => {
+                const data = player.gamemodes[gm] || { tier: 'N/A', wins: 0, losses: 0, elo: 0 };
+                const tier = data.tier || 'N/A';
+                const color = getTierColor(tier);
+                gamemodeHTML += `
+                    <div class="gm-stat">
+                        <div class="gm-name">${gm}</div>
+                        <div class="gm-detail">
+                            <span>${data.wins}W - ${data.losses}L</span>
+                            <span class="tier-badge" style="color: ${color}">${tier}</span>
+                            <span>${data.elo} ELO</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            content.innerHTML = `
+                <div class="player-stats-display">
+                    <div class="skin-large">
+                        <img src="${player.skin}" alt="Minecraft skin of ${player.username}" loading="lazy">
+                    </div>
+                    <div class="info">
+                        <h3>${player.username}</h3>
+                        <div class="discord">${player.discord}</div>
+                        <div class="tier" style="color: ${tierColor}">${player.overall}</div>
+                    </div>
+                </div>
+                
+                <div class="stats-mini-grid">
+                    <div class="mini-stat">
+                        <div class="num">${player.stats.wins}</div>
+                        <div class="label">Wins</div>
+                    </div>
+                    <div class="mini-stat">
+                        <div class="num">${player.stats.losses}</div>
+                        <div class="label">Losses</div>
+                    </div>
+                    <div class="mini-stat">
+                        <div class="num">${player.stats.kd}</div>
+                        <div class="label">K/D</div>
+                    </div>
+                    <div class="mini-stat">
+                        <div class="num">${player.stats.elo}</div>
+                        <div class="label">ELO</div>
+                    </div>
+                    <div class="mini-stat">
+                        <div class="num">${player.stats.games}</div>
+                        <div class="label">Games</div>
+                    </div>
+                    <div class="mini-stat">
+                        <div class="num">${player.stats.winRate}%</div>
+                        <div class="label">Win Rate</div>
+                    </div>
+                    <div class="mini-stat">
+                        <div class="num">${player.stats.streak}</div>
+                        <div class="label">Streak</div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--color-border);">
+                    <h3 style="font-size: 1rem; margin-bottom: 12px;">🎯 Gamemode Breakdown</h3>
+                    <div class="gamemode-stats">${gamemodeHTML}</div>
+                </div>
+            `;
+        }
+        
+        function searchStatsPlayer() {
+            const input = document.getElementById('stats-search');
+            const query = input.value.trim().toLowerCase();
+            if (!query) return;
+            
+            // Try to find player in mock data
+            // Replace this with real API call:
+            // const player = await fetchPlayerStats(query);
+            
+            let player = null;
+            for (const [key, data] of Object.entries(mockPlayerData)) {
+                if (key.toLowerCase() === query || key.toLowerCase().includes(query)) {
+                    player = data;
+                    break;
+                }
+            }
+            
+            if (!player) {
+                // Player not found
+                document.getElementById('stats-placeholder').innerHTML = `
+                    <div class="icon">❌</div>
+                    <p>Player "${query}" not found</p>
+                    <p style="font-size: 0.85rem; margin-top: 4px;">Try: sheluvs1ztx, shizeen, svynzz</p>
+                `;
+                document.getElementById('stats-placeholder').style.display = 'block';
+                document.getElementById('stats-content').style.display = 'none';
+                return;
+            }
+            
+            displayPlayerStats(player);
+            input.value = '';
+        }
+        
+        function loadStatsExample(username) {
+            document.getElementById('stats-search').value = username;
+            searchStatsPlayer();
+        }
+        
+        // Load leaderboard
+        function loadLeaderboard() {
+            const tbody = document.getElementById('leaderboard-body');
+            // Replace with real API call:
+            // const players = await fetchLeaderboard('global');
+            
+            const players = [
+                { username: 'sheluvs1ztx', elo: 1842, wins: 1247, losses: 832, kd: 1.50, skin: 'https://crafatar.com/avatars/sheluvs1ztx?size=32' },
+                { username: 'shizeen', elo: 1795, wins: 1102, losses: 789, kd: 1.40, skin: 'https://crafatar.com/avatars/shizeen?size=32' },
+                { username: 'svynzz', elo: 1723, wins: 987, losses: 723, kd: 1.36, skin: 'https://crafatar.com/avatars/svynzz?size=32' },
+                { username: 'vortex', elo: 1680, wins: 834, losses: 645, kd: 1.29, skin: 'https://crafatar.com/avatars/vortex?size=32' },
+                { username: 'blaze', elo: 1645, wins: 756, losses: 598, kd: 1.26, skin: 'https://crafatar.com/avatars/blaze?size=32' },
+                { username: 'sniper', elo: 1602, wins: 689, losses: 554, kd: 1.24, skin: 'https://crafatar.com/avatars/sniper?size=32' },
+                { username: 'knight', elo: 1578, wins: 634, losses: 521, kd: 1.22, skin: 'https://crafatar.com/avatars/knight?size=32' },
+                { username: 'shadow', elo: 1541, wins: 567, losses: 478, kd: 1.19, skin: 'https://crafatar.com/avatars/shadow?size=32' }
+            ];
+            
+            tbody.innerHTML = players.map((p, i) => {
+                const rank = i + 1;
+                let rankClass = 'rank';
+                if (rank === 1) rankClass += ' top1';
+                else if (rank === 2) rankClass += ' top2';
+                else if (rank === 3) rankClass += ' top3';
+                
+                return `
+                    <tr>
+                        <td class="${rankClass}">#${rank}</td>
+                        <td>
+                            <div class="player-cell">
+                                <div class="mini-skin">
+                                    <img src="${p.skin}" alt="Minecraft skin of ${p.username}" loading="lazy">
+                                </div>
+                                <span class="name">${p.username}</span>
+                            </div>
+                        </td>
+                        <td class="elo">${p.elo}</td>
+                        <td>${p.wins}</td>
+                        <td>${p.losses}</td>
+                        <td>${p.kd}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        // Enter key support
+        document.getElementById('stats-search').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') searchStatsPlayer();
+        });
+        
+        // Initialize
+        loadLeaderboard();
+        
+        // ============================================================
+        // REAL API INTEGRATION EXAMPLE
+        // ============================================================
+        /*
+        // Uncomment and implement these functions for real API integration
+        
+        async function fetchPlayerStats(username) {
+            try {
+                const response = await fetch(`${FROST_API.baseUrl}${FROST_API.endpoints.player}${username}`);
+                if (!response.ok) throw new Error('Player not found');
+                return await response.json();
+            } catch (error) {
+                console.error('Error fetching player stats:', error);
+                return null;
+            }
+        }
+        
+        async function fetchLeaderboard(gamemode = 'global') {
+            try {
+                const response = await fetch(`${FROST_API.baseUrl}${FROST_API.endpoints.leaderboard}?gamemode=${gamemode}`);
+                return await response.json();
+            } catch (error) {
+                console.error('Error fetching leaderboard:', error);
+                return [];
+            }
+        }
+        
+        async function fetchServerStatus() {
+            try {
+                const response = await fetch(`${FROST_API.baseUrl}${FROST_API.endpoints.server}`);
+                return await response.json();
+            } catch (error) {
+                console.error('Error fetching server status:', error);
+                return { online: false };
+            }
+        }
+        */
+        // ============================================================
+    </script>
+</body>
+</html>
