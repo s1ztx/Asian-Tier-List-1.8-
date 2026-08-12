@@ -29,7 +29,8 @@
         .hero .season-badge {
             display: inline-block;
             padding: 6px 20px;
-            background: var(--color-surface);
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
             border: 1px solid var(--color-border);
             border-radius: var(--radius-full);
             font-size: 0.8rem;
@@ -118,10 +119,10 @@
             max-width: 800px;
             margin: var(--spacing-2xl) auto 0;
             padding: var(--spacing-lg);
-            background: var(--color-surface);
+            background: rgba(255,255,255,0.04);
+            backdrop-filter: blur(10px);
             border-radius: var(--radius-lg);
             border: 1px solid var(--color-border);
-            backdrop-filter: blur(10px);
         }
         .stats-bar .stat-item {
             text-align: center;
@@ -147,6 +148,8 @@
             padding: var(--spacing-3xl) 20px;
             max-width: 1200px;
             margin: 0 auto;
+            position: relative;
+            z-index: 2;
         }
         .features h2 {
             text-align: center;
@@ -161,13 +164,13 @@
             margin-top: var(--spacing-xl);
         }
         .feature-card {
-            background: var(--color-surface);
+            background: rgba(255,255,255,0.04);
+            backdrop-filter: blur(10px);
             border-radius: var(--radius-lg);
             padding: var(--spacing-xl);
             border: 1px solid var(--color-border);
             text-align: center;
             transition: all var(--transition-normal);
-            backdrop-filter: blur(10px);
         }
         .feature-card:hover {
             transform: translateY(-4px);
@@ -182,6 +185,7 @@
             font-size: 1.1rem;
             font-weight: var(--font-weight-bold);
             margin-bottom: var(--spacing-sm);
+            color: var(--color-text);
         }
         .feature-card p {
             color: var(--color-text-secondary);
@@ -195,6 +199,8 @@
             max-width: 800px;
             margin: 0 auto;
             text-align: center;
+            position: relative;
+            z-index: 2;
         }
         .tier-ladder-preview h2 {
             font-size: clamp(1.8rem, 2.5vw, 2.5rem);
@@ -205,7 +211,8 @@
             display: flex;
             flex-direction: column;
             gap: 4px;
-            background: var(--color-surface);
+            background: rgba(255,255,255,0.04);
+            backdrop-filter: blur(10px);
             border-radius: var(--radius-lg);
             padding: var(--spacing-md);
             border: 1px solid var(--color-border);
@@ -219,7 +226,7 @@
             transition: background var(--transition-fast);
         }
         .tier-row:hover {
-            background: var(--color-surface-hover);
+            background: rgba(255,255,255,0.05);
         }
         .tier-row .tier-label {
             font-weight: var(--font-weight-bold);
@@ -251,6 +258,8 @@
             padding: var(--spacing-3xl) 20px;
             max-width: 1200px;
             margin: 0 auto;
+            position: relative;
+            z-index: 2;
         }
         .gamemodes-section h2 {
             text-align: center;
@@ -265,7 +274,8 @@
             margin-top: var(--spacing-xl);
         }
         .gamemode-chip {
-            background: var(--color-surface);
+            background: rgba(255,255,255,0.04);
+            backdrop-filter: blur(10px);
             border: 1px solid var(--color-border);
             border-radius: var(--radius-md);
             padding: var(--spacing-md);
@@ -285,15 +295,19 @@
         .gamemode-chip .name {
             font-size: 0.85rem;
             font-weight: var(--font-weight-semibold);
+            color: var(--color-text);
         }
 
         /* ----- CTA Section ----- */
         .cta-section {
             padding: var(--spacing-3xl) 20px;
             text-align: center;
-            background: var(--color-surface);
+            background: rgba(255,255,255,0.03);
+            backdrop-filter: blur(10px);
             border-top: 1px solid var(--color-border);
             border-bottom: 1px solid var(--color-border);
+            position: relative;
+            z-index: 2;
         }
         .cta-section h2 {
             font-size: clamp(1.8rem, 2.5vw, 2.5rem);
@@ -330,7 +344,7 @@
         <!-- Hero -->
         <section class="hero">
             <div class="hero-content">
-                <div class="season-badge">🏆 Season 1 · 2026</div>
+                <div class="season-badge">🏆 SEASON 1 · 2026</div>
                 <h1>
                     Prove Your Rank.<br>
                     <span class="highlight">Earn Your Tier.</span>
@@ -374,22 +388,22 @@
                 <div class="feature-card">
                     <div class="icon">⚔️</div>
                     <h3>Competitive PvP</h3>
-                    <p>Ranked 1.8 PvP across seven gamemodes including BedWars, Sumo, and Nodebuff.</p>
+                    <p>Ranked 1.8 PvP across seven gamemodes including BedWars, Sumo, and Nodebuff. Get tested by our certified testers.</p>
                 </div>
                 <div class="feature-card">
                     <div class="icon">🎯</div>
                     <h3>Real Rankings</h3>
-                    <p>Accurate tier system with real player data and live leaderboards.</p>
+                    <p>Accurate tier system with real player data and live leaderboards. Track your progress and climb the ranks.</p>
                 </div>
                 <div class="feature-card">
                     <div class="icon">👥</div>
                     <h3>Community Driven</h3>
-                    <p>Join our Discord community of competitive players and get ranked by our testers.</p>
+                    <p>Join our Discord community of competitive players. Get ranked, compete, and connect with the best players.</p>
                 </div>
                 <div class="feature-card">
                     <div class="icon">📊</div>
                     <h3>Live Statistics</h3>
-                    <p>Real-time stats from Frost Practice server with detailed player profiles.</p>
+                    <p>Real-time stats from Frost Practice server with detailed player profiles and performance analytics.</p>
                 </div>
             </div>
         </section>
@@ -482,7 +496,7 @@
                     const matches = document.getElementById('total-matches');
                     const topTier = document.getElementById('top-tier');
                     
-                    if (status.online) {
+                    if (status && status.online) {
                         players.textContent = status.total_players || '1.2k';
                         online.textContent = status.players_online || 47;
                         matches.textContent = status.total_matches || '12.4k';
@@ -495,6 +509,10 @@
                     }
                 } catch (error) {
                     console.error('Failed to load stats:', error);
+                    document.getElementById('total-players').textContent = '--';
+                    document.getElementById('online-players').textContent = '--';
+                    document.getElementById('total-matches').textContent = '--';
+                    document.getElementById('top-tier').textContent = '--';
                 }
             }
             
