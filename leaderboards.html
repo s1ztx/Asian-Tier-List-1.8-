@@ -1,80 +1,514 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Leaderboards — Asian Tier List [1.8+]</title>
-<link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="assets/css/main.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboards · Asian Tier List [1.8+]</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏆</text></svg>">
+    <link rel="stylesheet" href="assets/css/tokens.css">
+    <link rel="stylesheet" href="assets/css/components.css">
+    <link rel="stylesheet" href="assets/css/main.css">
+    <style>
+        .leaderboard-hero {
+            text-align: center;
+            padding: 30px 20px 20px;
+        }
+        .leaderboard-hero h1 {
+            font-size: clamp(2rem, 4vw, 3.2rem);
+            font-weight: var(--font-weight-extrabold);
+            background: var(--gradient-brand);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .leaderboard-hero p {
+            color: var(--color-text-secondary);
+            font-size: 1.1rem;
+            margin-top: 4px;
+        }
+
+        .leaderboard-controls {
+            max-width: 1200px;
+            margin: 0 auto 20px;
+            padding: 0 20px;
+            display: flex;
+            gap: var(--spacing-md);
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+        }
+        .leaderboard-controls .search-box {
+            flex: 1;
+            min-width: 200px;
+            max-width: 400px;
+            display: flex;
+            background: var(--color-surface);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--color-border);
+            overflow: hidden;
+            transition: border-color var(--transition-fast);
+        }
+        .leaderboard-controls .search-box:focus-within {
+            border-color: var(--color-blue);
+        }
+        .leaderboard-controls .search-box input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 10px 14px;
+            color: var(--color-text);
+            font-size: 0.9rem;
+            outline: none;
+        }
+        .leaderboard-controls .search-box input::placeholder {
+            color: var(--color-text-secondary);
+            opacity: 0.6;
+        }
+        .leaderboard-controls .search-box button {
+            padding: 10px 16px;
+            background: var(--gradient-brand);
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-weight: var(--font-weight-bold);
+            transition: opacity var(--transition-fast);
+        }
+        .leaderboard-controls .search-box button:hover {
+            opacity: 0.8;
+        }
+
+        .gamemode-tabs {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .gamemode-tabs .tab {
+            padding: 6px 16px;
+            border-radius: var(--radius-full);
+            border: 1px solid var(--color-border);
+            background: transparent;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: var(--font-weight-medium);
+            transition: all var(--transition-fast);
+            font-family: var(--font-family);
+        }
+        .gamemode-tabs .tab:hover {
+            border-color: var(--color-border-light);
+            color: var(--color-text);
+        }
+        .gamemode-tabs .tab.active {
+            background: var(--gradient-brand);
+            border-color: transparent;
+            color: white;
+        }
+
+        .leaderboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px 40px;
+        }
+
+        .leaderboard-table-wrap {
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--color-border);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+        .leaderboard-table-wrap table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .leaderboard-table-wrap th {
+            text-align: left;
+            padding: 12px 16px;
+            color: var(--color-text-secondary);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--color-border);
+            font-weight: var(--font-weight-semibold);
+        }
+        .leaderboard-table-wrap td {
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--color-border);
+            font-size: 0.9rem;
+            vertical-align: middle;
+        }
+        .leaderboard-table-wrap tr:last-child td {
+            border-bottom: none;
+        }
+        .leaderboard-table-wrap tr:hover td {
+            background: var(--color-surface-hover);
+        }
+
+        .rank {
+            font-weight: var(--font-weight-bold);
+            color: var(--color-text-secondary);
+            width: 40px;
+            text-align: center;
+        }
+        .rank.top1 { color: #ffd700; font-size: 1.1rem; }
+        .rank.top2 { color: #c0c0c0; font-size: 1.05rem; }
+        .rank.top3 { color: #cd7f32; font-size: 1rem; }
+
+        .player-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .player-cell .mini-skin {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            overflow: hidden;
+            image-rendering: pixelated;
+            border: 2px solid var(--color-border);
+            flex-shrink: 0;
+        }
+        .player-cell .mini-skin img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .player-cell .name {
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-text);
+        }
+        .player-cell .discord-tag {
+            font-size: 0.75rem;
+            color: var(--color-text-secondary);
+        }
+
+        .tier-badge-cell {
+            font-weight: var(--font-weight-bold);
+            font-size: 1rem;
+        }
+
+        .elo-cell {
+            font-weight: var(--font-weight-bold);
+            color: var(--color-blue);
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--color-text-secondary);
+        }
+        .no-data .icon {
+            font-size: 3rem;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        .loading-spinner {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        .loading-spinner .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--color-border);
+            border-top-color: var(--color-blue);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 12px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .leaderboard-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .leaderboard-controls .search-box {
+                max-width: 100%;
+            }
+            .leaderboard-table-wrap {
+                overflow-x: auto;
+            }
+            .leaderboard-table-wrap table {
+                font-size: 0.8rem;
+                min-width: 600px;
+            }
+            .player-cell .mini-skin {
+                width: 28px;
+                height: 28px;
+            }
+            .gamemode-tabs .tab {
+                font-size: 0.75rem;
+                padding: 4px 12px;
+            }
+        }
+    </style>
 </head>
 <body>
-<main>
-  <section class="page-hero">
-    <div class="container">
-      <div class="eyebrow">Live rankings</div>
-      <h1 class="h-title" style="font-size:clamp(32px,5vw,52px);">Leaderboards</h1>
-      <p class="h-sub">Every gamemode has its own leaderboard. Rankings update the moment a tester logs a new result.</p>
+    <div id="app">
+        <nav id="main-nav"></nav>
+
+        <div class="leaderboard-hero">
+            <h1>🏆 Leaderboards</h1>
+            <p>Top players ranked across all gamemodes</p>
+        </div>
+
+        <div class="leaderboard-controls">
+            <div class="search-box">
+                <input type="text" id="leaderboard-search" placeholder="Search player... e.g., sheluvs1ztx">
+                <button onclick="searchLeaderboard()">🔍</button>
+            </div>
+            <div class="gamemode-tabs" id="gamemode-tabs">
+                <!-- Filled by JS -->
+            </div>
+        </div>
+
+        <div class="leaderboard-container">
+            <div class="leaderboard-table-wrap">
+                <div id="leaderboard-content">
+                    <div class="loading-spinner" id="leaderboard-loading">
+                        <div class="spinner"></div>
+                        <p>Loading leaderboard...</p>
+                    </div>
+                    <table id="leaderboard-table" style="display:none;">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Player</th>
+                                <th>Tier</th>
+                                <th>ELO</th>
+                                <th>Wins</th>
+                                <th>Losses</th>
+                                <th>K/D</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboard-body">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <footer id="main-footer"></footer>
     </div>
-  </section>
 
-  <section class="section">
-    <div class="container">
-      <div id="gmTabs" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:22px;"></div>
-      <div class="table-wrap glass" id="lbTableWrap"></div>
-    </div>
-  </section>
-</main>
+    <script src="assets/js/data.js"></script>
+    <script src="assets/js/session.js"></script>
+    <script src="assets/js/nav.js"></script>
+    <script src="assets/js/backgrounds.js"></script>
+    <script src="assets/js/stats-api.js"></script>
+    <script>
+        // ============================================================
+        // LEADERBOARD LOGIC
+        // ============================================================
+        let currentGamemode = 'global';
+        let currentData = [];
 
-<script src="assets/js/data.js"></script>
-<script src="assets/js/session.js"></script>
-<script src="assets/js/nav.js"></script>
-<script src="assets/js/backgrounds.js"></script>
-<script type="module">
-  ATL_mountBackground('leaderboards');
-  ATL_initShell('leaderboards.html');
+        document.addEventListener('DOMContentLoaded', function() {
+            // Render gamemode tabs
+            const tabsContainer = document.getElementById('gamemode-tabs');
+            const gamemodes = window.ATL_DATA.GAMEMODES;
+            
+            tabsContainer.innerHTML = `
+                <button class="tab active" data-gamemode="global">🌍 Global</button>
+                ${gamemodes.map(gm => `
+                    <button class="tab" data-gamemode="${gm.id}">${gm.icon} ${gm.label}</button>
+                `).join('')}
+            `;
 
-  const tabsEl = document.getElementById('gmTabs');
-  const tableWrap = document.getElementById('lbTableWrap');
-  let active = ATL_DATA.GAMEMODES[0].id;
+            // Tab click handlers
+            tabsContainer.querySelectorAll('.tab').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    tabsContainer.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentGamemode = this.dataset.gamemode;
+                    loadLeaderboard(currentGamemode);
+                });
+            });
 
-  async function render(){
-    tabsEl.innerHTML = ATL_DATA.GAMEMODES.map(g=>`
-      <button class="btn ${g.id===active?'btn-secondary':'btn-ghost'} btn-sm" data-gm="${g.id}" style="text-transform:none;">${g.label}</button>
-    `).join('');
-    tabsEl.querySelectorAll('[data-gm]').forEach(b=> b.addEventListener('click', ()=>{ active=b.dataset.gm; render(); }));
+            // Search
+            document.getElementById('leaderboard-search').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') searchLeaderboard();
+            });
 
-    tableWrap.innerHTML = `<div class="empty-state"><p class="text-sm text-muted">Loading…</p></div>`;
-    const board = await ATL_SESSION.loadStore('leaderboard_'+active, []);
-    if(board.length === 0){
-      tableWrap.innerHTML = `
-        <div class="empty-state">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>
-          <h3>No ranked players yet</h3>
-          <p>Nobody has been tiered in ${ATL_DATA.GAMEMODES.find(g=>g.id===active).label} yet. Request a test to be the first on this board.</p>
-        </div>`;
-    } else {
-      const tierOrder = ATL_DATA.TIERS.map(t=>t.id);
-      const sorted = board.slice().sort((a,b)=> tierOrder.indexOf(a.tier) - tierOrder.indexOf(b.tier));
-      for(const p of sorted){
-        p._avatar = await ATL_SESSION.resolveAvatar({ mcUsername: p.mcUsername, discordUsername: p.player });
-      }
-      tableWrap.innerHTML = `
-        <table class="dt">
-          <thead><tr><th>#</th><th>Player</th><th>Tier</th><th>Tested by</th><th>Date</th></tr></thead>
-          <tbody>
-            ${sorted.map((p,i)=>`
-              <tr class="${i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':''}">
-                <td><span class="rank-num">${i+1}</span></td>
-                <td><div style="display:flex; align-items:center; gap:10px;"><img src="${p._avatar}" style="width:30px;height:30px;border-radius:50%;object-fit:cover; border:1px solid var(--glass-brd);">${p.player}</div></td>
-                <td>${ATL_hex(p.tier,'sm')}</td>
-                <td class="text-muted">${p.tester}</td>
-                <td class="mono text-muted">${p.date}</td>
-              </tr>`).join('')}
-          </tbody>
-        </table>`;
-    }
-  }
-  render();
-</script>
+            // Load initial leaderboard
+            loadLeaderboard('global');
+        });
+
+        async function loadLeaderboard(gamemode) {
+            const loading = document.getElementById('leaderboard-loading');
+            const table = document.getElementById('leaderboard-table');
+            const tbody = document.getElementById('leaderboard-body');
+
+            loading.style.display = 'block';
+            table.style.display = 'none';
+
+            try {
+                const players = await window.FROST_STATS.getLeaderboard(gamemode);
+                currentData = players || [];
+
+                loading.style.display = 'none';
+
+                if (!currentData || currentData.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="7" style="text-align:center; padding: 40px; color: var(--color-text-secondary);">
+                                <div class="no-data">
+                                    <div class="icon">📊</div>
+                                    <p>No players ranked in ${window.ATL_DATA.getGamemodeLabel(gamemode)} yet</p>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                    table.style.display = 'table';
+                    return;
+                }
+
+                // Get tier data for each player
+                const playersWithTiers = await Promise.all(
+                    currentData.map(async (p) => {
+                        try {
+                            const tier = await window.FROST_STATS.getPlayerTier(p.username);
+                            return { ...p, tier: tier?.overall || 'N/A' };
+                        } catch {
+                            return { ...p, tier: 'N/A' };
+                        }
+                    })
+                );
+
+                tbody.innerHTML = playersWithTiers.map((p, i) => {
+                    const rank = i + 1;
+                    let rankClass = 'rank';
+                    if (rank === 1) rankClass += ' top1';
+                    else if (rank === 2) rankClass += ' top2';
+                    else if (rank === 3) rankClass += ' top3';
+                    
+                    const tierColor = window.ATL_DATA.TIER_COLORS[p.tier] || '#94a3b8';
+                    const skinUrl = window.ATL_DATA.getSkinUrl(p.username, 36);
+
+                    return `
+                        <tr>
+                            <td class="${rankClass}">#${rank}</td>
+                            <td>
+                                <div class="player-cell">
+                                    <div class="mini-skin">
+                                        <img src="${skinUrl}" 
+                                             alt="Minecraft skin of ${p.username}"
+                                             loading="lazy"
+                                             onerror="this.src='${window.ATL_DATA.getSkinFallback()}'">
+                                    </div>
+                                    <div>
+                                        <div class="name">${p.username}</div>
+                                        <div class="discord-tag">${p.discord || ''}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="tier-badge-cell" style="color: ${tierColor}">${p.tier}</td>
+                            <td class="elo-cell">${p.elo || 0}</td>
+                            <td>${p.wins || 0}</td>
+                            <td>${p.losses || 0}</td>
+                            <td>${p.kd || 0}</td>
+                        </tr>
+                    `;
+                }).join('');
+
+                table.style.display = 'table';
+
+            } catch (error) {
+                console.error('Error loading leaderboard:', error);
+                loading.style.display = 'none';
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align:center; padding: 30px; color: var(--color-red);">
+                            Failed to load leaderboard: ${error.message}
+                        </td>
+                    </tr>
+                `;
+                table.style.display = 'table';
+            }
+        }
+
+        function searchLeaderboard() {
+            const query = document.getElementById('leaderboard-search').value.trim().toLowerCase();
+            if (!query) {
+                loadLeaderboard(currentGamemode);
+                return;
+            }
+
+            const filtered = currentData.filter(p => 
+                p.username.toLowerCase().includes(query) ||
+                (p.discord && p.discord.toLowerCase().includes(query))
+            );
+
+            const tbody = document.getElementById('leaderboard-body');
+            const table = document.getElementById('leaderboard-table');
+            const loading = document.getElementById('leaderboard-loading');
+
+            loading.style.display = 'none';
+            table.style.display = 'table';
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align:center; padding: 40px; color: var(--color-text-secondary);">
+                            <div class="no-data">
+                                <div class="icon">🔍</div>
+                                <p>No players found matching "${query}"</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            // We need to re-render with tiers
+            Promise.all(filtered.map(async (p) => {
+                try {
+                    const tier = await window.FROST_STATS.getPlayerTier(p.username);
+                    return { ...p, tier: tier?.overall || 'N/A' };
+                } catch {
+                    return { ...p, tier: 'N/A' };
+                }
+            })).then(playersWithTiers => {
+                tbody.innerHTML = playersWithTiers.map((p, i) => {
+                    const rank = i + 1;
+                    const tierColor = window.ATL_DATA.TIER_COLORS[p.tier] || '#94a3b8';
+                    const skinUrl = window.ATL_DATA.getSkinUrl(p.username, 36);
+
+                    return `
+                        <tr>
+                            <td class="rank">#${rank}</td>
+                            <td>
+                                <div class="player-cell">
+                                    <div class="mini-skin">
+                                        <img src="${skinUrl}" 
+                                             alt="Minecraft skin of ${p.username}"
+                                             loading="lazy"
+                                             onerror="this.src='${window.ATL_DATA.getSkinFallback()}'">
+                                    </div>
+                                    <div>
+                                        <div class="name">${p.username}</div>
+                                        <div class="discord-tag">${p.discord || ''}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="tier-badge-cell" style="color: ${tierColor}">${p.tier}</td>
+                            <td class="elo-cell">${p.elo || 0}</td>
+                            <td>${p.wins || 0}</td>
+                            <td>${p.losses || 0}</td>
+                            <td>${p.kd || 0}</td>
+                        </tr>
+                    `;
+                }).join('');
+            });
+        }
+
+        // Expose for inline onclick
+        window.searchLeaderboard = searchLeaderboard;
+        window.loadLeaderboard = loadLeaderboard;
+    </script>
 </body>
 </html>
