@@ -1,275 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Staff · Asian Tier List [1.8+]</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👔</text></svg>">
-    <link rel="stylesheet" href="assets/css/tokens.css">
-    <link rel="stylesheet" href="assets/css/components.css">
-    <link rel="stylesheet" href="assets/css/main.css">
-    <style>
-        .staff-hero {
-            text-align: center;
-            padding: 30px 20px 20px;
-        }
-        .staff-hero h1 {
-            font-size: clamp(2rem, 4vw, 3.2rem);
-            font-weight: var(--font-weight-extrabold);
-            background: var(--gradient-brand);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .staff-hero p {
-            color: var(--color-text-secondary);
-            font-size: 1.1rem;
-            margin-top: 4px;
-        }
-
-        .staff-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px 40px;
-        }
-
-        .staff-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: var(--spacing-lg);
-        }
-
-        .staff-card {
-            background: var(--color-surface);
-            border-radius: var(--radius-lg);
-            padding: var(--spacing-lg);
-            border: 1px solid var(--color-border);
-            backdrop-filter: blur(10px);
-            text-align: center;
-            transition: all var(--transition-normal);
-        }
-        .staff-card:hover {
-            transform: translateY(-4px);
-            border-color: var(--color-border-light);
-            box-shadow: var(--shadow-lg);
-        }
-        .staff-card .avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            margin: 0 auto var(--spacing-md);
-            overflow: hidden;
-            border: 3px solid var(--color-border);
-            image-rendering: pixelated;
-        }
-        .staff-card .avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .staff-card .name {
-            font-size: 1.1rem;
-            font-weight: var(--font-weight-bold);
-        }
-        .staff-card .discord {
-            font-size: 0.85rem;
-            color: var(--color-text-secondary);
-        }
-        .staff-card .rank {
-            display: inline-block;
-            margin-top: var(--spacing-sm);
-            padding: 4px 14px;
-            border-radius: var(--radius-full);
-            font-size: 0.75rem;
-            font-weight: var(--font-weight-semibold);
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-        }
-        .staff-card .minecraft {
-            margin-top: var(--spacing-sm);
-            font-size: 0.85rem;
-            color: var(--color-text-secondary);
-        }
-        .staff-card .minecraft .skin-mini {
-            display: inline-block;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            overflow: hidden;
-            vertical-align: middle;
-            margin-right: 6px;
-            image-rendering: pixelated;
-            border: 1px solid var(--color-border);
-        }
-        .staff-card .minecraft .skin-mini img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .rank-owner .rank { background: #e63946; color: white; }
-        .rank-founder .rank { background: #ffd700; color: #0a0e15; }
-        .rank-admin .rank { background: #8b5cf6; color: white; }
-        .rank-manager .rank { background: #3b82f6; color: white; }
-        .rank-senior-moderator .rank { background: #22c55e; color: white; }
-        .rank-moderator .rank { background: #f59e0b; color: white; }
-        .rank-trial-moderator .rank { background: #8b5cf6; color: white; opacity: 0.7; }
-
-        .no-staff {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--color-text-secondary);
-        }
-        .no-staff .icon {
-            font-size: 3rem;
-            margin-bottom: 12px;
-            opacity: 0.5;
-        }
-
-        .loading-spinner {
-            text-align: center;
-            padding: 40px 20px;
-        }
-        .loading-spinner .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid var(--color-border);
-            border-top-color: var(--color-blue);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin: 0 auto 12px;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        @media (max-width: 768px) {
-            .staff-grid {
-                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            }
-        }
-        @media (max-width: 480px) {
-            .staff-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Staff — Asian Tier List [1.8+]</title>
+<link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/css/main.css">
 </head>
 <body>
-    <div id="app">
-        <nav id="main-nav"></nav>
-
-        <div class="staff-hero">
-            <h1>👔 Staff Team</h1>
-            <p>Meet the team behind Asian Tier List</p>
-        </div>
-
-        <div class="staff-container">
-            <div id="staff-content">
-                <div class="loading-spinner" id="staff-loading">
-                    <div class="spinner"></div>
-                    <p>Loading staff...</p>
-                </div>
-                <div class="staff-grid" id="staff-grid" style="display:none;">
-                    <!-- Filled by JS -->
-                </div>
-            </div>
-        </div>
-
-        <footer id="main-footer"></footer>
+<main>
+  <section class="page-hero">
+    <div class="container">
+      <div class="eyebrow">The team</div>
+      <h1 class="h-title" style="font-size:clamp(32px,5vw,52px);">Staff</h1>
+      <p class="h-sub">Everyone keeping the platform, the server, and the tier system running fairly.</p>
     </div>
+  </section>
 
-    <script src="assets/js/data.js"></script>
-    <script src="assets/js/session.js"></script>
-    <script src="assets/js/nav.js"></script>
-    <script src="assets/js/backgrounds.js"></script>
-    <script>
-        // ============================================================
-        // STAFF LOGIC
-        // ============================================================
-        document.addEventListener('DOMContentLoaded', function() {
-            const loading = document.getElementById('staff-loading');
-            const grid = document.getElementById('staff-grid');
+  <section class="section">
+    <div class="container" id="staffContainer"></div>
+  </section>
+</main>
 
-            async function loadStaff() {
-                try {
-                    const staff = await window.ATL_SESSION.loadStore('staff', []);
-                    
-                    loading.style.display = 'none';
-                    grid.style.display = 'grid';
+<script src="assets/js/data.js"></script>
+<script src="assets/js/session.js"></script>
+<script src="assets/js/nav.js"></script>
+<script src="assets/js/backgrounds.js"></script>
+<script src="assets/js/cursor.js"></script>
 
-                    if (!staff || staff.length === 0) {
-                        grid.innerHTML = `
-                            <div class="no-staff" style="grid-column: 1 / -1;">
-                                <div class="icon">👔</div>
-                                <p>No staff members have been added yet.</p>
-                            </div>
-                        `;
-                        return;
-                    }
+<script type="module">
+  ATL_mountBackground('staff');
+  ATL_initShell('staff.html');
 
-                    // Sort by rank hierarchy
-                    const rankOrder = {
-                        'Founder': 0,
-                        'Owner': 1,
-                        'Admin': 2,
-                        'Manager': 3,
-                        'Senior Moderator': 4,
-                        'Moderator': 5,
-                        'Trial Moderator': 6
-                    };
+  const staff = await ATL_SESSION.loadStore('staff', []);
+  const container = document.getElementById('staffContainer');
 
-                    const sorted = [...staff].sort((a, b) => 
-                        (rankOrder[a.rank] ?? 99) - (rankOrder[b.rank] ?? 99)
-                    );
-
-                    grid.innerHTML = sorted.map(member => {
-                        const rankClass = member.rank.toLowerCase().replace(/\s+/g, '-');
-                        const avatarUrl = member.discordAvatar || 
-                            `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(member.discord || member.name)}&backgroundColor=141a29`;
-                        const skinUrl = member.minecraft ? 
-                            window.ATL_DATA.getSkinUrl(member.minecraft, 24) : 
-                            null;
-
-                        return `
-                            <div class="staff-card rank-${rankClass}">
-                                <div class="avatar">
-                                    <img src="${avatarUrl}" alt="${member.name}'s avatar">
-                                </div>
-                                <div class="name">${member.name}</div>
-                                <div class="discord">${member.discord || ''}</div>
-                                <div class="rank">${member.rank}</div>
-                                ${member.minecraft ? `
-                                    <div class="minecraft">
-                                        <span class="skin-mini">
-                                            <img src="${skinUrl}" 
-                                                 alt="Minecraft skin of ${member.minecraft}"
-                                                 onerror="this.src='${window.ATL_DATA.getSkinFallback()}'">
-                                        </span>
-                                        ${member.minecraft}
-                                    </div>
-                                ` : ''}
-                                ${member.bio ? `<p style="margin-top: var(--spacing-sm); font-size: 0.85rem; color: var(--color-text-secondary);">${member.bio}</p>` : ''}
-                            </div>
-                        `;
-                    }).join('');
-
-                } catch (error) {
-                    console.error('Error loading staff:', error);
-                    loading.innerHTML = `
-                        <div class="error-message" style="text-align:center; padding:30px; color: var(--color-red);">
-                            <div class="icon" style="font-size:2.5rem; margin-bottom:10px;">❌</div>
-                            <p>Failed to load staff: ${error.message}</p>
-                        </div>
-                    `;
-                }
-            }
-
-            loadStaff();
-
-            // Reload on session update
-            window.addEventListener('session-update', loadStaff);
-        });
-    </script>
+  if(staff.length === 0){
+    container.innerHTML = `
+      <div class="glass empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        <h3>No staff members added yet</h3>
+        <p>The Owner Panel hasn't added anyone to the roster. Once staff are added and assigned a role, they'll be listed here grouped by rank.</p>
+      </div>`;
+  } else {
+    const groups = ATL_DATA.STAFF_ROLES.map(role => ({ role, members: staff.filter(s=>s.role===role) })).filter(g=>g.members.length);
+    for(const g of groups){
+      for(const m of g.members){
+        m._avatar = await ATL_SESSION.resolveAvatar({ mcUsername: m.mcUsername, discordUsername: m.username });
+      }
+    }
+    container.innerHTML = groups.map(g=>`
+      <div class="mt-32">
+        <div class="eyebrow" style="margin-bottom:14px;">${g.role} · ${g.members.length}</div>
+        <div class="grid-3">
+          ${g.members.map(m=>`
+            <div class="glass card card-hover" style="text-align:center;">
+              <img src="${m._avatar}" style="width:64px;height:64px;border-radius:8px;margin:0 auto 12px;border:2px solid var(--panel-3); object-fit:cover; image-rendering:pixelated;">
+              <div style="font-family:var(--f-sub); font-weight:700; font-size:16px; color:var(--text-0);">${m.display || m.username}</div>
+              <div class="mt-8">${ATL_roleBadge(m.role)}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `).join('');
+  }
+</script>
 </body>
 </html>
