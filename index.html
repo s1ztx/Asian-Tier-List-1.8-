@@ -1,544 +1,213 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Asian Tier List [1.8+] · Competitive PvP Rankings</title>
-    <meta name="description" content="The competitive Minecraft 1.8 PvP tier list ranking Asia's best players across seven gamemodes.">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏆</text></svg>">
-    <link rel="stylesheet" href="assets/css/tokens.css">
-    <link rel="stylesheet" href="assets/css/components.css">
-    <link rel="stylesheet" href="assets/css/main.css">
-    <style>
-        /* ----- Hero Section ----- */
-        .hero {
-            position: relative;
-            padding: 80px 20px 60px;
-            text-align: center;
-            overflow: hidden;
-            min-height: 70vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .hero-content {
-            position: relative;
-            z-index: 2;
-            max-width: 900px;
-        }
-        .hero .season-badge {
-            display: inline-block;
-            padding: 6px 20px;
-            background: rgba(255,255,255,0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--color-border);
-            border-radius: var(--radius-full);
-            font-size: 0.8rem;
-            color: var(--color-text-secondary);
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            margin-bottom: var(--spacing-md);
-        }
-        .hero h1 {
-            font-family: var(--font-family-display);
-            font-size: clamp(3rem, 8vw, 6rem);
-            font-weight: var(--font-weight-extrabold);
-            line-height: 1.05;
-            margin-bottom: var(--spacing-md);
-            background: var(--gradient-brand);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-shadow: none;
-        }
-        .hero h1 .highlight {
-            background: linear-gradient(135deg, var(--color-red), var(--color-red-light));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .hero p {
-            font-size: clamp(1.1rem, 1.5vw, 1.4rem);
-            color: var(--color-text-secondary);
-            max-width: 600px;
-            margin: 0 auto var(--spacing-xl);
-            line-height: 1.7;
-        }
-        .hero-actions {
-            display: flex;
-            gap: var(--spacing-md);
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        .hero-actions .btn {
-            padding: 14px 32px;
-            border-radius: var(--radius-full);
-            font-weight: var(--font-weight-bold);
-            font-size: 1rem;
-            border: none;
-            cursor: pointer;
-            transition: all var(--transition-bounce);
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: var(--spacing-sm);
-        }
-        .hero-actions .btn-primary {
-            background: var(--gradient-brand);
-            color: white;
-            box-shadow: 0 4px 30px rgba(230, 57, 70, 0.3);
-        }
-        .hero-actions .btn-primary:hover {
-            transform: translateY(-2px) scale(1.02);
-            box-shadow: 0 8px 40px rgba(230, 57, 70, 0.4);
-        }
-        .hero-actions .btn-secondary {
-            background: var(--color-surface);
-            color: var(--color-text);
-            border: 1px solid var(--color-border);
-        }
-        .hero-actions .btn-secondary:hover {
-            background: var(--color-surface-hover);
-            transform: translateY(-2px);
-        }
-        .hero-actions .btn-discord {
-            background: #5865F2;
-            color: white;
-            box-shadow: 0 4px 30px rgba(88, 101, 242, 0.3);
-        }
-        .hero-actions .btn-discord:hover {
-            transform: translateY(-2px) scale(1.02);
-            box-shadow: 0 8px 40px rgba(88, 101, 242, 0.4);
-        }
-
-        /* ----- Stats Bar ----- */
-        .stats-bar {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: var(--spacing-md);
-            max-width: 800px;
-            margin: var(--spacing-2xl) auto 0;
-            padding: var(--spacing-lg);
-            background: rgba(255,255,255,0.04);
-            backdrop-filter: blur(10px);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--color-border);
-        }
-        .stats-bar .stat-item {
-            text-align: center;
-        }
-        .stats-bar .stat-item .number {
-            font-family: var(--font-family-display);
-            font-size: 1.8rem;
-            font-weight: var(--font-weight-extrabold);
-            background: var(--gradient-brand);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .stats-bar .stat-item .label {
-            font-size: 0.8rem;
-            color: var(--color-text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* ----- Features Section ----- */
-        .features {
-            padding: var(--spacing-3xl) 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 2;
-        }
-        .features h2 {
-            text-align: center;
-            font-size: clamp(2rem, 3vw, 2.8rem);
-            font-weight: var(--font-weight-extrabold);
-            margin-bottom: var(--spacing-lg);
-        }
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: var(--spacing-lg);
-            margin-top: var(--spacing-xl);
-        }
-        .feature-card {
-            background: rgba(255,255,255,0.04);
-            backdrop-filter: blur(10px);
-            border-radius: var(--radius-lg);
-            padding: var(--spacing-xl);
-            border: 1px solid var(--color-border);
-            text-align: center;
-            transition: all var(--transition-normal);
-        }
-        .feature-card:hover {
-            transform: translateY(-4px);
-            border-color: var(--color-border-light);
-            box-shadow: var(--shadow-lg);
-        }
-        .feature-card .icon {
-            font-size: 2.5rem;
-            margin-bottom: var(--spacing-md);
-        }
-        .feature-card h3 {
-            font-size: 1.1rem;
-            font-weight: var(--font-weight-bold);
-            margin-bottom: var(--spacing-sm);
-            color: var(--color-text);
-        }
-        .feature-card p {
-            color: var(--color-text-secondary);
-            font-size: 0.9rem;
-            line-height: 1.6;
-        }
-
-        /* ----- Tier Ladder Preview ----- */
-        .tier-ladder-preview {
-            padding: var(--spacing-3xl) 20px;
-            max-width: 800px;
-            margin: 0 auto;
-            text-align: center;
-            position: relative;
-            z-index: 2;
-        }
-        .tier-ladder-preview h2 {
-            font-size: clamp(1.8rem, 2.5vw, 2.5rem);
-            font-weight: var(--font-weight-extrabold);
-            margin-bottom: var(--spacing-lg);
-        }
-        .tier-ladder {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            background: rgba(255,255,255,0.04);
-            backdrop-filter: blur(10px);
-            border-radius: var(--radius-lg);
-            padding: var(--spacing-md);
-            border: 1px solid var(--color-border);
-        }
-        .tier-row {
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-md);
-            padding: 6px 16px;
-            border-radius: var(--radius-sm);
-            transition: background var(--transition-fast);
-        }
-        .tier-row:hover {
-            background: rgba(255,255,255,0.05);
-        }
-        .tier-row .tier-label {
-            font-weight: var(--font-weight-bold);
-            font-size: 1.1rem;
-            min-width: 40px;
-            text-align: right;
-        }
-        .tier-row .tier-bar {
-            flex: 1;
-            height: 8px;
-            border-radius: var(--radius-full);
-            background: var(--color-border);
-            position: relative;
-            overflow: hidden;
-        }
-        .tier-row .tier-bar .fill {
-            height: 100%;
-            border-radius: var(--radius-full);
-            transition: width 1s ease;
-        }
-        .tier-row .tier-count {
-            font-size: 0.85rem;
-            color: var(--color-text-secondary);
-            min-width: 40px;
-        }
-
-        /* ----- Gamemodes Section ----- */
-        .gamemodes-section {
-            padding: var(--spacing-3xl) 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 2;
-        }
-        .gamemodes-section h2 {
-            text-align: center;
-            font-size: clamp(1.8rem, 2.5vw, 2.5rem);
-            font-weight: var(--font-weight-extrabold);
-            margin-bottom: var(--spacing-lg);
-        }
-        .gamemodes-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: var(--spacing-md);
-            margin-top: var(--spacing-xl);
-        }
-        .gamemode-chip {
-            background: rgba(255,255,255,0.04);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--color-border);
-            border-radius: var(--radius-md);
-            padding: var(--spacing-md);
-            text-align: center;
-            transition: all var(--transition-fast);
-            cursor: default;
-        }
-        .gamemode-chip:hover {
-            border-color: var(--color-border-light);
-            transform: translateY(-2px);
-        }
-        .gamemode-chip .icon {
-            font-size: 1.8rem;
-            display: block;
-            margin-bottom: 4px;
-        }
-        .gamemode-chip .name {
-            font-size: 0.85rem;
-            font-weight: var(--font-weight-semibold);
-            color: var(--color-text);
-        }
-
-        /* ----- CTA Section ----- */
-        .cta-section {
-            padding: var(--spacing-3xl) 20px;
-            text-align: center;
-            background: rgba(255,255,255,0.03);
-            backdrop-filter: blur(10px);
-            border-top: 1px solid var(--color-border);
-            border-bottom: 1px solid var(--color-border);
-            position: relative;
-            z-index: 2;
-        }
-        .cta-section h2 {
-            font-size: clamp(1.8rem, 2.5vw, 2.5rem);
-            font-weight: var(--font-weight-extrabold);
-            margin-bottom: var(--spacing-sm);
-        }
-        .cta-section p {
-            color: var(--color-text-secondary);
-            max-width: 500px;
-            margin: 0 auto var(--spacing-lg);
-        }
-
-        /* ----- Responsive ----- */
-        @media (max-width: 768px) {
-            .hero { padding: 60px 16px 40px; min-height: 50vh; }
-            .hero-actions .btn { padding: 12px 24px; font-size: 0.9rem; }
-            .stats-bar { grid-template-columns: 1fr 1fr; gap: var(--spacing-sm); padding: var(--spacing-md); }
-            .stats-bar .stat-item .number { font-size: 1.4rem; }
-            .features-grid { grid-template-columns: 1fr; }
-            .gamemodes-grid { grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); }
-        }
-        @media (max-width: 480px) {
-            .hero h1 { font-size: 2.2rem; }
-            .hero-actions { flex-direction: column; align-items: center; }
-            .hero-actions .btn { width: 100%; justify-content: center; }
-            .stats-bar { grid-template-columns: 1fr 1fr; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Asian Tier List [1.8+] — Competitive Minecraft PvP Rankings</title>
+<meta name="description" content="The official Asian Tier List for Minecraft 1.8 PvP. Get tested, get ranked, climb the leaderboards across BedWars, Sumo, Nodebuff, Boxing, BUHC and Bridges.">
+<link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/css/main.css">
 </head>
 <body>
-    <div id="app">
-        <nav id="main-nav"></nav>
 
-        <!-- Hero -->
-        <section class="hero">
-            <div class="hero-content">
-                <div class="season-badge">🏆 SEASON 1 · 2026</div>
-                <h1>
-                    Prove Your Rank.<br>
-                    <span class="highlight">Earn Your Tier.</span>
-                </h1>
-                <p>
-                    The competitive Minecraft 1.8 PvP tier list ranking Asia's best players 
-                    across seven gamemodes. Compete, rank up, and claim your spot.
-                </p>
-                <div class="hero-actions">
-                    <a href="leaderboards.html" class="btn btn-primary">🏆 View Leaderboards</a>
-                    <a href="#features" class="btn btn-secondary">Learn More</a>
-                    <button class="btn btn-discord" id="heroLoginBtn">💬 Login with Discord</button>
-                </div>
+<main>
 
-                <!-- Stats Bar -->
-                <div class="stats-bar" id="stats-bar">
-                    <div class="stat-item">
-                        <div class="number" id="total-players">--</div>
-                        <div class="label">Total Players</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="number" id="online-players">--</div>
-                        <div class="label">Online Now</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="number" id="total-matches">--</div>
-                        <div class="label">Matches Played</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="number" id="top-tier">--</div>
-                        <div class="label">Top Tier</div>
-                    </div>
-                </div>
-            </div>
-        </section>
+  <!-- HERO -->
+  <section class="page-hero">
+    <div class="container">
+      <div class="eyebrow">SEASON 4 · 1.8 PVP · ASIA SERVER GROUP</div>
+      <h1 style="font-size:clamp(38px,6.4vw,74px); line-height:1.02; margin:16px 0 18px; max-width:960px;">
+        Prove your rank.<br><span style="background:linear-gradient(90deg,var(--red-500),var(--blue-500)); -webkit-background-clip:text; background-clip:text; color:transparent;">Earn your tier.</span>
+      </h1>
+      <p class="h-sub" style="font-size:17px; max-width:560px;">
+        Asian Tier List is the region's competitive ranking authority for Minecraft 1.8 combat. Get tested by verified staff across seven gamemodes and take your placement to the leaderboard.
+      </p>
+      <div class="mt-24" style="display:flex; gap:14px; flex-wrap:wrap;">
+        <a href="testers.html" class="btn btn-primary">Request a Test</a>
+        <a href="leaderboards.html" class="btn btn-ghost">View Leaderboards</a>
+      </div>
 
-        <!-- Features -->
-        <section class="features" id="features">
-            <h2>🚀 Why Join Asian Tier List?</h2>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="icon">⚔️</div>
-                    <h3>Competitive PvP</h3>
-                    <p>Ranked 1.8 PvP across seven gamemodes including BedWars, Sumo, and Nodebuff. Get tested by our certified testers.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="icon">🎯</div>
-                    <h3>Real Rankings</h3>
-                    <p>Accurate tier system with real player data and live leaderboards. Track your progress and climb the ranks.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="icon">👥</div>
-                    <h3>Community Driven</h3>
-                    <p>Join our Discord community of competitive players. Get ranked, compete, and connect with the best players.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="icon">📊</div>
-                    <h3>Live Statistics</h3>
-                    <p>Real-time stats from Frost Practice server with detailed player profiles and performance analytics.</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Tier Ladder Preview -->
-        <section class="tier-ladder-preview">
-            <h2>🏅 Official Tier Ladder</h2>
-            <div class="tier-ladder" id="tier-ladder">
-                <!-- Filled by JS -->
-            </div>
-        </section>
-
-        <!-- Gamemodes -->
-        <section class="gamemodes-section">
-            <h2>🎮 Supported Gamemodes</h2>
-            <div class="gamemodes-grid" id="gamemodes-grid">
-                <!-- Filled by JS -->
-            </div>
-        </section>
-
-        <!-- CTA -->
-        <section class="cta-section">
-            <h2>Ready to Prove Your Rank?</h2>
-            <p>Join our community, get tested by our experienced testers, and earn your tier.</p>
-            <div class="hero-actions">
-                <button class="btn btn-discord" id="ctaLoginBtn">💬 Login with Discord</button>
-                <a href="testers.html" class="btn btn-secondary">👥 Meet Our Testers</a>
-            </div>
-        </section>
-
-        <footer id="main-footer"></footer>
+      <div class="mt-32 glass card" style="padding:26px; display:flex; flex-wrap:wrap; gap:28px; align-items:center;">
+        <span class="eyebrow" style="min-width:120px;">Tier scale</span>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;" id="tierStrip"></div>
+      </div>
     </div>
+  </section>
 
-    <script src="assets/js/data.js"></script>
-    <script src="assets/js/session.js"></script>
-    <script src="assets/js/nav.js"></script>
-    <script src="assets/js/backgrounds.js"></script>
-    <script src="assets/js/stats-api.js"></script>
-    <script>
-        // ============================================================
-        // HOMEPAGE LOGIC
-        // ============================================================
-        document.addEventListener('DOMContentLoaded', function() {
-            // --- Render Tier Ladder ---
-            const ladderContainer = document.getElementById('tier-ladder');
-            const tiers = window.ATL_DATA.TIERS;
-            const tierColors = window.ATL_DATA.TIER_COLORS;
-            
-            // Mock data for tier distribution
-            const tierCounts = {
-                'S': 3, 'S-': 5, 'A+': 8, 'A': 12, 'A-': 15,
-                'B+': 18, 'B': 22, 'B-': 25, 'C+': 28, 'C': 30,
-                'C-': 25, 'D+': 20, 'D': 15, 'D-': 10
-            };
-            const maxCount = Math.max(...Object.values(tierCounts));
-            
-            ladderContainer.innerHTML = tiers.map(tier => {
-                const count = tierCounts[tier] || 0;
-                const percentage = maxCount > 0 ? (count / maxCount) * 100 : 0;
-                const color = tierColors[tier] || '#94a3b8';
-                
-                return `
-                    <div class="tier-row">
-                        <span class="tier-label" style="color: ${color}">${tier}</span>
-                        <div class="tier-bar">
-                            <div class="fill" style="width: ${percentage}%; background: ${color};"></div>
-                        </div>
-                        <span class="tier-count">${count}</span>
-                    </div>
-                `;
-            }).join('');
-            
-            // --- Render Gamemodes ---
-            const gamemodesGrid = document.getElementById('gamemodes-grid');
-            const gamemodes = window.ATL_DATA.GAMEMODES;
-            
-            gamemodesGrid.innerHTML = gamemodes.map(gm => `
-                <div class="gamemode-chip">
-                    <span class="icon">${gm.icon}</span>
-                    <span class="name">${gm.label}</span>
-                </div>
-            `).join('');
-            
-            // --- Load Real Stats ---
-            async function loadStats() {
-                try {
-                    const status = await window.FROST_STATS.getServerStatus();
-                    const players = document.getElementById('total-players');
-                    const online = document.getElementById('online-players');
-                    const matches = document.getElementById('total-matches');
-                    const topTier = document.getElementById('top-tier');
-                    
-                    if (status && status.online) {
-                        players.textContent = status.total_players || '1.2k';
-                        online.textContent = status.players_online || 47;
-                        matches.textContent = status.total_matches || '12.4k';
-                        topTier.textContent = 'S';
-                    } else {
-                        players.textContent = '--';
-                        online.textContent = '--';
-                        matches.textContent = '--';
-                        topTier.textContent = '--';
-                    }
-                } catch (error) {
-                    console.error('Failed to load stats:', error);
-                    document.getElementById('total-players').textContent = '--';
-                    document.getElementById('online-players').textContent = '--';
-                    document.getElementById('total-matches').textContent = '--';
-                    document.getElementById('top-tier').textContent = '--';
-                }
-            }
-            
-            loadStats();
-            
-            // --- Login buttons ---
-            document.querySelectorAll('#heroLoginBtn, #ctaLoginBtn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    window.ATL_SESSION.loginWithDiscord();
-                });
-            });
-            
-            // --- Update login button state ---
-            const session = window.ATL_SESSION.current();
-            if (session.authenticated) {
-                document.querySelectorAll('#heroLoginBtn, #ctaLoginBtn').forEach(btn => {
-                    btn.textContent = '👤 My Profile';
-                    btn.onclick = function() {
-                        window.location.href = 'profile.html';
-                    };
-                });
-            }
-            
-            // --- Auto-refresh stats every 30 seconds ---
-            setInterval(loadStats, 30000);
-        });
-    </script>
+  <!-- SERVER STATUS -->
+  <section class="section" style="padding-top:0;">
+    <div class="container">
+      <div class="glass card" id="serverStatusCard">
+        <div class="flex-between" style="align-items:flex-start; flex-wrap:wrap; gap:16px;">
+          <div>
+            <div class="eyebrow">Popular Servers</div>
+            <h3 class="mt-8" style="font-size:19px;" id="serverStatusTitle">Server Status</h3>
+            <p class="text-sm text-muted mono mt-8">stammer-predictive.tun.ply.gg</p>
+          </div>
+          <div id="serverStatusBadge"></div>
+        </div>
+        <div class="mt-16" id="serverStatusBody"><p class="text-sm text-muted">Checking server status…</p></div>
+        <div id="serverStatusPlayers"></div>
+        <a href="stats.html" class="btn btn-ghost btn-sm mt-16" style="text-transform:none;">Full server stats →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section class="section">
+    <div class="container grid-4" id="homeStats"></div>
+  </section>
+
+  <!-- GAMEMODES -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">Seven ways to prove it</div>
+          <h2 class="h-title">Ranked gamemodes</h2>
+        </div>
+        <p class="h-sub">Every gamemode is tiered and tracked independently — your overall tier reflects your strongest disciplines.</p>
+      </div>
+      <div class="grid-4" id="gamemodeGrid"></div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">The process</div>
+          <h2 class="h-title">How placement works</h2>
+        </div>
+      </div>
+      <div class="grid-3">
+        <div class="glass card card-hover">
+          <div class="pill pill-blue">Step 1</div>
+          <h3 class="mt-16" style="font-size:19px;">Request a test</h3>
+          <p class="text-sm text-muted">Head to the Testers page and submit a test request for the gamemode you want ranked.</p>
+        </div>
+        <div class="glass card card-hover">
+          <div class="pill pill-red">Step 2</div>
+          <h3 class="mt-16" style="font-size:19px;">Get evaluated</h3>
+          <p class="text-sm text-muted">A verified Tester plays against you and scores your mechanics, movement, and decision-making.</p>
+        </div>
+        <div class="glass card card-hover">
+          <div class="pill pill-gold">Step 3</div>
+          <h3 class="mt-16" style="font-size:19px;">Receive your tier</h3>
+          <p class="text-sm text-muted">Your result is logged to your profile and reflected instantly on the gamemode leaderboard.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section" id="discordCtaSection">
+    <div class="container">
+      <div class="glass card" style="padding:40px; display:flex; align-items:center; justify-content:space-between; gap:24px; flex-wrap:wrap;">
+        <div>
+          <div class="eyebrow">Join the server</div>
+          <h2 class="h-title" style="font-size:28px;">Link your Discord to get tiered</h2>
+          <p class="h-sub">Your profile, roles, and tier history all sync from your Discord identity once you connect.</p>
+        </div>
+        <button class="btn btn-primary" id="ctaLogin">Login with Discord</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/session.js"></script>
+<script src="assets/js/nav.js"></script>
+<script src="assets/js/backgrounds.js"></script>
+<script src="assets/js/cursor.js"></script>
+
+<script>
+  ATL_mountBackground('home');
+  const session = ATL_initShell('index.html');
+  if(session.authenticated){
+    document.getElementById('discordCtaSection').classList.add('hidden');
+  }
+
+  // Real server, proxied through the Worker (browsers can't set the
+  // descriptive User-Agent the status API requires, and this keeps
+  // every third-party call routed through one trusted place).
+  const FROST_SERVER_ADDRESS = 'stammer-predictive.tun.ply.gg';
+
+  (async function loadServerStatus(){
+    const body = document.getElementById('serverStatusBody');
+    const badge = document.getElementById('serverStatusBadge');
+    const title = document.getElementById('serverStatusTitle');
+    const playersEl = document.getElementById('serverStatusPlayers');
+
+    const data = await ATL_SESSION.fetchMcServerStatus(FROST_SERVER_ADDRESS);
+
+    if(data.error){
+      badge.innerHTML = `<span class="pill pill-red">Unreachable</span>`;
+      body.innerHTML = `<p class="text-sm text-muted">Couldn't reach the server status service right now. Try again shortly.</p>`;
+      return;
+    }
+    if(!data.online){
+      badge.innerHTML = `<span class="pill pill-red"><span class="pill-dot"></span>Offline</span>`;
+      body.innerHTML = `<p class="text-sm text-muted">Server is currently offline.</p>`;
+      return;
+    }
+
+    if(data.motd && data.motd.clean && data.motd.clean[0]) title.textContent = data.motd.clean[0];
+    badge.innerHTML = `<span class="pill pill-teal"><span class="pill-dot"></span>Online</span>`;
+
+    const players = data.players || {};
+    body.innerHTML = `
+      <div class="grid-3">
+        <div class="glass stat-card"><div class="s-val" style="font-size:19px;">${players.online ?? '—'}${players.max ? ' / '+players.max : ''}</div><div class="s-label">Players online</div></div>
+        <div class="glass stat-card"><div class="s-val" style="font-size:19px;">${data.version ?? 'N/A'}</div><div class="s-label">Version</div></div>
+        <div class="glass stat-card"><div class="s-val" style="font-size:19px;">${data.debug && data.debug.ping ? data.debug.ping+'ms' : 'N/A'}</div><div class="s-label">Response time</div></div>
+      </div>`;
+
+    if(players.list && players.list.length){
+      playersEl.innerHTML = `
+        <div class="eyebrow mt-24">Online now</div>
+        <div class="mt-16" style="display:flex; flex-wrap:wrap; gap:8px;">
+          ${players.list.slice(0,16).map(name=>`
+            <div class="pill" style="gap:8px; padding:5px 12px 5px 5px;">
+              <img class="avatar-sq" src="${ATL_DATA.mcAvatarUrl(name,32)}" alt="Minecraft skin of ${name}" style="width:20px;height:20px;object-fit:cover;" onerror="this.onerror=null;this.src='https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(name)}&backgroundColor=141a29';">
+              ${name}
+            </div>`).join('')}
+        </div>`;
+    }
+  })();
+
+  document.getElementById('tierStrip').innerHTML = ATL_DATA.TIERS.slice(0,8).map(t=>`
+    <div style="text-align:center;">${ATL_hex(t.id,'sm')}<div class="text-sm text-muted mt-8" style="font-family:var(--f-mono); font-size:11px;">${t.id}</div></div>
+  `).join('');
+
+  document.getElementById('homeStats').innerHTML = [
+    ['7','Ranked gamemodes'],
+    ['14','Official tiers, S to D-'],
+    ['24/7','Live leaderboard sync'],
+    ['1.8','Combat version']
+  ].map(([v,l])=>`<div class="glass stat-card"><div class="s-val">${v}</div><div class="s-label">${l}</div></div>`).join('');
+
+  const gmIcons = {
+    bed: '<path d="M3 18v-6a3 3 0 0 1 3-3h12a3 3 0 0 1 3 3v6"/><path d="M3 18h18"/><path d="M7 9V6a1 1 0 0 1 1-1h3v4"/>',
+    bedfight: '<path d="M2 19v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4"/><path d="M2 19h20"/><path d="m8 8 4 4M12 8l-4 4"/><path d="m16 8 4 4M20 8l-4 4"/>',
+    fireball: '<circle cx="12" cy="12" r="7"/><path d="M12 5v-3M8 6l-1-2M16 6l1-2"/>',
+    sumo: '<circle cx="12" cy="7" r="3"/><path d="M6 21c0-4 3-7 6-7s6 3 6 7"/>',
+    sword: '<path d="M14.5 3.5 21 10l-3 3-6.5-6.5z"/><path d="M11 10 3 18v3h3l8-8"/>',
+    glove: '<path d="M7 12V6a2 2 0 0 1 4 0v4M11 10V5a2 2 0 0 1 4 0v5M15 10V7a2 2 0 0 1 4 0v7a6 6 0 0 1-6 6H10a5 5 0 0 1-5-5v-3l3-2"/>',
+    heart: '<path d="M12 21s-7-4.6-9.5-9C.9 8.6 2.6 5 6 5c2 0 3.5 1.2 4 2 0.5-.8 2-2 4-2 3.4 0 5.1 3.6 3.5 7-2.5 4.4-9.5 9-9.5 9z"/>',
+    bridge: '<path d="M2 16c2-4 6-6 10-6s8 2 10 6"/><path d="M4 20V12M20 20V12M12 20v-6"/>'
+  };
+  document.getElementById('gamemodeGrid').innerHTML = ATL_DATA.GAMEMODES.map(g=>`
+    <a href="leaderboards.html" class="glass card card-hover" style="text-align:center;">
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--blue-400)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 12px;">${gmIcons[g.icon]}</svg>
+      <div style="font-family:var(--f-sub); font-weight:700; font-size:15px; color:var(--text-0);">${g.label}</div>
+      <div class="text-sm text-muted mt-8">View leaderboard →</div>
+    </a>
+  `).join('');
+
+  document.getElementById('ctaLogin').addEventListener('click', ATL_SESSION.loginWithDiscord);
+</script>
 </body>
 </html>
