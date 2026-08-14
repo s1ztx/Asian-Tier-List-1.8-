@@ -34,6 +34,23 @@
    database every visitor's browser reads/writes through instead of
    localStorage, so Staff/Testers/Announcements/Reviews/Leaderboards/
    Applications are visible to everyone, not just your own browser.
+
+   ---- Popular Servers statistics (NOT yet connected) ----
+   The Stats page and Compare page's stat rows call GET /api/server-stats
+   and GET /api/player-stats?username=X on this Worker. Both currently
+   return { configured:false } because there is no known public API
+   for any specific server, and this Worker never invents one.
+   To wire it up for real, tell the developer:
+     1. The base URL of that server's stats API (if it has one), or
+        confirm there isn't one and a plugin/webhook needs to push data
+        into this Worker's KV store instead.
+     2. Any auth required (API key, header name, etc.) — set it as a
+        Worker secret (e.g. FROST_API_KEY), never in frontend code.
+     3. Which fields it actually returns (player count, ELO, W/L, K/D,
+        per-gamemode stats, etc.) so the frontend can be built around
+        real field names instead of guessed ones.
+   Once that's known, handlePopularServerStats/handlePlayerServerStats below are
+   exactly where the real fetch calls go.
    ============================================================ */
 
 const SCOPE = 'identify guilds guilds.members.read';
@@ -61,6 +78,58 @@ async function handleStoreSet(request, env) {
   return jsonResponse({ ok: true }, 200, env);
 }
 
+// Live Minecraft server status (online players, MOTD, version) via the
+// real, public mcsrvstat.us API — proxied through the Worker because
+// (a) it requires a descriptive User-Agent header browsers can't set
+// themselves, and (b) it keeps every third-party call in one place.
+async function handleMcServerStatus(request, env) {
+  const ip = new URL(request.url).searchParams.get('ip');
+  if (!ip) return jsonResponse({ error: 'missing_ip' }, 400, env);
+  try {
+    const resp = await fetch(`https://api.mcsrvstat.us/3/${encodeURIComponent(ip)}`, {
+      headers: { 'User-Agent': 'AsianTierList-Worker/1.0 (+https://s1ztx.github.io/Asian-Tier-List-1.8-)' }
+    });
+    if (!resp.ok) return jsonResponse({ error: 'upstream_error' }, 502, env);
+    const data = await resp.json();
+    return jsonResponse(data, 200, env);
+  } catch (e) {
+    return jsonResponse({ error: 'fetch_failed' }, 502, env);
+  }
+}
+// Returns { configured:false } until FROST_API_URL is actually set —
+// never fabricates numbers. Fill in the real fetch once you have the
+// API details (see the header comment above).
+async function handlePopularServerStats(request, env) {
+  if (!env.FROST_API_URL) return jsonResponse({ configured: false }, 200, env);
+  try {
+    const headers = env.FROST_API_KEY ? { Authorization: `Bearer ${env.FROST_API_KEY}` } : {};
+    const resp = await fetch(env.FROST_API_URL, { headers });
+    if (!resp.ok) return jsonResponse({ configured: true, error: 'upstream_error' }, 502, env);
+    const data = await resp.json();
+    return jsonResponse({ configured: true, data }, 200, env);
+  } catch (e) {
+    return jsonResponse({ configured: true, error: 'fetch_failed' }, 502, env);
+  }
+}
+
+// Per-player stats (ELO, W/L, K/D, per-gamemode) for Compare and Stats.
+// Same "never invent data" rule applies.
+async function handlePlayerServerStats(request, env) {
+  const username = new URL(request.url).searchParams.get('username');
+  if (!username) return jsonResponse({ error: 'missing_username' }, 400, env);
+  if (!env.FROST_API_URL) return jsonResponse({ configured: false }, 200, env);
+  try {
+    const headers = env.FROST_API_KEY ? { Authorization: `Bearer ${env.FROST_API_KEY}` } : {};
+    const resp = await fetch(`${env.FROST_API_URL}/player/${encodeURIComponent(username)}`, { headers });
+    if (resp.status === 404) return jsonResponse({ configured: true, found: false }, 200, env);
+    if (!resp.ok) return jsonResponse({ configured: true, error: 'upstream_error' }, 502, env);
+    const data = await resp.json();
+    return jsonResponse({ configured: true, found: true, data }, 200, env);
+  } catch (e) {
+    return jsonResponse({ configured: true, error: 'fetch_failed' }, 502, env);
+  }
+}
+
 function randomState() {
   const bytes = crypto.getRandomValues(new Uint8Array(24));
   return [...bytes].map(b => b.toString(16).padStart(2, '0')).join('');
@@ -75,8 +144,10 @@ function b64urlEncode(obj) {
 }
 
 function cors(resp, env) {
-  resp.headers.set('Access-Control-Allow-Origin', env.SITE_URL);
+  const origin = new URL(env.SITE_URL).origin;
+  resp.headers.set('Access-Control-Allow-Origin', origin);
   resp.headers.set('Access-Control-Allow-Credentials', 'true');
+  resp.headers.append('Vary', 'Origin');
   return resp;
 }
 
@@ -217,6 +288,9 @@ export default {
     if (url.pathname === '/callback') return handleCallback(request, env);
     if (url.pathname === '/api/store' && request.method === 'GET') return handleStoreGet(request, env);
     if (url.pathname === '/api/store' && request.method === 'POST') return handleStoreSet(request, env);
+    if (url.pathname === '/api/server-stats' && request.method === 'GET') return handlePopularServerStats(request, env);
+    if (url.pathname === '/api/player-stats' && request.method === 'GET') return handlePlayerServerStats(request, env);
+    if (url.pathname === '/api/mc-server-status' && request.method === 'GET') return handleMcServerStatus(request, env);
 
     return new Response('Asian Tier List OAuth2 worker. Use /login to start sign-in.', { status: 200 });
   }
