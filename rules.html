@@ -1,223 +1,116 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rules · Asian Tier List [1.8+]</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📜</text></svg>">
-    <link rel="stylesheet" href="assets/css/tokens.css">
-    <link rel="stylesheet" href="assets/css/components.css">
-    <link rel="stylesheet" href="assets/css/main.css">
-    <style>
-        .rules-hero {
-            text-align: center;
-            padding: 30px 20px 20px;
-        }
-        .rules-hero h1 {
-            font-size: clamp(2rem, 4vw, 3.2rem);
-            font-weight: var(--font-weight-extrabold);
-            background: var(--gradient-brand);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .rules-hero p {
-            color: var(--color-text-secondary);
-            font-size: 1.1rem;
-            margin-top: 4px;
-        }
-
-        .rules-container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 0 20px 40px;
-        }
-
-        .rules-section {
-            background: var(--color-surface);
-            border-radius: var(--radius-lg);
-            padding: var(--spacing-xl);
-            border: 1px solid var(--color-border);
-            backdrop-filter: blur(10px);
-            margin-bottom: var(--spacing-lg);
-        }
-        .rules-section h2 {
-            font-size: 1.2rem;
-            font-weight: var(--font-weight-bold);
-            margin-bottom: var(--spacing-md);
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-sm);
-        }
-        .rules-section h2 .icon {
-            font-size: 1.4rem;
-        }
-        .rules-section ul {
-            list-style: none;
-            padding: 0;
-        }
-        .rules-section ul li {
-            padding: 8px 0;
-            border-bottom: 1px solid var(--color-border);
-            color: var(--color-text-secondary);
-            line-height: 1.6;
-            display: flex;
-            gap: var(--spacing-sm);
-        }
-        .rules-section ul li:last-child {
-            border-bottom: none;
-        }
-        .rules-section ul li .num {
-            color: var(--color-text-tertiary);
-            font-weight: var(--font-weight-bold);
-            min-width: 24px;
-        }
-        .rules-section ul li strong {
-            color: var(--color-text);
-        }
-
-        .rules-section .tier-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-            gap: 6px;
-            margin-top: var(--spacing-md);
-        }
-        .rules-section .tier-list .tier-item {
-            text-align: center;
-            padding: 6px 0;
-            border-radius: var(--radius-sm);
-            font-weight: var(--font-weight-bold);
-            font-size: 0.9rem;
-            background: var(--color-background);
-            border: 1px solid var(--color-border);
-        }
-
-        .rules-section .gamemode-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: var(--spacing-sm);
-        }
-        .rules-section .gamemode-list .gm-item {
-            padding: 4px 14px;
-            border-radius: var(--radius-full);
-            background: var(--color-background);
-            border: 1px solid var(--color-border);
-            font-size: 0.85rem;
-            color: var(--color-text-secondary);
-        }
-
-        @media (max-width: 480px) {
-            .rules-section {
-                padding: var(--spacing-md);
-            }
-            .rules-section .tier-list {
-                grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rules — Asian Tier List [1.8+]</title>
+<meta name="description" content="Testing rules, conduct standards, and tier retest policy for Asian Tier List.">
+<link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/css/main.css">
 </head>
 <body>
-    <div id="app">
-        <nav id="main-nav"></nav>
-
-        <div class="rules-hero">
-            <h1>📜 Rules & Guidelines</h1>
-            <p>Understand how the Asian Tier List works</p>
-        </div>
-
-        <div class="rules-container">
-            <!-- Tier System -->
-            <div class="rules-section">
-                <h2><span class="icon">🏅</span> Tier System</h2>
-                <p style="color: var(--color-text-secondary); margin-bottom: var(--spacing-md);">
-                    The Asian Tier List uses a 14-tier system from S (highest) to D- (lowest).
-                    Players are ranked based on their performance across seven gamemodes.
-                </p>
-                <div class="tier-list" id="tier-list">
-                    <!-- Filled by JS -->
-                </div>
-            </div>
-
-            <!-- Gamemodes -->
-            <div class="rules-section">
-                <h2><span class="icon">🎮</span> Supported Gamemodes</h2>
-                <p style="color: var(--color-text-secondary); margin-bottom: var(--spacing-sm);">
-                    Players can be ranked in any of these seven competitive gamemodes:
-                </p>
-                <div class="gamemode-list" id="gamemode-list">
-                    <!-- Filled by JS -->
-                </div>
-            </div>
-
-            <!-- Ranking Rules -->
-            <div class="rules-section">
-                <h2><span class="icon">⚖️</span> Ranking Rules</h2>
-                <ul>
-                    <li><span class="num">1.</span> <strong>Testing Process:</strong> All players must be tested by an official tester to receive a rank.</li>
-                    <li><span class="num">2.</span> <strong>Fair Play:</strong> Any form of cheating, hacking, or exploiting will result in immediate removal from the rankings.</li>
-                    <li><span class="num">3.</span> <strong>Respect:</strong> All players must treat testers and staff with respect. Toxic behavior will not be tolerated.</li>
-                    <li><span class="num">4.</span> <strong>Rank Updates:</strong> Ranks can be updated based on performance and activity. Players may request re-evaluation.</li>
-                    <li><span class="num">5.</span> <strong>One Account:</strong> Players can only have one active ranking. Duplicate accounts will be merged or removed.</li>
-                </ul>
-            </div>
-
-            <!-- Tester Rules -->
-            <div class="rules-section">
-                <h2><span class="icon">🎯</span> Tester Guidelines</h2>
-                <ul>
-                    <li><span class="num">1.</span> <strong>Objectivity:</strong> Testers must remain objective and fair when evaluating players.</li>
-                    <li><span class="num">2.</span> <strong>Documentation:</strong> All tests must be properly documented with date, gamemode, and result.</li>
-                    <li><span class="num">3.</span> <strong>Communication:</strong> Testers should provide constructive feedback to players after testing.</li>
-                    <li><span class="num">4.</span> <strong>Confidentiality:</strong> Test results are private until officially published.</li>
-                    <li><span class="num">5.</span> <strong>Activity:</strong> Testers must remain active and responsive to test requests.</li>
-                </ul>
-            </div>
-
-            <!-- Community Rules -->
-            <div class="rules-section">
-                <h2><span class="icon">🤝</span> Community Guidelines</h2>
-                <ul>
-                    <li><span class="num">1.</span> <strong>Discord Conduct:</strong> Follow Discord server rules at all times.</li>
-                    <li><span class="num">2.</span> <strong>Reviews:</strong> Reviews must be honest and constructive. Fake or toxic reviews will be removed.</li>
-                    <li><span class="num">3.</span> <strong>Support:</strong> Use the support system for any issues or disputes.</li>
-                    <li><span class="num">4.</span> <strong>Applications:</strong> Staff and tester applications must be honest and complete.</li>
-                    <li><span class="num">5.</span> <strong>Privacy:</strong> Do not share personal information of other players without consent.</li>
-                </ul>
-            </div>
-        </div>
-
-        <footer id="main-footer"></footer>
+<main>
+  <section class="page-hero">
+    <div class="container">
+      <div class="eyebrow">Standards &amp; conduct</div>
+      <h1 class="h-title" style="font-size:clamp(32px,5vw,52px);">Rules</h1>
+      <p class="h-sub" style="font-size:16px; max-width:640px;">These rules govern testing sessions, tier placement, and member conduct across the platform and Discord server. Violations can result in tier resets, suspension, or removal.</p>
     </div>
+  </section>
 
-    <script src="assets/js/data.js"></script>
-    <script src="assets/js/session.js"></script>
-    <script src="assets/js/nav.js"></script>
-    <script src="assets/js/backgrounds.js"></script>
-    <script>
-        // ============================================================
-        // RULES LOGIC
-        // ============================================================
-        document.addEventListener('DOMContentLoaded', function() {
-            // Render tier list
-            const tierList = document.getElementById('tier-list');
-            const tiers = window.ATL_DATA.TIERS;
-            const tierColors = window.ATL_DATA.TIER_COLORS;
+  <section class="section" style="padding-top:0;">
+    <div class="container">
+      <div id="categoryTabs" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:26px;"></div>
+      <div id="rulesBody"></div>
+    </div>
+  </section>
+</main>
 
-            tierList.innerHTML = tiers.map(tier => `
-                <div class="tier-item" style="color: ${tierColors[tier] || '#94a3b8'}; border-color: ${tierColors[tier] || '#94a3b8'}44;">
-                    ${tier}
-                </div>
-            `).join('');
+<style>
+  .rule-item{ display:flex; gap:14px; padding:14px 0; border-bottom:1px solid var(--hairline); }
+  .rule-item:last-child{ border-bottom:none; }
+  .rule-num{ font-family:var(--f-mono); color:var(--text-3); font-size:13px; min-width:28px; flex-shrink:0; }
+</style>
 
-            // Render gamemodes
-            const gamemodeList = document.getElementById('gamemode-list');
-            const gamemodes = window.ATL_DATA.GAMEMODES;
+<script src="assets/js/data.js"></script>
+<script src="assets/js/session.js"></script>
+<script src="assets/js/nav.js"></script>
+<script src="assets/js/backgrounds.js"></script>
+<script src="assets/js/cursor.js"></script>
 
-            gamemodeList.innerHTML = gamemodes.map(gm => `
-                <span class="gm-item">${gm.icon} ${gm.label}</span>
-            `).join('');
-        });
-    </script>
+<script>
+  ATL_mountBackground('rules');
+  ATL_initShell('rules.html');
+
+  const CATEGORIES = [
+    { id:'testing', title:'Testing Conduct', desc:'How test sessions are requested, run, and evaluated.', rules:[
+      'Test requests are handled in the order they are received unless a Testing Manager reassigns priority.',
+      'Both the Tester and the candidate must be present and ready before a session starts; no-shows may forfeit the request.',
+      'Recording the session (screen or replay) may be requested by either party and cannot be refused without reason.',
+      'A Tester may pause or end a session early if they suspect cheating, disconnect abuse, or unsafe conduct.',
+      'Candidates must use a version-legal 1.8 client with no combat-affecting modifications (reach, killaura, hitbox, or timer changes).',
+      'A Tester cannot test a candidate they have a personal conflict of interest with; reassign to another Tester instead.',
+      'Sessions should be run at reasonable ping for both parties; excessive lag on either side is grounds for a reschedule, not a low tier.'
+    ]},
+    { id:'placement', title:'Tier Placement', desc:'How tiers are assigned and what they mean.', rules:[
+      'Only the fourteen official tiers (S, S-, A+, A, A-, B+, B, B-, C+, C, C-, D+, D, D-) may ever be assigned.',
+      'Tiers are assigned per gamemode. Your overall tier reflects your highest-performing gamemode.',
+      'A tier decision is final once logged unless a formal retest is approved.',
+      'Testers must record the assignment date and their own name against every tier they issue.',
+      'Tier badges and history are public on a player\u2019s profile; tiers cannot be hidden or made private.',
+      'Placements reflect the meta and ruleset current at the time of testing and may shift as the meta evolves.'
+    ]},
+    { id:'retest', title:'Retest Policy', desc:'When and how you can request to be re-evaluated.', rules:[
+      'A retest may be requested no earlier than 7 days after your last result in that gamemode.',
+      'Retest requests citing meta changes, gear changes, or a documented improvement period are prioritized.',
+      'Abuse of the retest system (spamming requests) can result in a temporary testing freeze.',
+      'Where possible, retests are assigned to a different Tester than your previous session to keep evaluations independent.',
+      'A retest can only move your tier up or down based on that session\u2014previous results carry no weight once a retest is logged.'
+    ]},
+    { id:'fairplay', title:'Fair Play', desc:'Cheating, smurfing, and other integrity violations.', rules:[
+      'Using an alternate ("smurf") account to be tested at a lower tier than your known skill is not allowed.',
+      'Boosting\u2014deliberately underperforming to help someone else win or rank\u2014voids the result and can lead to suspension.',
+      'Exploiting client or server bugs during a test session invalidates that session\u2019s result.',
+      'Sharing accounts to inflate a tier or leaderboard position is treated as smurfing for both parties involved.',
+      'Any use of cheat clients, macros, or third-party combat assistance during a test results in a permanent testing ban.'
+    ]},
+    { id:'conduct', title:'Member Conduct', desc:'General behavior standards across the platform and Discord.', rules:[
+      'Harassment, hate speech, or targeted abuse toward staff, testers, or members is never tolerated.',
+      'Impersonating staff, testers, or the Founder account is grounds for immediate suspension.',
+      'Do not share, sell, or trade tier placements or accounts.',
+      'Respect decisions made by Senior Moderators and above; disputes go through the appeals process, not public callouts.',
+      'Spamming test requests, tickets, or staff DMs to pressure a faster response is not permitted.',
+      'Reviews and profile content must stay on-topic\u2014no advertising, no unrelated links, no doxxing.'
+    ]},
+    { id:'appeals', title:'Appeals', desc:'Disputing a tier or moderation decision.', rules:[
+      'Tier or moderation appeals are submitted through a ticket in the Discord server, not in public channels.',
+      'Appeals are reviewed by a Manager or higher and are never handled by the original Tester alone.',
+      'Decisions on appeals are final for that submission; a new appeal requires new evidence.',
+      'Appeals must be submitted within 14 days of the original decision; older results are considered settled.'
+    ]}
+  ];
+
+  let active = CATEGORIES[0].id;
+  const tabsEl = document.getElementById('categoryTabs');
+  const bodyEl = document.getElementById('rulesBody');
+
+  function render(){
+    tabsEl.innerHTML = CATEGORIES.map(c=>`
+      <button class="btn ${c.id===active?'btn-secondary':'btn-ghost'} btn-sm" data-cat="${c.id}" style="text-transform:none;">${c.title}</button>
+    `).join('');
+    tabsEl.querySelectorAll('[data-cat]').forEach(b=> b.addEventListener('click', ()=>{ active=b.dataset.cat; render(); }));
+
+    const cat = CATEGORIES.find(c=>c.id===active);
+    bodyEl.innerHTML = `
+      <div class="glass card">
+        <div class="eyebrow">${cat.title}</div>
+        <h3 class="mt-8" style="font-size:20px;">${cat.desc}</h3>
+        <div class="mt-16">
+          ${cat.rules.map((r,i)=>`<div class="rule-item"><span class="rule-num">${String(i+1).padStart(2,'0')}</span><span class="text-sm" style="color:var(--text-1);">${r}</span></div>`).join('')}
+        </div>
+      </div>`;
+  }
+  render();
+</script>
 </body>
 </html>
