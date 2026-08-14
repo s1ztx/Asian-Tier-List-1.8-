@@ -1,441 +1,165 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reviews · Asian Tier List [1.8+]</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⭐</text></svg>">
-    <link rel="stylesheet" href="assets/css/tokens.css">
-    <link rel="stylesheet" href="assets/css/components.css">
-    <link rel="stylesheet" href="assets/css/main.css">
-    <style>
-        .reviews-hero {
-            text-align: center;
-            padding: 30px 20px 20px;
-        }
-        .reviews-hero h1 {
-            font-size: clamp(2rem, 4vw, 3.2rem);
-            font-weight: var(--font-weight-extrabold);
-            background: var(--gradient-brand);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .reviews-hero p {
-            color: var(--color-text-secondary);
-            font-size: 1.1rem;
-            margin-top: 4px;
-        }
-
-        .reviews-container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 0 20px 40px;
-        }
-
-        .review-form {
-            background: var(--color-surface);
-            border-radius: var(--radius-lg);
-            padding: var(--spacing-xl);
-            border: 1px solid var(--color-border);
-            backdrop-filter: blur(10px);
-            margin-bottom: var(--spacing-xl);
-        }
-        .review-form h2 {
-            font-size: 1.2rem;
-            font-weight: var(--font-weight-bold);
-            margin-bottom: var(--spacing-md);
-        }
-        .review-form textarea {
-            width: 100%;
-            min-height: 120px;
-            background: var(--color-background);
-            border: 1px solid var(--color-border);
-            border-radius: var(--radius-md);
-            padding: var(--spacing-md);
-            color: var(--color-text);
-            font-family: var(--font-family);
-            font-size: 0.95rem;
-            resize: vertical;
-            transition: border-color var(--transition-fast);
-        }
-        .review-form textarea:focus {
-            outline: none;
-            border-color: var(--color-blue);
-        }
-        .review-form textarea::placeholder {
-            color: var(--color-text-secondary);
-            opacity: 0.6;
-        }
-        .review-form .rating {
-            display: flex;
-            gap: 8px;
-            margin: var(--spacing-md) 0;
-            flex-direction: row-reverse;
-            justify-content: flex-end;
-        }
-        .review-form .rating input {
-            display: none;
-        }
-        .review-form .rating label {
-            font-size: 2rem;
-            cursor: pointer;
-            color: var(--color-text-tertiary);
-            transition: color var(--transition-fast);
-        }
-        .review-form .rating label:hover,
-        .review-form .rating label:hover ~ label,
-        .review-form .rating input:checked ~ label {
-            color: #ffd700;
-        }
-        .review-form .submit-btn {
-            padding: 12px 32px;
-            background: var(--gradient-brand);
-            border: none;
-            border-radius: var(--radius-full);
-            color: white;
-            font-weight: var(--font-weight-bold);
-            cursor: pointer;
-            transition: all var(--transition-fast);
-            font-size: 1rem;
-        }
-        .review-form .submit-btn:hover {
-            transform: scale(1.02);
-            box-shadow: 0 4px 20px rgba(230, 57, 70, 0.3);
-        }
-        .review-form .submit-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-        .review-form .login-prompt {
-            text-align: center;
-            padding: 20px;
-        }
-        .review-form .login-prompt .icon {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            opacity: 0.5;
-        }
-
-        .review-card {
-            background: var(--color-surface);
-            border-radius: var(--radius-lg);
-            padding: var(--spacing-lg);
-            border: 1px solid var(--color-border);
-            backdrop-filter: blur(10px);
-            margin-bottom: var(--spacing-md);
-            transition: all var(--transition-fast);
-        }
-        .review-card:hover {
-            border-color: var(--color-border-light);
-        }
-        .review-card .review-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: var(--spacing-sm);
-            flex-wrap: wrap;
-            gap: var(--spacing-sm);
-        }
-        .review-card .review-header .author {
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-sm);
-        }
-        .review-card .review-header .author .avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            overflow: hidden;
-        }
-        .review-card .review-header .author .avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .review-card .review-header .author .name {
-            font-weight: var(--font-weight-semibold);
-        }
-        .review-card .review-header .author .discord {
-            font-size: 0.8rem;
-            color: var(--color-text-secondary);
-        }
-        .review-card .review-header .stars {
-            color: #ffd700;
-            font-size: 1.1rem;
-            letter-spacing: 2px;
-        }
-        .review-card .review-content {
-            color: var(--color-text-secondary);
-            line-height: 1.7;
-        }
-        .review-card .review-date {
-            font-size: 0.75rem;
-            color: var(--color-text-tertiary);
-            margin-top: var(--spacing-sm);
-        }
-
-        .no-reviews {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--color-text-secondary);
-        }
-        .no-reviews .icon {
-            font-size: 3rem;
-            margin-bottom: 12px;
-            opacity: 0.5;
-        }
-
-        .already-reviewed {
-            text-align: center;
-            padding: 20px;
-            color: var(--color-text-secondary);
-            border: 1px solid var(--color-border);
-            border-radius: var(--radius-lg);
-            background: var(--color-surface);
-        }
-        .already-reviewed .icon {
-            font-size: 2rem;
-            margin-bottom: 8px;
-        }
-
-        @media (max-width: 480px) {
-            .review-form .rating label {
-                font-size: 1.5rem;
-            }
-            .review-card .review-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reviews — Asian Tier List [1.8+]</title>
+<link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/css/main.css">
 </head>
 <body>
-    <div id="app">
-        <nav id="main-nav"></nav>
-
-        <div class="reviews-hero">
-            <h1>⭐ Community Reviews</h1>
-            <p>What players think about Asian Tier List</p>
-        </div>
-
-        <div class="reviews-container">
-            <!-- Review Form -->
-            <div class="review-form" id="review-form-container">
-                <!-- Filled by JS -->
-            </div>
-
-            <!-- Reviews List -->
-            <div id="reviews-list">
-                <!-- Filled by JS -->
-            </div>
-        </div>
-
-        <footer id="main-footer"></footer>
+<main>
+  <section class="page-hero">
+    <div class="container">
+      <div class="eyebrow">Community feedback</div>
+      <h1 class="h-title" style="font-size:clamp(32px,5vw,52px);">Reviews</h1>
+      <p class="h-sub">What members think of testing, the platform, and the community. Signed-in members can leave one review each.</p>
     </div>
+  </section>
 
-    <script src="assets/js/data.js"></script>
-    <script src="assets/js/session.js"></script>
-    <script src="assets/js/nav.js"></script>
-    <script src="assets/js/backgrounds.js"></script>
-    <script>
-        // ============================================================
-        // REVIEWS LOGIC
-        // ============================================================
-        document.addEventListener('DOMContentLoaded', function() {
-            const session = window.ATL_SESSION.current();
-            const formContainer = document.getElementById('review-form-container');
-            const reviewsList = document.getElementById('reviews-list');
+  <section class="section">
+    <div class="container" style="display:grid; grid-template-columns:1fr 340px; gap:28px; align-items:flex-start;">
+      <div id="reviewList" style="display:flex; flex-direction:column; gap:16px;"></div>
 
-            // Load reviews from KV store
-            async function loadReviews() {
-                try {
-                    const reviews = await window.ATL_SESSION.loadStore('reviews', []);
-                    renderReviews(reviews);
-                    return reviews;
-                } catch (error) {
-                    console.error('Error loading reviews:', error);
-                    reviewsList.innerHTML = `
-                        <div class="no-reviews">
-                            <div class="icon">❌</div>
-                            <p>Failed to load reviews</p>
-                        </div>
-                    `;
-                    return [];
-                }
-            }
+      <div class="glass card" id="reviewComposer" style="position:sticky; top:calc(var(--nav-h)+20px);"></div>
+    </div>
+  </section>
+</main>
 
-            function renderReviews(reviews) {
-                if (!reviews || reviews.length === 0) {
-                    reviewsList.innerHTML = `
-                        <div class="no-reviews">
-                            <div class="icon">📝</div>
-                            <p>No community reviews have been submitted yet.</p>
-                            <p style="font-size: 0.85rem; margin-top: 4px;">Be the first to share your experience!</p>
-                        </div>
-                    `;
-                    return;
-                }
+<div class="modal-backdrop" id="confirmDelete">
+  <div class="glass modal">
+    <h3>Delete your review?</h3>
+    <p class="text-sm text-muted">This can't be undone. You can always write a new one later.</p>
+    <div style="display:flex; gap:10px; margin-top:18px;">
+      <button class="btn btn-ghost btn-block" id="cancelDelete">Cancel</button>
+      <button class="btn btn-primary btn-block" id="confirmDeleteBtn">Delete</button>
+    </div>
+  </div>
+</div>
 
-                // Sort by date (newest first)
-                const sorted = [...reviews].sort((a, b) => new Date(b.date) - new Date(a.date));
+<script src="assets/js/data.js"></script>
+<script src="assets/js/session.js"></script>
+<script src="assets/js/nav.js"></script>
+<script src="assets/js/backgrounds.js"></script>
+<script src="assets/js/cursor.js"></script>
 
-                reviewsList.innerHTML = sorted.map(review => {
-                    const stars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
-                    const date = new Date(review.date).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric'
-                    });
-                    const avatarUrl = review.discordAvatar || 
-                        `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(review.author)}&backgroundColor=141a29`;
+<script type="module">
+  ATL_mountBackground('reviews');
+  const session = ATL_initShell('reviews.html');
+  const listEl = document.getElementById('reviewList');
+  const composer = document.getElementById('reviewComposer');
 
-                    return `
-                        <div class="review-card">
-                            <div class="review-header">
-                                <div class="author">
-                                    <div class="avatar">
-                                        <img src="${avatarUrl}" alt="${review.author}'s avatar">
-                                    </div>
-                                    <div>
-                                        <div class="name">${review.author}</div>
-                                        <div class="discord">${review.discord || ''}</div>
-                                    </div>
-                                </div>
-                                <div class="stars">${stars}</div>
-                            </div>
-                            <div class="review-content">${review.content}</div>
-                            <div class="review-date">${date}</div>
-                        </div>
-                    `;
-                }).join('');
-            }
+  async function loadReviews(){ return await ATL_SESSION.loadStore('reviews', []); }
+  async function saveReviews(r){ return await ATL_SESSION.saveStore('reviews', r); }
 
-            // Render review form
-            function renderForm() {
-                const session = window.ATL_SESSION.current();
+  function starRow(n){
+    return `<div class="mono" style="color:var(--gold-500); letter-spacing:2px;">${'★'.repeat(n)}${'☆'.repeat(5-n)}</div>`;
+  }
 
-                if (!session.authenticated) {
-                    formContainer.innerHTML = `
-                        <h2>📝 Write a Review</h2>
-                        <div class="login-prompt">
-                            <div class="icon">🔒</div>
-                            <p>Login with Discord to write a review</p>
-                            <button class="discord-btn" onclick="window.ATL_SESSION.loginWithDiscord()">
-                                💬 Login with Discord
-                            </button>
-                        </div>
-                    `;
-                    return;
-                }
+  async function renderList(){
+    const reviews = await loadReviews();
+    if(reviews.length === 0){
+      listEl.innerHTML = `
+        <div class="glass empty-state">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 17.3 6.2 20l1.1-6.5L2.5 9l6.5-1L12 2l3 6 6.5 1-4.8 4.5 1.1 6.5z"/></svg>
+          <h3>No reviews yet</h3>
+          <p>Be the first signed-in member to share your experience with testing and the platform.</p>
+        </div>`;
+    } else {
+      for(const r of reviews){
+        r._avatar = await ATL_SESSION.resolveAvatar({ discordId: r.userId, discordUsername: r.username, discordAvatar: r.avatar });
+      }
+      listEl.innerHTML = reviews.slice().reverse().map(r=>`
+        <div class="glass card">
+          <div class="flex-between" style="align-items:flex-start;">
+            <div style="display:flex; gap:10px; align-items:center;">
+              <img src="${r._avatar}" style="width:36px;height:36px;border-radius:8px; object-fit:cover; image-rendering:pixelated;">
+              <div>
+                <div style="font-family:var(--f-sub); font-weight:700; color:var(--text-0);">${r.display}</div>
+                <span class="text-sm text-muted mono">${r.date}</span>
+              </div>
+            </div>
+            ${starRow(r.rating)}
+          </div>
+          <p class="text-sm mt-16" style="color:var(--text-1);">${r.body}</p>
+        </div>
+      `).join('');
+    }
+  }
 
-                // Check if user already reviewed
-                loadReviews().then(reviews => {
-                    const existing = reviews.find(r => 
-                        r.userId === session.user.id || 
-                        r.discordId === session.user.id
-                    );
+  async function renderComposer(){
+    if(!session.authenticated){
+      composer.innerHTML = `
+        <div class="eyebrow">Members only</div>
+        <h3 class="mt-8">Sign in to review</h3>
+        <p class="text-sm text-muted">Guests can read reviews, but only signed-in Discord members can post one.</p>
+        <button class="btn btn-primary btn-block mt-16" id="composerLogin">Login with Discord</button>`;
+      document.getElementById('composerLogin').addEventListener('click', ATL_SESSION.loginWithDiscord);
+      return;
+    }
+    const reviews = await loadReviews();
+    const mine = reviews.find(r=>r.userId===session.user.id);
+    if(mine){
+      composer.innerHTML = `
+        <div class="eyebrow">Your review</div>
+        <h3 class="mt-8">You've already reviewed</h3>
+        ${starRow(mine.rating)}
+        <p class="text-sm text-muted mt-8">"${mine.body}"</p>
+        <div style="display:flex; gap:10px; margin-top:16px;">
+          <button class="btn btn-ghost btn-block" id="editReview">Edit Review</button>
+          <button class="btn btn-outline-red btn-block" id="deleteReview">Delete Review</button>
+        </div>`;
+      document.getElementById('editReview').addEventListener('click', ()=> openForm(mine));
+      document.getElementById('deleteReview').addEventListener('click', ()=>{
+        document.getElementById('confirmDelete').classList.add('open');
+        document.getElementById('confirmDeleteBtn').onclick = async ()=>{
+          const current = await loadReviews();
+          await saveReviews(current.filter(r=>r.userId!==session.user.id));
+          document.getElementById('confirmDelete').classList.remove('open');
+          await renderComposer(); await renderList();
+          ATL_toast('Review deleted.', 'success');
+        };
+      });
+    } else {
+      openForm(null);
+    }
+  }
 
-                    if (existing) {
-                        formContainer.innerHTML = `
-                            <h2>📝 Your Review</h2>
-                            <div class="already-reviewed">
-                                <div class="icon">✅</div>
-                                <p>You have already submitted a review.</p>
-                                <p style="font-size: 0.85rem; margin-top: 4px; color: var(--color-text-tertiary);">
-                                    One review per Discord account.
-                                </p>
-                                <div style="margin-top: 12px; padding: 12px; background: var(--color-background); border-radius: var(--radius-sm);">
-                                    ${'★'.repeat(existing.rating)}${'☆'.repeat(5 - existing.rating)}
-                                    <p style="margin-top: 4px; color: var(--color-text-secondary);">${existing.content}</p>
-                                </div>
-                            </div>
-                        `;
-                        return;
-                    }
+  function openForm(existing){
+    composer.innerHTML = `
+      <div class="eyebrow">${existing?'Edit your review':'Leave a review'}</div>
+      <h3 class="mt-8">${existing?'Update your thoughts':'Share your experience'}</h3>
+      <div class="field mt-16">
+        <label>Rating</label>
+        <select class="select" id="ratingSelect">
+          ${[5,4,3,2,1].map(n=>`<option value="${n}" ${existing&&existing.rating===n?'selected':''}>${n} star${n>1?'s':''}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field">
+        <label>Review</label>
+        <textarea class="textarea" id="bodyInput" placeholder="How was your testing experience?">${existing?existing.body:''}</textarea>
+      </div>
+      <button class="btn btn-primary btn-block" id="saveReview">${existing?'Save changes':'Post Review'}</button>
+      ${existing?'<button class="btn btn-ghost btn-block mt-8" id="cancelEdit">Cancel</button>':''}
+    `;
+    const cancelBtn = document.getElementById('cancelEdit');
+    if(cancelBtn) cancelBtn.addEventListener('click', renderComposer);
+    document.getElementById('saveReview').addEventListener('click', async ()=>{
+      const body = document.getElementById('bodyInput').value.trim();
+      if(!body){ ATL_toast('Write something before posting.', 'error'); return; }
+      const rating = parseInt(document.getElementById('ratingSelect').value,10);
+      const current = await loadReviews();
+      let reviews = current.filter(r=>r.userId!==session.user.id);
+      reviews.push({ userId:session.user.id, username:session.user.username, display:session.user.display, avatar:session.user.avatar||null, rating, body, date:new Date().toISOString().slice(0,10) });
+      await saveReviews(reviews);
+      await renderComposer(); await renderList();
+      ATL_toast(existing?'Review updated.':'Review posted.', 'success');
+    });
+  }
 
-                    formContainer.innerHTML = `
-                        <h2>📝 Write a Review</h2>
-                        <p style="color: var(--color-text-secondary); font-size: 0.9rem; margin-bottom: var(--spacing-md);">
-                            Share your experience with the Asian Tier List community.
-                        </p>
-                        <form id="review-submit-form">
-                            <div class="rating" id="rating-container">
-                                <input type="radio" name="rating" id="star5" value="5">
-                                <label for="star5" title="5 stars">★</label>
-                                <input type="radio" name="rating" id="star4" value="4">
-                                <label for="star4" title="4 stars">★</label>
-                                <input type="radio" name="rating" id="star3" value="3">
-                                <label for="star3" title="3 stars">★</label>
-                                <input type="radio" name="rating" id="star2" value="2">
-                                <label for="star2" title="2 stars">★</label>
-                                <input type="radio" name="rating" id="star1" value="1">
-                                <label for="star1" title="1 star">★</label>
-                            </div>
-                            <textarea id="review-content" placeholder="Write your review here... (min. 10 characters)" required></textarea>
-                            <button type="submit" class="submit-btn" id="submit-review-btn">Submit Review</button>
-                        </form>
-                    `;
+  document.getElementById('cancelDelete').addEventListener('click', ()=> document.getElementById('confirmDelete').classList.remove('open'));
 
-                    // Handle form submission
-                    document.getElementById('review-submit-form').addEventListener('submit', async function(e) {
-                        e.preventDefault();
-                        const btn = document.getElementById('submit-review-btn');
-                        const rating = document.querySelector('input[name="rating"]:checked');
-                        const content = document.getElementById('review-content').value.trim();
-
-                        if (!rating) {
-                            window.ATL_toast('Please select a rating', 'error');
-                            return;
-                        }
-                        if (content.length < 10) {
-                            window.ATL_toast('Review must be at least 10 characters', 'error');
-                            return;
-                        }
-
-                        btn.disabled = true;
-                        btn.textContent = 'Submitting...';
-
-                        try {
-                            const reviews = await window.ATL_SESSION.loadStore('reviews', []);
-                            const newReview = {
-                                id: Date.now().toString(),
-                                author: session.user.display || session.user.username,
-                                discord: session.user.username,
-                                userId: session.user.id,
-                                discordId: session.user.id,
-                                discordAvatar: session.user.avatar || null,
-                                rating: parseInt(rating.value),
-                                content: content,
-                                date: new Date().toISOString()
-                            };
-
-                            reviews.push(newReview);
-                            await window.ATL_SESSION.saveStore('reviews', reviews);
-                            
-                            window.ATL_toast('Review submitted successfully! 🎉', 'success');
-                            renderForm();
-                            loadReviews();
-                        } catch (error) {
-                            console.error('Error submitting review:', error);
-                            window.ATL_toast('Failed to submit review: ' + error.message, 'error');
-                            btn.disabled = false;
-                            btn.textContent = 'Submit Review';
-                        }
-                    });
-                });
-            }
-
-            renderForm();
-            loadReviews();
-
-            // Handle session updates
-            window.addEventListener('session-update', function() {
-                renderForm();
-                loadReviews();
-            });
-        });
-    </script>
+  renderList(); renderComposer();
+</script>
 </body>
 </html>
