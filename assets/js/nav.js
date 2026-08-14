@@ -5,7 +5,7 @@
 window.ATL_hex = function(tier, size){
   size = size || 'md';
   const cssVar = window.ATL_DATA.TIER_CSS_VAR[tier] || '--tier-B';
-  const cls = size=='sm' ? 'sm' : size=='lg' ? 'lg' : '';
+  const cls = size==='sm' ? 'sm' : size==='lg' ? 'lg' : '';
   return `<span class="tier-hex ${cls}" style="--tc:var(${cssVar})">
     <svg viewBox="0 0 100 112" preserveAspectRatio="none">
       <defs>
@@ -43,8 +43,9 @@ const NAV_ITEMS = [
   { href:'staff.html', label:'Staff' },
   { href:'testers.html', label:'Testers' },
   { href:'leaderboards.html', label:'Leaderboards' },
-  { href:'stats.html', label:'📊 Stats' },
-  { href:'compare.html', label:'⚔️ Compare' },
+  { href:'search.html', label:'Search' },
+  { href:'compare.html', label:'Compare' },
+  { href:'stats.html', label:'Stats' },
   { href:'reviews.html', label:'Reviews' },
   { href:'support.html', label:'Support' },
   { href:'profile.html', label:'Player Profile' },
@@ -59,6 +60,8 @@ function discordIconSvg(){
 function menuIconSvg(){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>`; }
 function closeIconSvg(){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>`; }
 window.ATL_brandFallback = function(img){
+  // If assets/images/logo.png isn't there (or hasn't been uploaded yet),
+  // fall back to a simple gradient "A" mark instead of a broken image icon.
   const span = document.createElement('span');
   span.className = 'brand-mark';
   span.style.cssText = 'display:flex;align-items:center;justify-content:center;border-radius:8px;background:linear-gradient(135deg,var(--red-500),var(--blue-500));color:#0a0e15;font-family:Orbitron,sans-serif;font-weight:800;font-size:15px;';
@@ -66,6 +69,8 @@ window.ATL_brandFallback = function(img){
   img.replaceWith(span);
 };
 function brandMarkSvg(){
+  // Uses your uploaded logo at assets/images/logo.png — change the src
+  // below if you used a different filename or an .svg instead.
   return `<img class="brand-mark" src="assets/images/logo.png" alt="Asian Tier List logo" onerror="ATL_brandFallback(this)">`;
 }
 
@@ -81,6 +86,8 @@ const ATL_THEMES = [
   { id:'cyber',   label:'Cyber Neon',    colors:['#06b6d4','#f97316'] },
   { id:'emerald', label:'Emerald',       colors:['#22c55e','#a855f7'] },
 ];
+// Applied as soon as this script loads (before the nav renders) to
+// minimize any flash of the default theme on load.
 (function(){
   const saved = localStorage.getItem('atl_theme');
   if(saved && ATL_THEMES.some(t=>t.id===saved)) document.documentElement.dataset.theme = saved;
@@ -94,6 +101,10 @@ function loadNotifSeen(){
 }
 function saveNotifSeen(v){ localStorage.setItem(NOTIF_STORAGE_KEY, JSON.stringify(v)); }
 
+// Builds the current user's unread notifications by diffing the shared
+// tier_log / tickets / applications stores against what this browser
+// has already marked as seen. Fire-and-forget from ATL_initShell so it
+// never blocks nav rendering.
 async function computeNotifications(session){
   const seen = loadNotifSeen();
   seen.ticketsLastRead = seen.ticketsLastRead || {};
@@ -162,85 +173,6 @@ function markAllNotifsRead(session, items){
   });
 }
 
-// ============================================================
-// CUSTOM CURSOR
-// ============================================================
-function initCustomCursor() {
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  if (window.matchMedia('(pointer: coarse)').matches) return;
-  if (window.innerWidth < 769) return;
-  
-  const cursor = document.createElement('div');
-  cursor.className = 'custom-cursor';
-  cursor.innerHTML = `
-    <div class="cursor-dot"></div>
-    <div class="cursor-ring"></div>
-  `;
-  document.body.appendChild(cursor);
-  
-  const dot = cursor.querySelector('.cursor-dot');
-  const ring = cursor.querySelector('.cursor-ring');
-  let mouseX = 0, mouseY = 0;
-  let ringX = 0, ringY = 0;
-  
-  document.addEventListener('mousemove', (e) => {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-    dot.style.transform = `translate(${mouseX - 4}px, ${mouseY - 4}px)`;
-  });
-  
-  function animateRing() {
-    ringX += (mouseX - ringX) * 0.12;
-    ringY += (mouseY - ringY) * 0.12;
-    ring.style.transform = `translate(${ringX - 15}px, ${ringY - 15}px)`;
-    requestAnimationFrame(animateRing);
-  }
-  animateRing();
-  
-  const hoverTargets = document.querySelectorAll(
-    'a, button, .clickable, .nav-link, .brand, .discord-btn, ' +
-    '.theme-option, .tab, .submit-btn, .btn, .user-chip, ' +
-    '.theme-toggle, .nav-menu-toggle, .modal-close, .example'
-  );
-  
-  hoverTargets.forEach(el => {
-    el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
-    el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
-  });
-  
-  document.addEventListener('mousedown', () => cursor.classList.add('click'));
-  document.addEventListener('mouseup', () => cursor.classList.remove('click'));
-  
-  // Handle dynamically added elements
-  const observer = new MutationObserver(() => {
-    document.querySelectorAll(
-      'a, button, .clickable, .nav-link, .brand, .discord-btn, ' +
-      '.theme-option, .tab, .submit-btn, .btn, .user-chip, ' +
-      '.theme-toggle, .nav-menu-toggle, .modal-close, .example'
-    ).forEach(el => {
-      if (!el.dataset.cursorAttached) {
-        el.dataset.cursorAttached = 'true';
-        el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
-        el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
-      }
-    });
-  });
-  observer.observe(document.body, { childList: true, subtree: true });
-  
-  // Handle resize
-  let resizeTimeout;
-  window.addEventListener('resize', () => {
-    clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(() => {
-      if (window.innerWidth < 769) {
-        cursor.style.display = 'none';
-      } else {
-        cursor.style.display = 'block';
-      }
-    }, 200);
-  });
-}
-
 window.ATL_initShell = function(activePage){
   const session = window.ATL_SESSION.current();
   const role = session.role;
@@ -254,7 +186,7 @@ window.ATL_initShell = function(activePage){
 
   const authArea = session.authenticated
     ? `<div class="user-chip" id="userChip">
-         <img src="${avatarUrl(session.user)}" alt="${session.user.display}'s avatar">
+         <img src="${avatarUrl(session.user)}" alt="">
          <span>
            <span class="u-name">${session.user.display}</span><br>
            <span class="u-role">${session.role}</span>
@@ -315,9 +247,6 @@ window.ATL_initShell = function(activePage){
   </div>`;
   document.body.prepend(nav);
 
-  // Initialize custom cursor
-  initCustomCursor();
-
   if(session.authenticated){
     const notifToggle = document.getElementById('notifToggle');
     const notifDropdown = document.getElementById('notifDropdown');
@@ -369,31 +298,18 @@ window.ATL_initShell = function(activePage){
   });
   const themeToggle = document.getElementById('themeToggle');
   const themeDropdown = document.getElementById('themeDropdown');
-  if(themeToggle && themeDropdown) {
-    themeToggle.addEventListener('click', (e)=>{ e.stopPropagation(); themeDropdown.classList.toggle('open'); });
-    document.addEventListener('click', (e)=>{ if(!themeDropdown.contains(e.target) && e.target!==themeToggle) themeDropdown.classList.remove('open'); });
-  }
+  themeToggle.addEventListener('click', (e)=>{ e.stopPropagation(); themeDropdown.classList.toggle('open'); });
+  document.addEventListener('click', (e)=>{ if(!themeDropdown.contains(e.target) && e.target!==themeToggle) themeDropdown.classList.remove('open'); });
 
-  const menuToggle = document.getElementById('menuToggle');
-  const drawerBackdrop = document.getElementById('drawerBackdrop');
-  const navDrawer = document.getElementById('navDrawer');
-  const drawerClose = document.getElementById('drawerClose');
-  
-  if(menuToggle) {
-    menuToggle.addEventListener('click', ()=>{
-      navDrawer.classList.add('open');
-      drawerBackdrop.classList.add('open');
-    });
-  }
-  if(drawerClose) {
-    drawerClose.addEventListener('click', closeDrawer);
-  }
-  if(drawerBackdrop) {
-    drawerBackdrop.addEventListener('click', closeDrawer);
-  }
+  document.getElementById('menuToggle').addEventListener('click', ()=>{
+    document.getElementById('navDrawer').classList.add('open');
+    document.getElementById('drawerBackdrop').classList.add('open');
+  });
+  document.getElementById('drawerClose').addEventListener('click', closeDrawer);
+  document.getElementById('drawerBackdrop').addEventListener('click', closeDrawer);
   function closeDrawer(){
-    navDrawer.classList.remove('open');
-    drawerBackdrop.classList.remove('open');
+    document.getElementById('navDrawer').classList.remove('open');
+    document.getElementById('drawerBackdrop').classList.remove('open');
   }
 
   const loginBtn = document.getElementById('loginBtn');
@@ -412,24 +328,13 @@ window.ATL_initShell = function(activePage){
         <p class="text-sm text-muted" style="max-width:320px;">The competitive PvP tier list ranking Asia's best 1.8 combat players across seven gamemodes.</p>
       </div>
       <div class="footer-col"><h4>Platform</h4>
-        <a href="rules.html">Rules</a>
-        <a href="leaderboards.html">Leaderboards</a>
-        <a href="stats.html">📊 Stats</a>
-        <a href="compare.html">⚔️ Compare</a>
-        <a href="announcements.html">Announcements</a>
-        <a href="reviews.html">Reviews</a>
+        <a href="rules.html">Rules</a><a href="leaderboards.html">Leaderboards</a><a href="search.html">Search</a><a href="compare.html">Compare</a><a href="stats.html">Stats</a><a href="announcements.html">Announcements</a><a href="reviews.html">Reviews</a>
       </div>
       <div class="footer-col"><h4>Community</h4>
-        <a href="staff.html">Staff</a>
-        <a href="testers.html">Testers</a>
-        <a href="staff-applications.html">Applications</a>
-        <a href="profile.html">Player Profile</a>
+        <a href="staff.html">Staff</a><a href="testers.html">Testers</a><a href="staff-applications.html">Applications</a><a href="profile.html">Player Profile</a>
       </div>
       <div class="footer-col"><h4>Account</h4>
-        <a href="#" id="footerDiscordLink">Discord Server</a>
-        <a href="support.html">Support</a>
-        <a href="tester-panel.html">Tester Panel</a>
-        <a href="owner-panel.html">Owner Panel</a>
+        <a href="#" id="footerDiscordLink">Discord Server</a><a href="support.html">Support</a><a href="tester-panel.html">Tester Panel</a><a href="owner-panel.html">Owner Panel</a>
       </div>
     </div>
     <div class="footer-bottom">
