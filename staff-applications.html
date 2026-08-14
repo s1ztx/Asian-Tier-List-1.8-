@@ -1,441 +1,254 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Staff Applications · Asian Tier List [1.8+]</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>">
-    <link rel="stylesheet" href="assets/css/tokens.css">
-    <link rel="stylesheet" href="assets/css/components.css">
-    <link rel="stylesheet" href="assets/css/main.css">
-    <style>
-        .apps-hero {
-            text-align: center;
-            padding: 30px 20px 20px;
-        }
-        .apps-hero h1 {
-            font-size: clamp(2rem, 4vw, 3.2rem);
-            font-weight: var(--font-weight-extrabold);
-            background: var(--gradient-brand);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .apps-hero p {
-            color: var(--color-text-secondary);
-            font-size: 1.1rem;
-            margin-top: 4px;
-        }
-
-        .apps-container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 0 20px 40px;
-        }
-
-        .app-form {
-            background: var(--color-surface);
-            border-radius: var(--radius-lg);
-            padding: var(--spacing-xl);
-            border: 1px solid var(--color-border);
-            backdrop-filter: blur(10px);
-        }
-        .app-form h2 {
-            font-size: 1.2rem;
-            font-weight: var(--font-weight-bold);
-            margin-bottom: var(--spacing-md);
-        }
-
-        .form-group {
-            margin-bottom: var(--spacing-md);
-        }
-        .form-group label {
-            display: block;
-            font-size: 0.85rem;
-            font-weight: var(--font-weight-semibold);
-            margin-bottom: 4px;
-            color: var(--color-text-secondary);
-        }
-        .form-group label .required {
-            color: var(--color-red);
-        }
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 10px 14px;
-            background: var(--color-background);
-            border: 1px solid var(--color-border);
-            border-radius: var(--radius-md);
-            color: var(--color-text);
-            font-family: var(--font-family);
-            font-size: 0.95rem;
-            transition: border-color var(--transition-fast);
-        }
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: var(--color-blue);
-        }
-        .form-group textarea {
-            min-height: 80px;
-            resize: vertical;
-        }
-
-        .terms-box {
-            background: var(--color-background);
-            border: 1px solid var(--color-border);
-            border-radius: var(--radius-md);
-            padding: var(--spacing-md);
-            max-height: 150px;
-            overflow-y: auto;
-            font-size: 0.85rem;
-            color: var(--color-text-secondary);
-            line-height: 1.6;
-            margin-bottom: var(--spacing-md);
-        }
-        .terms-box strong {
-            color: var(--color-text);
-        }
-
-        .checkbox-group {
-            display: flex;
-            align-items: flex-start;
-            gap: var(--spacing-sm);
-            margin-bottom: var(--spacing-md);
-        }
-        .checkbox-group input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            margin-top: 3px;
-            accent-color: var(--color-blue);
-            cursor: pointer;
-        }
-        .checkbox-group label {
-            font-size: 0.9rem;
-            color: var(--color-text-secondary);
-            cursor: pointer;
-        }
-        .checkbox-group label strong {
-            color: var(--color-text);
-        }
-
-        .submit-btn {
-            padding: 12px 32px;
-            background: var(--gradient-brand);
-            border: none;
-            border-radius: var(--radius-full);
-            color: white;
-            font-weight: var(--font-weight-bold);
-            cursor: pointer;
-            transition: all var(--transition-fast);
-            font-size: 1rem;
-            width: 100%;
-        }
-        .submit-btn:hover {
-            transform: scale(1.02);
-            box-shadow: 0 4px 20px rgba(230, 57, 70, 0.3);
-        }
-        .submit-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .login-prompt {
-            text-align: center;
-            padding: 40px 20px;
-        }
-        .login-prompt .icon {
-            font-size: 3rem;
-            margin-bottom: var(--spacing-md);
-            opacity: 0.5;
-        }
-        .login-prompt h2 {
-            font-size: 1.5rem;
-            margin-bottom: var(--spacing-sm);
-        }
-        .login-prompt p {
-            color: var(--color-text-secondary);
-            max-width: 400px;
-            margin: 0 auto var(--spacing-lg);
-        }
-
-        .success-message {
-            text-align: center;
-            padding: 40px 20px;
-        }
-        .success-message .icon {
-            font-size: 4rem;
-            margin-bottom: var(--spacing-md);
-        }
-        .success-message h2 {
-            font-size: 1.5rem;
-            margin-bottom: var(--spacing-sm);
-            color: #00e676;
-        }
-        .success-message p {
-            color: var(--color-text-secondary);
-        }
-
-        .error-message {
-            text-align: center;
-            padding: 20px;
-            color: var(--color-red);
-        }
-
-        @media (max-width: 480px) {
-            .app-form {
-                padding: var(--spacing-md);
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Applications — Asian Tier List [1.8+]</title>
+<link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/css/main.css">
 </head>
 <body>
-    <div id="app">
-        <nav id="main-nav"></nav>
-
-        <div class="apps-hero">
-            <h1>📝 Staff Applications</h1>
-            <p>Join the Asian Tier List staff team</p>
-        </div>
-
-        <div class="apps-container">
-            <!-- Login Prompt -->
-            <div id="login-prompt" style="display:none;">
-                <div class="login-prompt">
-                    <div class="icon">🔒</div>
-                    <h2>Login Required</h2>
-                    <p>Connect your Discord account to submit a staff application.</p>
-                    <button class="discord-btn" onclick="window.ATL_SESSION.loginWithDiscord()">
-                        💬 Login with Discord
-                    </button>
-                </div>
-            </div>
-
-            <!-- Application Form -->
-            <div id="app-form-container" style="display:none;">
-                <div class="app-form">
-                    <h2>📋 Staff Application Form</h2>
-                    <p style="color: var(--color-text-secondary); margin-bottom: var(--spacing-lg);">
-                        Fill out all required fields. Applications are reviewed by the Owner team.
-                    </p>
-
-                    <form id="app-form">
-                        <!-- Personal Info -->
-                        <div class="form-group">
-                            <label>Discord Username <span class="required">*</span></label>
-                            <input type="text" id="app-discord" placeholder="Your Discord username" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label>Minecraft Username <span class="required">*</span></label>
-                            <input type="text" id="app-minecraft" placeholder="Your Minecraft username" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Position Applying For <span class="required">*</span></label>
-                            <select id="app-position" required>
-                                <option value="">Select a position...</option>
-                                <option value="Tester">Tester</option>
-                                <option value="Senior Tester">Senior Tester</option>
-                                <option value="Trial Moderator">Trial Moderator</option>
-                                <option value="Moderator">Moderator</option>
-                            </select>
-                        </div>
-
-                        <!-- Experience -->
-                        <div class="form-group">
-                            <label>Minecraft Experience <span class="required">*</span></label>
-                            <textarea id="app-mc-exp" placeholder="How long have you played Minecraft? What's your PvP experience?" rows="3" required></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Discord Experience <span class="required">*</span></label>
-                            <textarea id="app-discord-exp" placeholder="Describe your Discord experience. Have you moderated before?" rows="3" required></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Moderation Experience</label>
-                            <textarea id="app-mod-exp" placeholder="Any previous moderation experience? (staff, admin, etc.)" rows="3"></textarea>
-                        </div>
-
-                        <!-- Skills -->
-                        <div class="form-group">
-                            <label>What are your strengths? <span class="required">*</span></label>
-                            <textarea id="app-strengths" placeholder="What makes you a good candidate?" rows="3" required></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>What are your weaknesses? <span class="required">*</span></label>
-                            <textarea id="app-weaknesses" placeholder="Areas you'd like to improve on" rows="3" required></textarea>
-                        </div>
-
-                        <!-- Scenarios -->
-                        <div class="form-group">
-                            <label>Scenario: Conflict Resolution <span class="required">*</span></label>
-                            <textarea id="app-scenario1" placeholder="How would you handle a conflict between two players?" rows="3" required></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Scenario: Rules Knowledge <span class="required">*</span></label>
-                            <textarea id="app-scenario2" placeholder="What would you do if you witnessed a player breaking the rules?" rows="3" required></textarea>
-                        </div>
-
-                        <!-- Availability -->
-                        <div class="form-group">
-                            <label>Availability <span class="required">*</span></label>
-                            <textarea id="app-availability" placeholder="How many hours per week can you commit? What's your timezone?" rows="3" required></textarea>
-                        </div>
-
-                        <!-- Motivation -->
-                        <div class="form-group">
-                            <label>Why do you want to join the team? <span class="required">*</span></label>
-                            <textarea id="app-motivation" placeholder="What motivates you to apply?" rows="3" required></textarea>
-                        </div>
-
-                        <!-- Terms -->
-                        <div class="terms-box">
-                            <strong>Terms & Conditions</strong><br><br>
-                            By submitting this application, you agree to:<br>
-                            • Follow all Asian Tier List rules and guidelines<br>
-                            • Act professionally and respectfully at all times<br>
-                            • Maintain confidentiality of staff discussions<br>
-                            • Be active and responsive to your duties<br>
-                            • Accept that your application may be rejected or your position revoked<br>
-                            • Provide truthful and accurate information
-                        </div>
-
-                        <div class="checkbox-group">
-                            <input type="checkbox" id="app-terms" required>
-                            <label for="app-terms">I have read and agree to the <strong>Terms & Conditions</strong> <span style="color: var(--color-red);">*</span></label>
-                        </div>
-
-                        <button type="submit" class="submit-btn" id="app-submit-btn">Submit Application</button>
-                    </form>
-
-                    <div id="app-success" style="display:none;">
-                        <div class="success-message">
-                            <div class="icon">✅</div>
-                            <h2>Application Submitted!</h2>
-                            <p>Your application has been received and will be reviewed by the Owner team.</p>
-                            <p style="font-size: 0.85rem; color: var(--color-text-tertiary); margin-top: var(--spacing-sm);">
-                                You will be notified on Discord about the decision.
-                            </p>
-                        </div>
-                    </div>
-
-                    <div id="app-error" style="display:none;">
-                        <div class="error-message">
-                            <p>❌ Failed to submit application. Please try again.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <footer id="main-footer"></footer>
+<main>
+  <section class="page-hero">
+    <div class="container">
+      <div class="eyebrow">Join the team</div>
+      <h1 class="h-title" style="font-size:clamp(32px,5vw,52px);">Applications</h1>
+      <p class="h-sub" style="max-width:640px;">Two ways to get involved beyond playing: keep the community running as Staff, or evaluate players as a Tester. Pick a track to get started.</p>
     </div>
+  </section>
 
-    <script src="assets/js/data.js"></script>
-    <script src="assets/js/session.js"></script>
-    <script src="assets/js/nav.js"></script>
-    <script src="assets/js/backgrounds.js"></script>
-    <script>
-        // ============================================================
-        // STAFF APPLICATIONS LOGIC
-        // ============================================================
-        document.addEventListener('DOMContentLoaded', function() {
-            const session = window.ATL_SESSION.current();
-            const loginPrompt = document.getElementById('login-prompt');
-            const formContainer = document.getElementById('app-form-container');
+  <section class="section" style="padding-top:0;">
+    <div class="container">
 
-            // Check authentication
-            if (!session.authenticated) {
-                loginPrompt.style.display = 'block';
-                formContainer.style.display = 'none';
-                return;
-            }
+      <!-- STEP 1: TRACK SELECTION -->
+      <div id="stepSelect">
+        <div class="grid-2">
+          <button class="glass card card-hover" data-track="staff" style="text-align:left; cursor:pointer; border:none; width:100%;">
+            <div class="pill pill-red">Staff</div>
+            <h3 class="mt-16" style="font-size:21px;">Staff Application</h3>
+            <p class="text-sm text-muted">Moderate the server, help members, and keep the community running smoothly.</p>
+            <span class="text-sm" style="color:var(--red-300); font-family:var(--f-sub); font-weight:700;">Apply as Staff →</span>
+          </button>
+          <button class="glass card card-hover" data-track="tester" style="text-align:left; cursor:pointer; border:none; width:100%;">
+            <div class="pill pill-teal">Tester</div>
+            <h3 class="mt-16" style="font-size:21px;">Tier-Tester Application</h3>
+            <p class="text-sm text-muted">Evaluate candidates and issue official tiers in the gamemodes you're strongest in.</p>
+            <span class="text-sm" style="color:var(--teal-400); font-family:var(--f-sub); font-weight:700;">Apply as Tester →</span>
+          </button>
+        </div>
+      </div>
 
-            loginPrompt.style.display = 'none';
-            formContainer.style.display = 'block';
+      <!-- STEP 2: LOGIN GATE -->
+      <div id="stepLoginGate" class="hidden" style="max-width:520px; margin:0 auto;">
+        <div class="glass card" style="text-align:center;">
+          <div class="eyebrow" style="justify-content:center;">Almost there</div>
+          <h3 class="mt-8" id="gateTitle">Login to continue</h3>
+          <p class="text-sm text-muted mt-8">You need to sign in with Discord before starting a <span id="gateTrackLabel"></span> application, so we can verify your account and membership.</p>
+          <button class="btn btn-primary mt-16" id="gateLoginBtn">Login with Discord</button>
+          <button class="btn btn-ghost btn-sm mt-16" id="gateBackBtn" style="text-transform:none;">← Choose a different track</button>
+        </div>
+      </div>
 
-            // Set Discord username
-            document.getElementById('app-discord').value = session.user.display || session.user.username;
+      <!-- STEP 3: APPLICATION FORM -->
+      <div id="stepForm" class="hidden">
+        <button class="btn btn-ghost btn-sm mt-8" id="formBackBtn" style="text-transform:none; margin-bottom:24px;">← Choose a different track</button>
 
-            // --- Handle form submission ---
-            const form = document.getElementById('app-form');
-            const submitBtn = document.getElementById('app-submit-btn');
-            const successDiv = document.getElementById('app-success');
-            const errorDiv = document.getElementById('app-error');
+        <div class="grid-2">
+          <div class="glass card">
+            <div class="eyebrow">Requirements</div>
+            <h3 class="mt-8">Before you apply</h3>
+            <ul class="mt-16" id="reqList" style="display:flex; flex-direction:column; gap:10px;"></ul>
+          </div>
+          <div class="glass card">
+            <div class="eyebrow">Responsibilities</div>
+            <h3 class="mt-8">What the role involves</h3>
+            <ul class="mt-16" id="respList" style="display:flex; flex-direction:column; gap:10px;"></ul>
+          </div>
+        </div>
 
-            form.addEventListener('submit', async function(e) {
-                e.preventDefault();
+        <div class="glass card mt-32" style="max-width:720px; margin-left:auto; margin-right:auto;">
+          <div class="eyebrow" id="formEyebrow">Application</div>
+          <h3 class="mt-8" id="formTitle">Application form</h3>
+          <form id="appForm" class="mt-16">
+            <div class="field"><label for="af1">Discord username</label><input class="input" id="af1" required></div>
+            <div class="field"><label for="af2">Age</label><input class="input" type="number" min="13" id="af2" required></div>
+            <div class="field"><label for="af3">Timezone</label><input class="input" id="af3" placeholder="e.g. GMT+8" required></div>
 
-                // Validate terms
-                const termsChecked = document.getElementById('app-terms').checked;
-                if (!termsChecked) {
-                    window.ATL_toast('Please accept the Terms & Conditions', 'error');
-                    return;
-                }
+            <div class="field hidden" id="gamemodeField">
+              <label>Which gamemodes do you want to test in?</label>
+              <div style="display:flex; flex-wrap:wrap; gap:8px;" id="gmCheckboxes"></div>
+              <p class="hint">Pick at least one. You can be certified for more later.</p>
+            </div>
 
-                // Collect data
-                const application = {
-                    id: Date.now().toString(),
-                    username: session.user.username,
-                    discordId: session.user.id,
-                    discord: session.user.display || session.user.username,
-                    minecraft: document.getElementById('app-minecraft').value.trim(),
-                    position: document.getElementById('app-position').value,
-                    mcExp: document.getElementById('app-mc-exp').value.trim(),
-                    discordExp: document.getElementById('app-discord-exp').value.trim(),
-                    modExp: document.getElementById('app-mod-exp').value.trim(),
-                    strengths: document.getElementById('app-strengths').value.trim(),
-                    weaknesses: document.getElementById('app-weaknesses').value.trim(),
-                    scenario1: document.getElementById('app-scenario1').value.trim(),
-                    scenario2: document.getElementById('app-scenario2').value.trim(),
-                    availability: document.getElementById('app-availability').value.trim(),
-                    motivation: document.getElementById('app-motivation').value.trim(),
-                    track: 'staff',
-                    status: 'pending',
-                    submitted: new Date().toISOString()
-                };
+            <div class="field"><label for="af5" id="whyLabel">Why do you want to join?</label><textarea class="textarea" id="af5" required></textarea></div>
+            <div class="field"><label for="af6" id="expLabel">Relevant experience</label><textarea class="textarea" id="af6"></textarea></div>
 
-                // Validate required fields
-                const required = ['minecraft', 'position', 'mcExp', 'discordExp', 'strengths', 'weaknesses', 'scenario1', 'scenario2', 'availability', 'motivation'];
-                for (const field of required) {
-                    if (!application[field]) {
-                        window.ATL_toast(`Please fill in all required fields`, 'error');
-                        return;
-                    }
-                }
+            <div class="eyebrow mt-24" style="margin-bottom:12px;">Scenario questions</div>
+            <div class="field"><label id="scenario1Label" for="af7"></label><textarea class="textarea" id="af7" required></textarea></div>
+            <div class="field"><label id="scenario2Label" for="af8"></label><textarea class="textarea" id="af8" required></textarea></div>
 
-                submitBtn.disabled = true;
-                submitBtn.textContent = 'Submitting...';
+            <div class="eyebrow mt-24" style="margin-bottom:12px;">Terms &amp; conditions</div>
+            <label class="checkbox-row mt-8"><input type="checkbox" id="tc1" required><span>I have read and agree to the Staff Application Terms &amp; Conditions.</span></label>
+            <label class="checkbox-row mt-16"><input type="checkbox" id="tc2" required><span>I understand submitting an application does not guarantee acceptance.</span></label>
 
-                try {
-                    // Save to KV store
-                    const applications = await window.ATL_SESSION.loadStore('applications', []);
-                    applications.push(application);
-                    await window.ATL_SESSION.saveStore('applications', applications);
+            <button class="btn btn-primary btn-block mt-24" type="submit" id="submitAppBtn">Submit Application</button>
+          </form>
+        </div>
+      </div>
 
-                    // Show success
-                    form.style.display = 'none';
-                    successDiv.style.display = 'block';
-                    window.ATL_toast('Application submitted successfully! 🎉', 'success');
+    </div>
+  </section>
+</main>
 
-                } catch (error) {
-                    console.error('Error submitting application:', error);
-                    errorDiv.style.display = 'block';
-                    errorDiv.innerHTML = `<p>❌ Failed to submit application: ${error.message}</p>`;
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Submit Application';
-                }
-            });
+<script src="assets/js/data.js"></script>
+<script src="assets/js/session.js"></script>
+<script src="assets/js/nav.js"></script>
+<script src="assets/js/backgrounds.js"></script>
+<script src="assets/js/cursor.js"></script>
 
-            // --- Handle session updates ---
-            window.addEventListener('session-update', function() {
-                const newSession = window.ATL_SESSION.current();
-                if (!newSession.authenticated) {
-                    window.location.reload();
-                }
-            });
-        });
-    </script>
+<script type="module">
+  ATL_mountBackground('staff-applications');
+  const session = ATL_initShell('staff-applications.html');
+
+  const TRACKS = {
+    staff: {
+      label: 'Staff',
+      formTitle: 'Staff application form',
+      requirements: [
+        '30+ days as a verified member of the Discord server',
+        'No active moderation strikes in the last 60 days',
+        'Comfortable communicating in written and voice chat',
+        'Available at least 4 hours a week for the role',
+        'Solid understanding of the tier system and current rules'
+      ],
+      responsibilities: [
+        'Enforcing server rules fairly and consistently',
+        'Assisting members with questions about testing and tiers',
+        'Escalating disputes to Managers rather than resolving publicly',
+        'Representing the platform professionally at all times'
+      ],
+      whyLabel: 'Why do you want to join staff?',
+      expLabel: 'Relevant experience (moderation, community work)',
+      scenarios: [
+        'A member is accusing a Tester of unfair grading in public chat. What do you do?',
+        'You witness a fellow staff member breaking server rules. How do you handle it?'
+      ],
+      showGamemodes: false
+    },
+    tester: {
+      label: 'Tier-Tester',
+      formTitle: 'Tier-Tester application form',
+      requirements: [
+        '14+ days as a verified member of the Discord server',
+        'No active moderation strikes',
+        'Demonstrated skill in at least one gamemode you want to test',
+        'Solid understanding of the official tier scale and testing rules',
+        'Available to run test sessions on a regular basis'
+      ],
+      responsibilities: [
+        'Evaluating candidates fairly using only the official tier scale',
+        'Logging tier results promptly with accurate assignment dates',
+        'Staying current on meta or rule changes for your certified gamemodes',
+        'Escalating disputed results rather than resolving them unilaterally'
+      ],
+      whyLabel: 'Why do you want to become a tester?',
+      expLabel: 'Your combat experience in the gamemodes selected above',
+      scenarios: [
+        "You're testing a candidate in Sumo and they disconnect mid-match claiming lag. How do you proceed?",
+        "Two testers disagree on whether a candidate's Bridges run deserves A or A-. How do you handle the discrepancy?"
+      ],
+      showGamemodes: true
+    }
+  };
+
+  let currentTrack = null;
+  const stepSelect = document.getElementById('stepSelect');
+  const stepLoginGate = document.getElementById('stepLoginGate');
+  const stepForm = document.getElementById('stepForm');
+
+  function show(step){
+    stepSelect.classList.toggle('hidden', step!=='select');
+    stepLoginGate.classList.toggle('hidden', step!=='login');
+    stepForm.classList.toggle('hidden', step!=='form');
+    window.scrollTo({ top: 0, behavior:'smooth' });
+  }
+
+  document.querySelectorAll('[data-track]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      currentTrack = btn.dataset.track;
+      if(!session.authenticated){
+        document.getElementById('gateTrackLabel').textContent = TRACKS[currentTrack].label;
+        document.getElementById('gateTitle').textContent = `Login to apply for ${TRACKS[currentTrack].label}`;
+        show('login');
+      } else {
+        openForm(currentTrack);
+      }
+    });
+  });
+
+  document.getElementById('gateBackBtn').addEventListener('click', ()=> show('select'));
+  document.getElementById('formBackBtn').addEventListener('click', ()=> show('select'));
+  document.getElementById('gateLoginBtn').addEventListener('click', ATL_SESSION.loginWithDiscord);
+
+  function openForm(track){
+    const t = TRACKS[track];
+    document.getElementById('formEyebrow').textContent = t.label + ' application';
+    document.getElementById('formTitle').textContent = t.formTitle;
+    document.getElementById('reqList').innerHTML = t.requirements.map(r=>`<li class="text-sm" style="color:var(--text-1);">• ${r}</li>`).join('');
+    document.getElementById('respList').innerHTML = t.responsibilities.map(r=>`<li class="text-sm" style="color:var(--text-1);">• ${r}</li>`).join('');
+    document.getElementById('whyLabel').textContent = t.whyLabel;
+    document.getElementById('expLabel').textContent = t.expLabel;
+    document.getElementById('scenario1Label').textContent = t.scenarios[0];
+    document.getElementById('scenario2Label').textContent = t.scenarios[1];
+
+    const gmField = document.getElementById('gamemodeField');
+    gmField.classList.toggle('hidden', !t.showGamemodes);
+    if(t.showGamemodes){
+      document.getElementById('gmCheckboxes').innerHTML = ATL_DATA.GAMEMODES.map(g=>`
+        <label class="checkbox-row" style="background:var(--panel-2); padding:6px 10px; border-radius:var(--r-full); border:1px solid var(--glass-brd);">
+          <input type="checkbox" value="${g.id}" class="gmCheck"> <span>${g.label}</span>
+        </label>`).join('');
+    }
+
+    if(session.authenticated){
+      document.getElementById('af1').value = session.user.username;
+    }
+
+    show('form');
+  }
+
+  const form = document.getElementById('appForm');
+  form.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    if(!document.getElementById('tc1').checked || !document.getElementById('tc2').checked){
+      ATL_toast('Please accept both terms checkboxes.', 'error'); return;
+    }
+    const t = TRACKS[currentTrack];
+    let gamemodes = [];
+    if(t.showGamemodes){
+      gamemodes = Array.from(document.querySelectorAll('.gmCheck:checked')).map(c=>c.value);
+      if(gamemodes.length === 0){ ATL_toast('Select at least one gamemode.', 'error'); return; }
+    }
+    const apps = await ATL_SESSION.loadStore('applications', []);
+    apps.push({
+      id: Date.now(),
+      track: currentTrack,
+      username: document.getElementById('af1').value,
+      age: document.getElementById('af2').value,
+      timezone: document.getElementById('af3').value,
+      gamemodes,
+      why: document.getElementById('af5').value,
+      experience: document.getElementById('af6').value,
+      scenario1: document.getElementById('af7').value,
+      scenario2: document.getElementById('af8').value,
+      submitted: new Date().toISOString().slice(0,10),
+      status: 'pending'
+    });
+    await ATL_SESSION.saveStore('applications', apps);
+    ATL_toast(`${t.label} application submitted. Staff will review it soon.`, 'success');
+    form.reset();
+    show('select');
+  });
+</script>
 </body>
 </html>
