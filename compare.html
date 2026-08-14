@@ -1,586 +1,168 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Compare Players · Asian Tier List [1.8+]</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚔️</text></svg>">
-    <link rel="stylesheet" href="assets/css/tokens.css">
-    <link rel="stylesheet" href="assets/css/components.css">
-    <link rel="stylesheet" href="assets/css/main.css">
-    <style>
-        .compare-hero {
-            text-align: center;
-            padding: 30px 20px 20px;
-            position: relative;
-        }
-        .compare-hero h1 {
-            font-size: clamp(2rem, 5vw, 3.2rem);
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--color-red), var(--color-blue));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .compare-hero p {
-            color: var(--color-text-secondary);
-            font-size: 1.1rem;
-            margin-top: 6px;
-        }
-        
-        .compare-container {
-            display: grid;
-            grid-template-columns: 1fr auto 1fr;
-            gap: 20px;
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-            align-items: start;
-        }
-        
-        .player-card {
-            background: var(--color-surface);
-            border-radius: var(--radius-lg);
-            padding: 24px;
-            border: 2px solid var(--color-border);
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            min-height: 400px;
-        }
-        .player-card.blue {
-            border-color: var(--color-blue);
-            box-shadow: 0 0 30px rgba(69, 123, 157, 0.2);
-        }
-        .player-card.blue::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--color-blue), var(--color-blue-light));
-        }
-        .player-card.red {
-            border-color: var(--color-red);
-            box-shadow: 0 0 30px rgba(230, 57, 70, 0.2);
-        }
-        .player-card.red::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--color-red), var(--color-red-light));
-        }
-        
-        .player-card .skin-display {
-            width: 100px;
-            height: 100px;
-            margin: 0 auto 12px;
-            border-radius: 50%;
-            border: 3px solid var(--color-border);
-            overflow: hidden;
-            background: var(--color-background);
-            position: relative;
-        }
-        .player-card.blue .skin-display { border-color: var(--color-blue); }
-        .player-card.red .skin-display { border-color: var(--color-red); }
-        
-        .player-card .skin-display img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            image-rendering: pixelated;
-        }
-        
-        .player-card .player-name {
-            font-size: 1.4rem;
-            font-weight: 700;
-            text-align: center;
-            color: var(--color-text);
-        }
-        .player-card .player-discord {
-            text-align: center;
-            color: var(--color-text-secondary);
-            font-size: 0.85rem;
-            margin-top: 2px;
-        }
-        .player-card .overall-tier {
-            text-align: center;
-            margin: 10px 0;
-            font-size: 1.8rem;
-            font-weight: 800;
-        }
-        
-        .stat-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 6px 16px;
-            margin-top: 14px;
-            padding-top: 14px;
-            border-top: 1px solid var(--color-border);
-        }
-        .stat-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 3px 0;
-            font-size: 0.85rem;
-        }
-        .stat-item .label {
-            color: var(--color-text-secondary);
-        }
-        .stat-item .value {
-            color: var(--color-text);
-            font-weight: 600;
-        }
-        
-        .gamemode-tiers {
-            margin-top: 14px;
-            padding-top: 14px;
-            border-top: 1px solid var(--color-border);
-        }
-        .gamemode-tier-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 3px 0;
-            font-size: 0.85rem;
-        }
-        .gamemode-tier-row .gm {
-            color: var(--color-text-secondary);
-        }
-        .gamemode-tier-row .tier {
-            font-weight: 700;
-        }
-        
-        .vs-divider {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 0 10px;
-            font-size: 2.5rem;
-            font-weight: 900;
-            color: var(--color-text-secondary);
-            opacity: 0.4;
-            user-select: none;
-        }
-        .vs-divider .line {
-            width: 2px;
-            height: 50px;
-            background: var(--color-border);
-            margin: 6px 0;
-        }
-        
-        .search-section {
-            max-width: 800px;
-            margin: 0 auto 25px;
-            padding: 0 20px;
-        }
-        .search-section .search-box {
-            display: flex;
-            gap: 10px;
-            background: var(--color-surface);
-            border-radius: var(--radius-lg);
-            padding: 6px;
-            border: 2px solid var(--color-border);
-            transition: all 0.3s ease;
-        }
-        .search-section .search-box:focus-within {
-            border-color: var(--color-blue);
-            box-shadow: 0 0 25px rgba(69, 123, 157, 0.15);
-        }
-        .search-section .search-box input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            padding: 10px 16px;
-            color: var(--color-text);
-            font-size: 0.95rem;
-            outline: none;
-        }
-        .search-section .search-box input::placeholder {
-            color: var(--color-text-secondary);
-            opacity: 0.6;
-        }
-        .search-section .search-box button {
-            padding: 10px 24px;
-            background: linear-gradient(135deg, var(--color-red), var(--color-blue));
-            border: none;
-            border-radius: var(--radius-md);
-            color: white;
-            font-weight: 700;
-            cursor: pointer;
-            transition: transform 0.2s ease;
-        }
-        .search-section .search-box button:hover {
-            transform: scale(1.03);
-        }
-        .search-section .search-box button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .search-examples {
-            text-align: center;
-            margin-top: 8px;
-            color: var(--color-text-secondary);
-            font-size: 0.85rem;
-        }
-        .search-examples .example {
-            color: var(--color-blue);
-            cursor: pointer;
-            transition: color 0.2s;
-            display: inline-block;
-            margin: 0 4px;
-            font-weight: 500;
-        }
-        .search-examples .example:hover {
-            color: var(--color-red);
-        }
-        
-        .no-player {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--color-text-secondary);
-        }
-        .no-player .icon {
-            font-size: 3rem;
-            margin-bottom: 12px;
-            opacity: 0.5;
-        }
-        
-        .loading-spinner {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--color-text-secondary);
-        }
-        .loading-spinner .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid var(--color-border);
-            border-top-color: var(--color-blue);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin: 0 auto 12px;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        .error-message {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--color-red);
-        }
-        .error-message .icon {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-        
-        @media (max-width: 900px) {
-            .compare-container {
-                grid-template-columns: 1fr;
-                gap: 30px;
-            }
-            .vs-divider {
-                flex-direction: row;
-                padding: 10px 0;
-            }
-            .vs-divider .line {
-                width: 50px;
-                height: 2px;
-                margin: 0 10px;
-            }
-        }
-        @media (max-width: 480px) {
-            .stat-grid {
-                grid-template-columns: 1fr;
-            }
-            .search-section .search-box {
-                flex-direction: column;
-            }
-            .search-section .search-box button {
-                width: 100%;
-            }
-            .player-card .skin-display {
-                width: 80px;
-                height: 80px;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Compare Players — Asian Tier List [1.8+]</title>
+<meta name="description" content="Compare two players' tiers side by side.">
+<link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/css/main.css">
 </head>
 <body>
-    <div id="app">
-        <nav id="main-nav"></nav>
-        
-        <div class="compare-hero">
-            <h1>⚔️ Player Comparison</h1>
-            <p>Head-to-head stats and tier comparison</p>
-        </div>
-        
-        <div class="search-section">
-            <div class="search-box">
-                <input type="text" id="compare-search" placeholder="Search a player to compare... e.g., sheluvs1ztx, shizeen, svynzz">
-                <button onclick="searchPlayer()" id="search-btn">Compare</button>
-            </div>
-            <div class="search-examples">
-                Try: 
-                <span class="example" onclick="loadExample('sheluvs1ztx')">sheluvs1ztx</span> · 
-                <span class="example" onclick="loadExample('shizeen')">shizeen</span> · 
-                <span class="example" onclick="loadExample('svynzz')">svynzz</span>
-            </div>
-        </div>
-        
-        <div class="compare-container" id="compare-container">
-            <div class="player-card blue" id="player-a-card">
-                <div class="no-player">
-                    <div class="icon">👤</div>
-                    <p>Select a player to compare</p>
-                </div>
-            </div>
-            
-            <div class="vs-divider">
-                <span>VS</span>
-                <div class="line"></div>
-            </div>
-            
-            <div class="player-card red" id="player-b-card">
-                <div class="no-player">
-                    <div class="icon">👤</div>
-                    <p>Select a player to compare</p>
-                </div>
-            </div>
-        </div>
-        
-        <footer id="main-footer"></footer>
+<main>
+  <section class="page-hero">
+    <div class="container">
+      <div class="eyebrow">Head to head</div>
+      <h1 class="h-title" style="font-size:clamp(32px,5vw,52px);">Compare Players</h1>
+      <p class="h-sub" style="max-width:640px;">Put two players side by side — tiers, gamemodes, and (once connected) live server stats.</p>
     </div>
-    
-    <script src="assets/js/data.js"></script>
-    <script src="assets/js/session.js"></script>
-    <script src="assets/js/nav.js"></script>
-    <script src="assets/js/backgrounds.js"></script>
-    <script>
-        // ============================================================
-        // FROST PRACTICE API CONFIGURATION
-        // ============================================================
-        const FROST_API = {
-            baseUrl: 'http://localhost:8080', // CHANGE THIS TO YOUR SERVER
-            endpoints: {
-                player: '/api/stats?player=',
-                tier: '/api/tier?player='
-            }
-        };
-        // ============================================================
-        
-        let currentPlayerA = null;
-        let currentPlayerB = null;
-        let isLoading = false;
-        
-        function getTierColor(tier) {
-            const colors = {
-                'S': '#ff6b6b',
-                'S-': '#ff8a8a',
-                'A+': '#4ecdc4',
-                'A': '#45b7d1',
-                'A-': '#6ec8d9',
-                'B+': '#f9ca24',
-                'B': '#f6b93b',
-                'B-': '#f8a5c2',
-                'C+': '#a29bfe',
-                'C': '#6c5ce7',
-                'C-': '#fd79a8',
-                'D+': '#dfe6e9',
-                'D': '#b2bec3',
-                'D-': '#636e72'
-            };
-            return colors[tier] || '#ffffff';
-        }
-        
-        async function fetchPlayerData(username) {
-            try {
-                // Fetch stats from Frost Practice server
-                const statsResponse = await fetch(`${FROST_API.baseUrl}${FROST_API.endpoints.player}${encodeURIComponent(username)}`);
-                if (!statsResponse.ok) {
-                    throw new Error(`Server returned ${statsResponse.status}`);
-                }
-                const stats = await statsResponse.json();
-                
-                // Fetch tier data
-                const tierResponse = await fetch(`${FROST_API.baseUrl}${FROST_API.endpoints.tier}${encodeURIComponent(username)}`);
-                let tiers = {};
-                if (tierResponse.ok) {
-                    tiers = await tierResponse.json();
-                }
-                
-                return {
-                    username: stats.username || username,
-                    discord: stats.discord || `${username}#0000`,
-                    skin: `https://crafatar.com/avatars/${encodeURIComponent(username)}?size=100`,
-                    overall: tiers.overall || 'N/A',
-                    stats: {
-                        wins: stats.wins || 0,
-                        losses: stats.losses || 0,
-                        kd: stats.kd || 0,
-                        elo: stats.elo || 0,
-                        games: stats.games || 0,
-                        winRate: stats.winRate || 0
-                    },
-                    gamemodes: tiers.gamemodes || {}
-                };
-            } catch (error) {
-                console.error('Error fetching player data:', error);
-                throw error;
-            }
-        }
-        
-        function renderPlayerCard(cardId, data) {
-            const card = document.getElementById(cardId);
-            if (!data) {
-                card.innerHTML = `
-                    <div class="no-player">
-                        <div class="icon">👤</div>
-                        <p>Select a player to compare</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            const tierColor = getTierColor(data.overall);
-            
-            // Define gamemodes order
-            const gamemodes = ['BedWars', 'Fireball Fight', 'Sumo', 'Nodebuff', 'Boxing', 'BUHC', 'Bridges'];
-            let gamemodeHTML = '';
-            gamemodes.forEach(gm => {
-                const tier = data.gamemodes[gm] || 'N/A';
-                const color = getTierColor(tier);
-                gamemodeHTML += `
-                    <div class="gamemode-tier-row">
-                        <span class="gm">${gm}</span>
-                        <span class="tier" style="color: ${color}">${tier}</span>
-                    </div>
-                `;
-            });
-            
-            card.innerHTML = `
-                <div class="skin-display">
-                    <img src="${data.skin}" alt="Minecraft skin of ${data.username}" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22%3E%3Crect width=%22100%22 height=%22100%22 fill=%22%23333%22/%3E%3Ctext x=%2250%22 y=%2255%22 text-anchor=%22middle%22 fill=%22%23666%22 font-size=%2240%22%3E?%3C/text%3E%3C/svg%3E'">
-                </div>
-                <div class="player-name">${data.username}</div>
-                <div class="player-discord">${data.discord}</div>
-                <div class="overall-tier" style="color: ${tierColor}">${data.overall}</div>
-                
-                <div class="stat-grid">
-                    <div class="stat-item"><span class="label">Wins</span><span class="value">${data.stats.wins}</span></div>
-                    <div class="stat-item"><span class="label">Losses</span><span class="value">${data.stats.losses}</span></div>
-                    <div class="stat-item"><span class="label">K/D</span><span class="value">${data.stats.kd}</span></div>
-                    <div class="stat-item"><span class="label">ELO</span><span class="value">${data.stats.elo}</span></div>
-                    <div class="stat-item"><span class="label">Games</span><span class="value">${data.stats.games}</span></div>
-                    <div class="stat-item"><span class="label">Win Rate</span><span class="value">${data.stats.winRate}%</span></div>
-                </div>
-                
-                <div class="gamemode-tiers">
-                    ${gamemodeHTML}
-                </div>
-            `;
-        }
-        
-        function showLoading(cardId) {
-            const card = document.getElementById(cardId);
-            card.innerHTML = `
-                <div class="loading-spinner">
-                    <div class="spinner"></div>
-                    <p>Loading player data...</p>
-                </div>
-            `;
-        }
-        
-        function showError(cardId, message) {
-            const card = document.getElementById(cardId);
-            card.innerHTML = `
-                <div class="error-message">
-                    <div class="icon">❌</div>
-                    <p>${message}</p>
-                    <p style="font-size: 0.85rem; margin-top: 8px; color: var(--color-text-secondary)">Try: sheluvs1ztx, shizeen, svynzz</p>
-                </div>
-            `;
-        }
-        
-        async function searchPlayer() {
-            if (isLoading) return;
-            
-            const input = document.getElementById('compare-search');
-            const query = input.value.trim();
-            if (!query) return;
-            
-            const btn = document.getElementById('search-btn');
-            btn.disabled = true;
-            btn.textContent = 'Searching...';
-            isLoading = true;
-            
-            try {
-                const playerData = await fetchPlayerData(query);
-                
-                // Check if player exists
-                if (!playerData || playerData.stats.games === 0) {
-                    showError('player-a-card', `Player "${query}" not found on Frost Practice`);
-                    btn.disabled = false;
-                    btn.textContent = 'Compare';
-                    isLoading = false;
-                    return;
-                }
-                
-                // Assign to slots
-                if (!currentPlayerA) {
-                    currentPlayerA = playerData;
-                    renderPlayerCard('player-a-card', playerData);
-                } else if (!currentPlayerB) {
-                    currentPlayerB = playerData;
-                    renderPlayerCard('player-b-card', playerData);
-                } else {
-                    // Both filled - shift: B becomes A, new player becomes B
-                    currentPlayerA = currentPlayerB;
-                    currentPlayerB = playerData;
-                    renderPlayerCard('player-a-card', currentPlayerA);
-                    renderPlayerCard('player-b-card', currentPlayerB);
-                }
-                
-                input.value = '';
-            } catch (error) {
-                console.error('Search error:', error);
-                showError('player-a-card', `Failed to fetch player data: ${error.message}`);
-            }
-            
-            btn.disabled = false;
-            btn.textContent = 'Compare';
-            isLoading = false;
-        }
-        
-        function loadExample(username) {
-            document.getElementById('compare-search').value = username;
-            // Reset comparison
-            currentPlayerA = null;
-            currentPlayerB = null;
-            renderPlayerCard('player-a-card', null);
-            renderPlayerCard('player-b-card', null);
-            searchPlayer();
-        }
-        
-        // Enter key support
-        document.getElementById('compare-search').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') searchPlayer();
-        });
-        
-        // Initialize with example on load
-        window.addEventListener('load', function() {
-            // Load first example automatically
-            setTimeout(() => {
-                loadExample('sheluvs1ztx');
-            }, 500);
-        });
-    </script>
+  </section>
+
+  <section class="section" style="padding-top:0;">
+    <div class="container">
+      <div class="glass card">
+        <div class="grid-2">
+          <div class="field" style="margin-bottom:0;">
+            <label style="color:var(--blue-400);">Player A</label>
+            <input class="input" id="inputA" placeholder="Discord or Minecraft username">
+          </div>
+          <div class="field" style="margin-bottom:0;">
+            <label style="color:var(--red-400);">Player B</label>
+            <input class="input" id="inputB" placeholder="Discord or Minecraft username">
+          </div>
+        </div>
+        <button class="btn btn-primary btn-block mt-16" id="compareBtn">Compare</button>
+      </div>
+
+      <div class="mt-32" id="compareResult"></div>
+    </div>
+  </section>
+</main>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/session.js"></script>
+<script src="assets/js/nav.js"></script>
+<script src="assets/js/backgrounds.js"></script>
+<script src="assets/js/cursor.js"></script>
+<script type="module">
+  window.ATL_skinFallback = function(img, mcUsername){
+    const seed = mcUsername || 'guest';
+    img.onerror = null;
+    img.src = `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(seed)}&backgroundColor=141a29`;
+  };
+
+  ATL_mountBackground('compare');
+  ATL_initShell('compare.html');
+
+  const resultEl = document.getElementById('compareResult');
+
+  async function findPlayer(query){
+    query = query.trim().toLowerCase();
+    if(!query) return null;
+    const [known, staff, testers, mcLinks] = await Promise.all([
+      ATL_SESSION.loadStore('known_users', { byUsername:{}, byId:{} }),
+      ATL_SESSION.loadStore('staff', []),
+      ATL_SESSION.loadStore('testers', []),
+      ATL_SESSION.loadStore('mc_usernames', {})
+    ]);
+
+    // exact username match on a real account first
+    let account = known.byUsername && known.byUsername[query];
+    // else match by linked minecraft username
+    if(!account){
+      const mcMatchId = Object.keys(mcLinks).find(id => (mcLinks[id]||'').toLowerCase() === query);
+      if(mcMatchId && known.byId) account = known.byId[mcMatchId];
+    }
+    if(account){
+      const tierRecord = await ATL_SESSION.loadStore('tier_'+account.id, null);
+      return { discordId: account.id, username: account.username, display: account.display, avatar: account.avatar, mcUsername: mcLinks[account.id]||'', roles: account.roles && account.roles.length ? account.roles : (account.role?[account.role]:[]), tierRecord };
+    }
+
+    // fall back to staff/tester roster (may not have a real login yet)
+    const rosterMatch = staff.find(s=>s.username.toLowerCase()===query) || testers.find(t=>t.username.toLowerCase()===query);
+    if(rosterMatch){
+      return { discordId:null, username: rosterMatch.username, display: rosterMatch.display||rosterMatch.username, avatar:null, mcUsername: rosterMatch.mcUsername||'', roles:[rosterMatch.role||rosterMatch.rank], tierRecord:null };
+    }
+    return null;
+  }
+
+  function playerColumn(p, color, label){
+    if(!p){
+      return `<div class="glass card" style="text-align:center; border-color:rgba(${color},.25);">
+        <div class="eyebrow" style="justify-content:center; color:rgb(${color});">${label}</div>
+        <div class="empty-state" style="padding:40px 12px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <h3 style="font-size:16px;">Not found</h3>
+        </div>
+      </div>`;
+    }
+    return `<div class="glass card" style="text-align:center; border-color:rgba(${color},.3);">
+      <div class="eyebrow" style="justify-content:center; color:rgb(${color});">${label}</div>
+      <div style="display:flex; justify-content:center; margin:16px 0;">
+        ${p.mcUsername
+          ? `<img class="avatar-sq" src="${ATL_DATA.mcBodyUrl(p.mcUsername,7)}" alt="Minecraft skin of ${p.mcUsername}" style="height:150px; image-rendering:pixelated;" onerror="ATL_skinFallback(this,'${p.mcUsername.replace(/'/g,"")}')">`
+          : `<img class="avatar-sq" src="${p.avatar || `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(p.username)}&backgroundColor=141a29`}" alt="${p.username}" style="width:96px;height:96px;object-fit:cover;">`}
+      </div>
+      <div style="font-family:var(--f-sub); font-weight:700; font-size:17px; color:var(--text-0);">${p.display}</div>
+      <div class="text-sm text-muted mono">@${p.username}</div>
+      <div class="mt-8" style="display:flex; gap:6px; flex-wrap:wrap; justify-content:center;">
+        ${(p.roles||[]).filter(Boolean).map(r=>ATL_roleBadge(r)).join('')}
+      </div>
+      <div class="mt-16">
+        <div class="text-sm text-muted">Overall tier</div>
+        <div class="mt-8" style="display:flex; justify-content:center;">${p.tierRecord && p.tierRecord.overall ? ATL_hex(p.tierRecord.overall) : '<span class="text-muted text-sm">Not yet tested</span>'}</div>
+      </div>
+    </div>`;
+  }
+
+  document.getElementById('compareBtn').addEventListener('click', async ()=>{
+    resultEl.innerHTML = `<div class="glass empty-state"><p class="text-sm text-muted">Comparing…</p></div>`;
+    const [a, b] = await Promise.all([
+      findPlayer(document.getElementById('inputA').value),
+      findPlayer(document.getElementById('inputB').value)
+    ]);
+
+    if(!a && !b){
+      resultEl.innerHTML = `<div class="glass empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <h3>Neither player found</h3>
+        <p>Enter usernames for players who have signed in, or been added as staff/testers.</p>
+      </div>`;
+      return;
+    }
+
+    const gmRows = ATL_DATA.GAMEMODES.map(g=>{
+      const ta = a && a.tierRecord && a.tierRecord.gamemodes[g.id];
+      const tb = b && b.tierRecord && b.tierRecord.gamemodes[g.id];
+      return `<tr>
+        <td style="text-align:center;">${ta ? ATL_hex(ta,'sm') : '<span class="text-muted text-sm">—</span>'}</td>
+        <td class="text-muted" style="text-align:center;">${g.label}</td>
+        <td style="text-align:center;">${tb ? ATL_hex(tb,'sm') : '<span class="text-muted text-sm">—</span>'}</td>
+      </tr>`;
+    }).join('');
+
+    const statRows = ['ELO / Rating','Wins','Losses','K/D','Win rate','Games played'].map(label=>`
+      <tr><td style="text-align:center;" class="text-muted mono">N/A</td><td class="text-muted" style="text-align:center;">${label}</td><td style="text-align:center;" class="text-muted mono">N/A</td></tr>
+    `).join('');
+
+    resultEl.innerHTML = `
+      <div class="grid-2">
+        ${playerColumn(a, '58,134,255', 'Player A')}
+        ${playerColumn(b, '230,57,70', 'Player B')}
+      </div>
+
+      <div class="glass card mt-24">
+        <div class="eyebrow">Gamemode tiers</div>
+        <div class="table-wrap mt-16"><table class="dt"><tbody>${gmRows}</tbody></table></div>
+      </div>
+
+      <div class="glass card mt-24">
+        <div class="eyebrow">Server statistics</div>
+        <p class="text-sm text-muted mt-8">These come from live server stats and aren't connected yet, so they show N/A rather than made-up numbers.</p>
+        <div class="table-wrap mt-16"><table class="dt"><tbody>${statRows}</tbody></table></div>
+      </div>
+    `;
+  });
+</script>
 </body>
 </html>
