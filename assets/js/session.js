@@ -111,5 +111,49 @@ window.ATL_SESSION = (function(){
     return `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(seed)}&backgroundColor=141a29`;
   }
 
-  return { loginWithDiscord, current, logout, loadStore, saveStore, consumeCallbackHash, resolveAvatar };
+  // Given only a typed Discord username (no ID on hand — e.g. a
+  // leaderboard row, or a tester about to log a result), looks up
+  // whether that person has ever signed in and linked a Minecraft
+  // username on their Profile. Lets staff/testers set an MC username
+  // ONCE on someone's profile and have it auto-apply everywhere that
+  // person's name is entered afterward, instead of re-typing it per
+  // gamemode/leaderboard/result.
+  async function lookupLinkedMcUsername(discordUsername){
+    if(!discordUsername) return '';
+    try{
+      const known = await loadStore('known_users', { byUsername:{}, byId:{} });
+      const match = (known.byUsername && known.byUsername[discordUsername.toLowerCase()]) || known[discordUsername.toLowerCase()];
+      if(!match) return '';
+      const links = await loadStore('mc_usernames', {});
+      return links[match.id] || '';
+    }catch(e){ return ''; }
+  }
+  async function resolveByPlayerName(discordUsername, size){
+    const mc = await lookupLinkedMcUsername(discordUsername);
+    return resolveAvatar({ mcUsername: mc, discordUsername }, size);
+  }
+
+  async function fetchMcServerStatus(ip){
+    try{
+      const resp = await fetch(`${OAUTH_WORKER_URL}/api/mc-server-status?ip=${encodeURIComponent(ip)}`);
+      if(!resp.ok) return { error:'unavailable' };
+      return await resp.json();
+    }catch(e){ return { error:'unavailable' }; }
+  }
+  async function fetchPopularServerStats(){
+    try{
+      const resp = await fetch(`${OAUTH_WORKER_URL}/api/server-stats`);
+      if(!resp.ok) return { configured:false };
+      return await resp.json();
+    }catch(e){ return { configured:false }; }
+  }
+  async function fetchPlayerServerStats(username){
+    try{
+      const resp = await fetch(`${OAUTH_WORKER_URL}/api/player-stats?username=${encodeURIComponent(username)}`);
+      if(!resp.ok) return { configured:false };
+      return await resp.json();
+    }catch(e){ return { configured:false }; }
+  }
+
+  return { loginWithDiscord, current, logout, loadStore, saveStore, consumeCallbackHash, resolveAvatar, lookupLinkedMcUsername, resolveByPlayerName, fetchMcServerStatus, fetchPopularServerStats, fetchPlayerServerStats };
 })();
