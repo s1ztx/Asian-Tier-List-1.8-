@@ -1,859 +1,154 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Frost Practice Stats · Asian Tier List [1.8+]</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
-    <link rel="stylesheet" href="assets/css/tokens.css">
-    <link rel="stylesheet" href="assets/css/components.css">
-    <link rel="stylesheet" href="assets/css/main.css">
-    <style>
-        .stats-hero {
-            text-align: center;
-            padding: 30px 20px 20px;
-            position: relative;
-        }
-        .stats-hero h1 {
-            font-size: clamp(2rem, 5vw, 3.2rem);
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--color-red), var(--color-blue));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .stats-hero p {
-            color: var(--color-text-secondary);
-            font-size: 1.1rem;
-            margin-top: 6px;
-        }
-        
-        .server-status {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 20px;
-            padding: 12px 24px;
-            background: var(--color-surface);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--color-border);
-            max-width: 600px;
-            margin: 0 auto 25px;
-            flex-wrap: wrap;
-        }
-        .server-status .status-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            display: inline-block;
-        }
-        .server-status .status-dot.online { background: #00e676; box-shadow: 0 0 10px #00e67666; }
-        .server-status .status-dot.offline { background: #ff1744; box-shadow: 0 0 10px #ff174466; }
-        .server-status .status-dot.checking { background: #ffd700; box-shadow: 0 0 10px #ffd70066; animation: pulse 1s infinite; }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.4; }
-        }
-        .server-status .stat-badge {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            color: var(--color-text-secondary);
-            font-size: 0.9rem;
-        }
-        .server-status .stat-badge .num {
-            color: var(--color-text);
-            font-weight: 700;
-        }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 20px 30px;
-        }
-        
-        .stat-card {
-            background: var(--color-surface);
-            border-radius: var(--radius-lg);
-            padding: 20px;
-            border: 1px solid var(--color-border);
-            backdrop-filter: blur(10px);
-        }
-        .stat-card.full-width {
-            grid-column: 1 / -1;
-        }
-        .stat-card h2 {
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 16px;
-            color: var(--color-text);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .stat-card h2 .badge {
-            font-size: 0.7rem;
-            background: var(--color-blue);
-            color: white;
-            padding: 2px 10px;
-            border-radius: 12px;
-            font-weight: 600;
-        }
-        .stat-card h2 .badge.online { background: #00e676; }
-        .stat-card h2 .badge.offline { background: #ff1744; }
-        
-        .player-search-box {
-            display: flex;
-            gap: 10px;
-            background: var(--color-background);
-            border-radius: var(--radius-md);
-            padding: 4px;
-            border: 2px solid var(--color-border);
-            transition: all 0.3s ease;
-        }
-        .player-search-box:focus-within {
-            border-color: var(--color-blue);
-        }
-        .player-search-box input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            padding: 10px 14px;
-            color: var(--color-text);
-            font-size: 0.95rem;
-            outline: none;
-        }
-        .player-search-box input::placeholder {
-            color: var(--color-text-secondary);
-            opacity: 0.6;
-        }
-        .player-search-box button {
-            padding: 10px 20px;
-            background: linear-gradient(135deg, var(--color-red), var(--color-blue));
-            border: none;
-            border-radius: var(--radius-md);
-            color: white;
-            font-weight: 700;
-            cursor: pointer;
-            transition: transform 0.2s ease;
-        }
-        .player-search-box button:hover {
-            transform: scale(1.03);
-        }
-        .player-search-box button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .search-examples {
-            text-align: center;
-            margin-top: 8px;
-            color: var(--color-text-secondary);
-            font-size: 0.85rem;
-        }
-        .search-examples .example {
-            color: var(--color-blue);
-            cursor: pointer;
-            transition: color 0.2s;
-            display: inline-block;
-            margin: 0 4px;
-            font-weight: 500;
-        }
-        .search-examples .example:hover {
-            color: var(--color-red);
-        }
-        
-        .player-stats-display {
-            display: grid;
-            grid-template-columns: auto 1fr;
-            gap: 16px 24px;
-            align-items: start;
-        }
-        .player-stats-display .skin-large {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            border: 3px solid var(--color-border);
-            overflow: hidden;
-            image-rendering: pixelated;
-        }
-        .player-stats-display .skin-large img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .player-stats-display .info h3 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin: 0;
-        }
-        .player-stats-display .info .discord {
-            color: var(--color-text-secondary);
-            font-size: 0.9rem;
-        }
-        .player-stats-display .info .tier {
-            font-size: 1.8rem;
-            font-weight: 800;
-            margin: 4px 0;
-        }
-        
-        .stats-mini-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            gap: 10px;
-            margin-top: 14px;
-            padding-top: 14px;
-            border-top: 1px solid var(--color-border);
-        }
-        .stats-mini-grid .mini-stat {
-            text-align: center;
-        }
-        .stats-mini-grid .mini-stat .num {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--color-text);
-        }
-        .stats-mini-grid .mini-stat .label {
-            font-size: 0.75rem;
-            color: var(--color-text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .gamemode-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-        .gamemode-stats .gm-stat {
-            background: var(--color-background);
-            padding: 12px 16px;
-            border-radius: var(--radius-md);
-            border: 1px solid var(--color-border);
-        }
-        .gamemode-stats .gm-stat .gm-name {
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: var(--color-text);
-        }
-        .gamemode-stats .gm-stat .gm-detail {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.8rem;
-            color: var(--color-text-secondary);
-            margin-top: 4px;
-        }
-        .gamemode-stats .gm-stat .gm-detail .tier-badge {
-            font-weight: 700;
-        }
-        
-        .leaderboard-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .leaderboard-table th {
-            text-align: left;
-            padding: 8px 12px;
-            color: var(--color-text-secondary);
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-bottom: 1px solid var(--color-border);
-        }
-        .leaderboard-table td {
-            padding: 8px 12px;
-            border-bottom: 1px solid var(--color-border);
-            font-size: 0.9rem;
-        }
-        .leaderboard-table tr:hover td {
-            background: var(--color-surface-hover);
-        }
-        .leaderboard-table .rank {
-            font-weight: 700;
-            color: var(--color-text-secondary);
-            width: 40px;
-        }
-        .leaderboard-table .rank.top1 { color: #ffd700; }
-        .leaderboard-table .rank.top2 { color: #c0c0c0; }
-        .leaderboard-table .rank.top3 { color: #cd7f32; }
-        .leaderboard-table .player-cell {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .leaderboard-table .player-cell .mini-skin {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            overflow: hidden;
-            image-rendering: pixelated;
-            border: 1px solid var(--color-border);
-        }
-        .leaderboard-table .player-cell .mini-skin img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .leaderboard-table .player-cell .name {
-            font-weight: 600;
-        }
-        .leaderboard-table .elo {
-            font-weight: 700;
-            color: var(--color-blue);
-        }
-        
-        .no-data {
-            text-align: center;
-            padding: 30px 20px;
-            color: var(--color-text-secondary);
-        }
-        .no-data .icon {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            opacity: 0.5;
-        }
-        
-        .loading-spinner {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--color-text-secondary);
-        }
-        .loading-spinner .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid var(--color-border);
-            border-top-color: var(--color-blue);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin: 0 auto 12px;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        .error-message {
-            text-align: center;
-            padding: 30px 20px;
-            color: var(--color-red);
-        }
-        .error-message .icon {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-        
-        .gamemode-filter {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 16px;
-        }
-        .gamemode-filter button {
-            padding: 4px 14px;
-            background: var(--color-background);
-            border: 1px solid var(--color-border);
-            border-radius: 12px;
-            color: var(--color-text-secondary);
-            cursor: pointer;
-            font-size: 0.8rem;
-            transition: all 0.2s ease;
-        }
-        .gamemode-filter button:hover {
-            border-color: var(--color-blue);
-            color: var(--color-text);
-        }
-        .gamemode-filter button.active {
-            background: var(--color-blue);
-            border-color: var(--color-blue);
-            color: white;
-        }
-        
-        @media (max-width: 900px) {
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-            .stat-card.full-width {
-                grid-column: 1;
-            }
-            .player-stats-display {
-                grid-template-columns: 1fr;
-                text-align: center;
-            }
-            .player-stats-display .skin-large {
-                margin: 0 auto;
-            }
-            .gamemode-stats {
-                grid-template-columns: 1fr;
-            }
-        }
-        @media (max-width: 480px) {
-            .server-status {
-                flex-direction: column;
-                gap: 8px;
-                padding: 16px;
-            }
-            .stats-mini-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-            .player-search-box {
-                flex-direction: column;
-            }
-            .player-search-box button {
-                width: 100%;
-            }
-            .leaderboard-table {
-                font-size: 0.8rem;
-            }
-            .leaderboard-table .player-cell .mini-skin {
-                width: 22px;
-                height: 22px;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Server Stats — Asian Tier List [1.8+]</title>
+<meta name="description" content="Live server status and player statistics for popular servers.">
+<link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/css/main.css">
 </head>
 <body>
-    <div id="app">
-        <nav id="main-nav"></nav>
-        
-        <div class="stats-hero">
-            <h1>📊 Frost Practice Stats</h1>
-            <p>Real-time server statistics and player rankings</p>
-        </div>
-        
-        <!-- Server Status -->
-        <div class="server-status" id="server-status">
-            <div>
-                <span class="status-dot checking" id="status-dot"></span>
-                <span id="status-text">Checking...</span>
-            </div>
-            <div class="stat-badge">
-                👥 <span class="num" id="players-online">--</span> online
-            </div>
-            <div class="stat-badge">
-                ⏱️ <span class="num" id="uptime">--</span>
-            </div>
-            <div class="stat-badge">
-                📌 <span class="num" id="server-version">--</span>
-            </div>
-        </div>
-        
-        <div class="stats-grid">
-            <!-- Player Search -->
-            <div class="stat-card full-width">
-                <h2>🔍 Find Player</h2>
-                <div class="player-search-box">
-                    <input type="text" id="stats-search" placeholder="Search Minecraft username... e.g., sheluvs1ztx, shizeen, svynzz">
-                    <button onclick="searchStatsPlayer()" id="stats-search-btn">Search</button>
-                </div>
-                <div class="search-examples">
-                    Try: 
-                    <span class="example" onclick="loadStatsExample('sheluvs1ztx')">sheluvs1ztx</span> · 
-                    <span class="example" onclick="loadStatsExample('shizeen')">shizeen</span> · 
-                    <span class="example" onclick="loadStatsExample('svynzz')">svynzz</span>
-                </div>
-            </div>
-            
-            <!-- Player Stats -->
-            <div class="stat-card full-width" id="player-stats-card">
-                <h2>👤 Player Statistics <span class="badge" id="stats-badge">Live</span></h2>
-                <div id="stats-content">
-                    <div class="no-data" id="stats-placeholder">
-                        <div class="icon">🔍</div>
-                        <p>Search for a player to view their stats</p>
-                        <p style="font-size: 0.85rem; margin-top: 4px;">Try searching sheluvs1ztx, shizeen, or svynzz</p>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Leaderboard -->
-            <div class="stat-card full-width">
-                <h2>🏆 Top Players <span class="badge">Global</span></h2>
-                <div class="gamemode-filter" id="leaderboard-filter">
-                    <button class="active" data-gamemode="global">🌍 Global</button>
-                    <button data-gamemode="bedwars">BedWars</button>
-                    <button data-gamemode="fireball">Fireball</button>
-                    <button data-gamemode="sumo">Sumo</button>
-                    <button data-gamemode="nodebuff">Nodebuff</button>
-                    <button data-gamemode="boxing">Boxing</button>
-                    <button data-gamemode="buhc">BUHC</button>
-                    <button data-gamemode="bridges">Bridges</button>
-                </div>
-                <div id="leaderboard-content">
-                    <div class="loading-spinner" id="leaderboard-loading">
-                        <div class="spinner"></div>
-                        <p>Loading leaderboard...</p>
-                    </div>
-                    <table class="leaderboard-table" id="leaderboard-table" style="display:none;">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Player</th>
-                                <th>ELO</th>
-                                <th>Wins</th>
-                                <th>Losses</th>
-                                <th>K/D</th>
-                            </tr>
-                        </thead>
-                        <tbody id="leaderboard-body">
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        
-        <footer id="main-footer"></footer>
+<main>
+  <section class="page-hero">
+    <div class="container">
+      <div class="eyebrow">Popular Servers</div>
+      <h1 class="h-title" style="font-size:clamp(32px,5vw,52px);">Server Stats</h1>
+      <p class="h-sub" style="max-width:640px;">Live status straight from the server, plus per-player statistics once they're connected.</p>
     </div>
-    
-    <script src="assets/js/data.js"></script>
-    <script src="assets/js/session.js"></script>
-    <script src="assets/js/nav.js"></script>
-    <script src="assets/js/backgrounds.js"></script>
-    <script>
-        // ============================================================
-        // FROST PRACTICE API CONFIGURATION
-        // ============================================================
-        const FROST_API = {
-            baseUrl: 'http://localhost:8080', // CHANGE THIS TO YOUR SERVER
-            endpoints: {
-                player: '/api/stats?player=',
-                leaderboard: '/api/leaderboard',
-                server: '/api/server-status',
-                tier: '/api/tier?player='
-            }
-        };
-        // ============================================================
-        
-        let currentGamemode = 'global';
-        
-        function getTierColor(tier) {
-            const colors = {
-                'S': '#ff6b6b',
-                'S-': '#ff8a8a',
-                'A+': '#4ecdc4',
-                'A': '#45b7d1',
-                'A-': '#6ec8d9',
-                'B+': '#f9ca24',
-                'B': '#f6b93b',
-                'B-': '#f8a5c2',
-                'C+': '#a29bfe',
-                'C': '#6c5ce7',
-                'C-': '#fd79a8',
-                'D+': '#dfe6e9',
-                'D': '#b2bec3',
-                'D-': '#636e72'
-            };
-            return colors[tier] || '#ffffff';
-        }
-        
-        // ============================================================
-        // SERVER STATUS
-        // ============================================================
-        async function fetchServerStatus() {
-            const dot = document.getElementById('status-dot');
-            const text = document.getElementById('status-text');
-            const online = document.getElementById('players-online');
-            const uptime = document.getElementById('uptime');
-            const version = document.getElementById('server-version');
-            
-            try {
-                const response = await fetch(`${FROST_API.baseUrl}${FROST_API.endpoints.server}`);
-                if (!response.ok) throw new Error('Server unreachable');
-                const data = await response.json();
-                
-                dot.className = 'status-dot online';
-                text.textContent = 'Online';
-                online.textContent = data.players_online || 0;
-                uptime.textContent = data.uptime || '0d 0h';
-                version.textContent = data.version || '1.8.8';
-            } catch (error) {
-                console.error('Server status error:', error);
-                dot.className = 'status-dot offline';
-                text.textContent = 'Offline';
-                online.textContent = '0';
-                uptime.textContent = '--';
-                version.textContent = '--';
-            }
-        }
-        
-        // ============================================================
-        // PLAYER STATS
-        // ============================================================
-        async function fetchPlayerStats(username) {
-            try {
-                const response = await fetch(`${FROST_API.baseUrl}${FROST_API.endpoints.player}${encodeURIComponent(username)}`);
-                if (!response.ok) {
-                    if (response.status === 404) {
-                        throw new Error('Player not found');
-                    }
-                    throw new Error(`Server error: ${response.status}`);
-                }
-                return await response.json();
-            } catch (error) {
-                console.error('Error fetching player stats:', error);
-                throw error;
-            }
-        }
-        
-        async function fetchPlayerTier(username) {
-            try {
-                const response = await fetch(`${FROST_API.baseUrl}${FROST_API.endpoints.tier}${encodeURIComponent(username)}`);
-                if (!response.ok) return null;
-                return await response.json();
-            } catch (error) {
-                console.error('Error fetching player tier:', error);
-                return null;
-            }
-        }
-        
-        async function displayPlayerStats(username) {
-            const content = document.getElementById('stats-content');
-            
-            try {
-                // Show loading
-                content.innerHTML = `
-                    <div class="loading-spinner">
-                        <div class="spinner"></div>
-                        <p>Loading stats for ${username}...</p>
-                    </div>
-                `;
-                
-                // Fetch data
-                const stats = await fetchPlayerStats(username);
-                const tier = await fetchPlayerTier(username);
-                
-                // Check if player exists
-                if (!stats || stats.games === 0) {
-                    content.innerHTML = `
-                        <div class="error-message">
-                            <div class="icon">❌</div>
-                            <p>Player "${username}" not found on Frost Practice</p>
-                            <p style="font-size: 0.85rem; margin-top: 8px; color: var(--color-text-secondary)">Try: sheluvs1ztx, shizeen, svynzz</p>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                const tierColor = getTierColor(tier?.overall || 'N/A');
-                
-                let gamemodeHTML = '';
-                const gamemodes = ['BedWars', 'Fireball Fight', 'Sumo', 'Nodebuff', 'Boxing', 'BUHC', 'Bridges'];
-                gamemodes.forEach(gm => {
-                    const data = tier?.gamemodes?.[gm] || { tier: 'N/A', wins: 0, losses: 0, elo: 0 };
-                    const t = data.tier || 'N/A';
-                    const color = getTierColor(t);
-                    gamemodeHTML += `
-                        <div class="gm-stat">
-                            <div class="gm-name">${gm}</div>
-                            <div class="gm-detail">
-                                <span>${data.wins || 0}W - ${data.losses || 0}L</span>
-                                <span class="tier-badge" style="color: ${color}">${t}</span>
-                                <span>${data.elo || 0} ELO</span>
-                            </div>
-                        </div>
-                    `;
-                });
-                
-                content.innerHTML = `
-                    <div class="player-stats-display">
-                        <div class="skin-large">
-                            <img src="https://crafatar.com/avatars/${encodeURIComponent(username)}?size=100" 
-                                 alt="Minecraft skin of ${username}" 
-                                 loading="lazy"
-                                 onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22%3E%3Crect width=%22100%22 height=%22100%22 fill=%22%23333%22/%3E%3Ctext x=%2250%22 y=%2255%22 text-anchor=%22middle%22 fill=%22%23666%22 font-size=%2240%22%3E?%3C/text%3E%3C/svg%3E'">
-                        </div>
-                        <div class="info">
-                            <h3>${stats.username || username}</h3>
-                            <div class="discord">${stats.discord || `${username}#0000`}</div>
-                            <div class="tier" style="color: ${tierColor}">${tier?.overall || 'N/A'}</div>
-                        </div>
-                    </div>
-                    
-                    <div class="stats-mini-grid">
-                        <div class="mini-stat">
-                            <div class="num">${stats.wins || 0}</div>
-                            <div class="label">Wins</div>
-                        </div>
-                        <div class="mini-stat">
-                            <div class="num">${stats.losses || 0}</div>
-                            <div class="label">Losses</div>
-                        </div>
-                        <div class="mini-stat">
-                            <div class="num">${stats.kd || 0}</div>
-                            <div class="label">K/D</div>
-                        </div>
-                        <div class="mini-stat">
-                            <div class="num">${stats.elo || 0}</div>
-                            <div class="label">ELO</div>
-                        </div>
-                        <div class="mini-stat">
-                            <div class="num">${stats.games || 0}</div>
-                            <div class="label">Games</div>
-                        </div>
-                        <div class="mini-stat">
-                            <div class="num">${stats.winRate || 0}%</div>
-                            <div class="label">Win Rate</div>
-                        </div>
-                        <div class="mini-stat">
-                            <div class="num">${stats.streak || 0}</div>
-                            <div class="label">Streak</div>
-                        </div>
-                    </div>
-                    
-                    <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--color-border);">
-                        <h3 style="font-size: 1rem; margin-bottom: 12px;">🎯 Gamemode Breakdown</h3>
-                        <div class="gamemode-stats">${gamemodeHTML}</div>
-                    </div>
-                `;
-                
-            } catch (error) {
-                console.error('Error displaying player stats:', error);
-                content.innerHTML = `
-                    <div class="error-message">
-                        <div class="icon">❌</div>
-                        <p>${error.message}</p>
-                        <p style="font-size: 0.85rem; margin-top: 8px; color: var(--color-text-secondary)">Make sure Frost Practice server is running at ${FROST_API.baseUrl}</p>
-                    </div>
-                `;
-            }
-        }
-        
-        function searchStatsPlayer() {
-            const input = document.getElementById('stats-search');
-            const query = input.value.trim();
-            if (!query) return;
-            displayPlayerStats(query);
-            input.value = '';
-        }
-        
-        function loadStatsExample(username) {
-            document.getElementById('stats-search').value = username;
-            displayPlayerStats(username);
-        }
-        
-        // ============================================================
-        // LEADERBOARD
-        // ============================================================
-        async function fetchLeaderboard(gamemode = 'global') {
-            try {
-                const response = await fetch(`${FROST_API.baseUrl}${FROST_API.endpoints.leaderboard}?gamemode=${encodeURIComponent(gamemode)}`);
-                if (!response.ok) {
-                    if (response.status === 404) {
-                        return [];
-                    }
-                    throw new Error(`Server error: ${response.status}`);
-                }
-                return await response.json();
-            } catch (error) {
-                console.error('Error fetching leaderboard:', error);
-                return [];
-            }
-        }
-        
-        async function loadLeaderboard(gamemode = 'global') {
-            const loading = document.getElementById('leaderboard-loading');
-            const table = document.getElementById('leaderboard-table');
-            const tbody = document.getElementById('leaderboard-body');
-            
-            loading.style.display = 'block';
-            table.style.display = 'none';
-            
-            try {
-                const players = await fetchLeaderboard(gamemode);
-                
-                loading.style.display = 'none';
-                
-                if (!players || players.length === 0) {
-                    tbody.innerHTML = `
-                        <tr>
-                            <td colspan="6" style="text-align:center; padding: 30px; color: var(--color-text-secondary);">
-                                No players ranked in ${gamemode} yet
-                            </td>
-                        </tr>
-                    `;
-                    table.style.display = 'table';
-                    return;
-                }
-                
-                tbody.innerHTML = players.map((p, i) => {
-                    const rank = i + 1;
-                    let rankClass = 'rank';
-                    if (rank === 1) rankClass += ' top1';
-                    else if (rank === 2) rankClass += ' top2';
-                    else if (rank === 3) rankClass += ' top3';
-                    
-                    return `
-                        <tr>
-                            <td class="${rankClass}">#${rank}</td>
-                            <td>
-                                <div class="player-cell">
-                                    <div class="mini-skin">
-                                        <img src="https://crafatar.com/avatars/${encodeURIComponent(p.username)}?size=32" 
-                                             alt="Minecraft skin of ${p.username}"
-                                             loading="lazy"
-                                             onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2232%22 height=%2232%22%3E%3Crect width=%2232%22 height=%2232%22 fill=%22%23333%22/%3E%3Ctext x=%2216%22 y=%2221%22 text-anchor=%22middle%22 fill=%22%23666%22 font-size=%2214%22%3E?%3C/text%3E%3C/svg%3E'">
-                                    </div>
-                                    <span class="name">${p.username}</span>
-                                </div>
-                            </td>
-                            <td class="elo">${p.elo || 0}</td>
-                            <td>${p.wins || 0}</td>
-                            <td>${p.losses || 0}</td>
-                            <td>${p.kd || 0}</td>
-                        </tr>
-                    `;
-                }).join('');
-                
-                table.style.display = 'table';
-                
-            } catch (error) {
-                loading.style.display = 'none';
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="6" style="text-align:center; padding: 30px; color: var(--color-red);">
-                            Failed to load leaderboard: ${error.message}
-                        </td>
-                    </tr>
-                `;
-                table.style.display = 'table';
-            }
-        }
-        
-        // ============================================================
-        // EVENT LISTENERS
-        // ============================================================
-        // Enter key for search
-        document.getElementById('stats-search').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') searchStatsPlayer();
-        });
-        
-        // Gamemode filter buttons
-        document.querySelectorAll('#leaderboard-filter button').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('#leaderboard-filter button').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                currentGamemode = this.dataset.gamemode;
-                loadLeaderboard(currentGamemode);
-            });
-        });
-        
-        // ============================================================
-        // INITIALIZATION
-        // ============================================================
-        window.addEventListener('load', function() {
-            fetchServerStatus();
-            loadLeaderboard('global');
-            
-            // Auto-load a player
-            setTimeout(() => {
-                loadStatsExample('sheluvs1ztx');
-            }, 1000);
-            
-            // Refresh server status every 30 seconds
-            setInterval(fetchServerStatus, 30000);
-        });
-    </script>
+  </section>
+
+  <section class="section" style="padding-top:0;">
+    <div class="container">
+      <div class="glass card" id="serverStatusCard">
+        <div class="flex-between" style="align-items:flex-start; flex-wrap:wrap; gap:16px;">
+          <div>
+            <div class="eyebrow">Live status</div>
+            <h3 class="mt-8" id="ssTitle" style="font-size:19px;">Checking server status…</h3>
+            <p class="text-sm text-muted mono mt-8" id="ssIp">stammer-predictive.tun.ply.gg</p>
+          </div>
+          <div id="ssBadge"></div>
+        </div>
+        <div class="grid-4 mt-24" id="ssStats"></div>
+        <div id="ssPlayerList" class="mt-24"></div>
+      </div>
+
+      <div class="glass card mt-32">
+        <div class="eyebrow">Look up a player</div>
+        <h3 class="mt-8" style="font-size:19px;">Player statistics</h3>
+        <p class="text-sm text-muted mt-8">ELO, wins/losses, K/D, and per-gamemode breakdowns, once the server's stats API is connected.</p>
+        <div class="mt-16" style="display:flex; gap:10px; max-width:420px; flex-wrap:wrap;">
+          <input class="input" id="statsPlayerInput" placeholder="Minecraft username" style="flex:1; min-width:200px;">
+          <button class="btn btn-secondary" id="statsPlayerBtn" style="text-transform:none;">Look up</button>
+        </div>
+        <div class="mt-24" id="playerStatsResult"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/session.js"></script>
+<script src="assets/js/nav.js"></script>
+<script src="assets/js/backgrounds.js"></script>
+<script src="assets/js/cursor.js"></script>
+<script type="module">
+  window.ATL_skinFallback = function(img, mcUsername){
+    const seed = mcUsername || 'guest';
+    img.onerror = null;
+    img.src = `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(seed)}&backgroundColor=141a29`;
+  };
+
+  ATL_mountBackground('stats');
+  ATL_initShell('stats.html');
+
+  const SERVER_IP = 'stammer-predictive.tun.ply.gg';
+
+  async function loadServerStatus(){
+    const data = await ATL_SESSION.fetchMcServerStatus(SERVER_IP);
+    const title = document.getElementById('ssTitle');
+    const badge = document.getElementById('ssBadge');
+    const statsGrid = document.getElementById('ssStats');
+    const playerList = document.getElementById('ssPlayerList');
+
+    if(data.error){
+      title.textContent = 'Status unavailable right now';
+      badge.innerHTML = `<span class="pill pill-red">Unreachable</span>`;
+      statsGrid.innerHTML = `<div class="glass stat-card" style="grid-column: 1 / -1;"><p class="text-sm text-muted" style="margin:0;">Couldn't reach the status service for ${SERVER_IP}. It'll retry next time you load this page.</p></div>`;
+      return;
+    }
+
+    if(!data.online){
+      title.textContent = 'Server is offline';
+      badge.innerHTML = `<span class="pill pill-red"><span class="pill-dot"></span>Offline</span>`;
+      statsGrid.innerHTML = '';
+      return;
+    }
+
+    title.textContent = data.motd && data.motd.clean && data.motd.clean[0] ? data.motd.clean[0] : 'Popular Server';
+    badge.innerHTML = `<span class="pill pill-teal"><span class="pill-dot"></span>Online</span>`;
+
+    const online = data.players && typeof data.players.online === 'number' ? data.players.online : null;
+    const max = data.players && typeof data.players.max === 'number' ? data.players.max : null;
+    const version = data.version || 'Unknown';
+
+    statsGrid.innerHTML = [
+      [online!==null ? online : '—', 'Players online'],
+      [max!==null ? max : '—', 'Max players'],
+      [version, 'Version'],
+      [data.protocol && data.protocol.name ? data.protocol.name : 'Java', 'Protocol']
+    ].map(([v,l])=>`<div class="glass stat-card"><div class="s-val" style="font-size:20px;">${v}</div><div class="s-label">${l}</div></div>`).join('');
+
+    if(data.players && Array.isArray(data.players.list) && data.players.list.length){
+      playerList.innerHTML = `
+        <div class="eyebrow">Online now</div>
+        <div class="mt-16" style="display:flex; flex-wrap:wrap; gap:8px;">
+          ${data.players.list.map(name=>`
+            <div class="pill" style="gap:8px; padding:5px 12px 5px 5px;">
+              <img class="avatar-sq" src="${ATL_DATA.mcAvatarUrl(name,32)}" alt="Minecraft skin of ${name}" style="width:20px;height:20px;object-fit:cover;" onerror="ATL_skinFallback(this,'${name.replace(/'/g,"")}')">
+              ${name}
+            </div>`).join('')}
+        </div>`;
+    } else {
+      playerList.innerHTML = '';
+    }
+  }
+
+  loadServerStatus();
+
+  document.getElementById('statsPlayerBtn').addEventListener('click', async ()=>{
+    const username = document.getElementById('statsPlayerInput').value.trim();
+    const resultEl = document.getElementById('playerStatsResult');
+    if(!username){ ATL_toast('Enter a Minecraft username.', 'error'); return; }
+    resultEl.innerHTML = `<p class="text-sm text-muted">Looking up…</p>`;
+
+    const data = await ATL_SESSION.fetchPlayerServerStats(username);
+
+    if(!data.configured){
+      resultEl.innerHTML = `
+        <div class="empty-state">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="4" y="4" width="16" height="16"/><path d="M4 4l16 16M20 4L4 20"/></svg>
+          <h3>Stats aren't connected yet</h3>
+          <p>This server's stats API hasn't been wired up on the backend yet, so there's nothing real to show here — no made-up numbers either.</p>
+        </div>`;
+      return;
+    }
+    if(!data.found){
+      resultEl.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><h3>No stats found for "${username}"</h3></div>`;
+      return;
+    }
+
+    const d = data.data || {};
+    resultEl.innerHTML = `
+      <div style="display:flex; align-items:center; gap:14px; margin-bottom:18px;">
+        <img class="avatar-sq" src="${ATL_DATA.mcAvatarUrl(username,96)}" alt="Minecraft skin of ${username}" style="width:56px;height:56px;object-fit:cover; border:2px solid var(--panel-3);" onerror="ATL_skinFallback(this,'${username.replace(/'/g,"")}')">
+        <div style="font-family:var(--f-sub); font-weight:700; font-size:17px; color:var(--text-0);">${username}</div>
+      </div>
+      <div class="grid-4">
+        ${['elo','wins','losses','kd','winRate','games'].map(k=>`<div class="glass stat-card"><div class="s-val" style="font-size:18px;">${d[k] ?? 'N/A'}</div><div class="s-label">${k}</div></div>`).join('')}
+      </div>`;
+  });
+  document.getElementById('statsPlayerInput').addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('statsPlayerBtn').click(); });
+</script>
 </body>
 </html>
