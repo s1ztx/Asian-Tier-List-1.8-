@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Search — Asian Tier List [1.8+]</title>
+<meta name="description" content="Search for a player by Minecraft username, Discord username, or Discord ID.">
+<link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+<main>
+  <section class="page-hero">
+    <div class="container">
+      <div class="eyebrow">Find a player</div>
+      <h1 class="h-title" style="font-size:clamp(32px,5vw,52px);">Search</h1>
+      <p class="h-sub" style="max-width:640px;">Look up anyone who has signed in to Asian Tier List by Minecraft username, Discord username, or Discord ID.</p>
+      <div class="mt-24" style="display:flex; gap:10px; max-width:520px; flex-wrap:wrap;">
+        <input class="input" id="searchInput" placeholder="Try sheluvs1ztx, shizeen, or any player…" style="flex:1; min-width:220px;">
+        <button class="btn btn-primary" id="searchBtn">Search</button>
+      </div>
+      <div class="mt-16" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+        <span class="text-sm text-muted">Popular:</span>
+        <button class="pill" data-quick="sheluvs1ztx" style="cursor:pointer; border:1px solid var(--glass-brd);">sheluvs1ztx</button>
+        <button class="pill" data-quick="shizeen" style="cursor:pointer; border:1px solid var(--glass-brd);">shizeen</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0;">
+    <div class="container">
+      <div id="searchResults"></div>
+    </div>
+  </section>
+</main>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/session.js"></script>
+<script src="assets/js/nav.js"></script>
+<script src="assets/js/backgrounds.js"></script>
+<script src="assets/js/cursor.js"></script>
+<script type="module">
+  window.ATL_skinFallback = function(img, mcUsername){
+    const seed = mcUsername || 'guest';
+    img.onerror = null;
+    img.src = `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(seed)}&backgroundColor=141a29`;
+  };
+
+  ATL_mountBackground('search');
+  ATL_initShell('search.html');
+
+  const resultsEl = document.getElementById('searchResults');
+  const input = document.getElementById('searchInput');
+  const btn = document.getElementById('searchBtn');
+
+  function emptyState(title, body, icon){
+    resultsEl.innerHTML = `<div class="glass empty-state">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">${icon}</svg>
+      <h3>${title}</h3><p>${body}</p>
+    </div>`;
+  }
+
+  emptyState('Search for a player', 'Type a Minecraft username, Discord username, or Discord ID above to get started.', '<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>');
+
+  async function runSearch(){
+    const q = input.value.trim().toLowerCase();
+    if(!q){ emptyState('Search for a player', 'Type a Minecraft username, Discord username, or Discord ID above to get started.', '<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>'); return; }
+
+    resultsEl.innerHTML = `<div class="glass empty-state"><p class="text-sm text-muted">Searching…</p></div>`;
+
+    const [known, staff, testers, mcLinks] = await Promise.all([
+      ATL_SESSION.loadStore('known_users', { byUsername:{}, byId:{} }),
+      ATL_SESSION.loadStore('staff', []),
+      ATL_SESSION.loadStore('testers', []),
+      ATL_SESSION.loadStore('mc_usernames', {})
+    ]);
+
+    const results = new Map(); // keyed by a unique-ish identity string to dedupe
+
+    // 1) known Discord accounts (anyone who has ever logged in)
+    Object.values(known.byId || {}).forEach(u=>{
+      const mc = mcLinks[u.id] || '';
+      const haystack = [u.username, u.display, u.id, mc].filter(Boolean).join(' ').toLowerCase();
+      if(haystack.includes(q)){
+        results.set('id:'+u.id, {
+          discordId: u.id, username: u.username, display: u.display, avatar: u.avatar,
+          mcUsername: mc, roles: u.roles && u.roles.length ? u.roles : (u.role ? [u.role] : []),
+          source: 'account'
+        });
+      }
+    });
+
+    // 2) staff roster entries (may or may not correspond to a known Discord login)
+    staff.forEach(s=>{
+      const haystack = [s.username, s.display, s.mcUsername].filter(Boolean).join(' ').toLowerCase();
+      if(haystack.includes(q)){
+        const linkedId = Object.keys(known.byId||{}).find(id => known.byId[id].username.toLowerCase()===s.username.toLowerCase());
+        const key = linkedId ? 'id:'+linkedId : 'staff:'+s.username.toLowerCase();
+        const existing = results.get(key) || {};
+        results.set(key, { ...existing, discordId: linkedId||existing.discordId, username: s.username, display: s.display||s.username, avatar: existing.avatar, mcUsername: s.mcUsername||existing.mcUsername, roles: [...(existing.roles||[]), s.role], source:'staff' });
+      }
+    });
+
+    // 3) tester roster entries
+    testers.forEach(t=>{
+      const haystack = [t.username, t.display, t.mcUsername].filter(Boolean).join(' ').toLowerCase();
+      if(haystack.includes(q)){
+        const linkedId = Object.keys(known.byId||{}).find(id => known.byId[id].username.toLowerCase()===t.username.toLowerCase());
+        const key = linkedId ? 'id:'+linkedId : 'tester:'+t.username.toLowerCase();
+        const existing = results.get(key) || {};
+        results.set(key, { ...existing, discordId: linkedId||existing.discordId, username: t.username, display: t.display||t.username, avatar: existing.avatar, mcUsername: t.mcUsername||existing.mcUsername, roles: [...(existing.roles||[]), t.rank], source:'tester' });
+      }
+    });
+
+    const list = Array.from(results.values());
+
+    if(list.length === 0){
+      emptyState('No matching player found', `Nobody who has signed in, been added as staff, or been added as a tester matches "${input.value.trim()}".`, '<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>');
+      return;
+    }
+
+    resultsEl.innerHTML = `<div class="grid-3" id="resultsGrid"></div>`;
+    const grid = document.getElementById('resultsGrid');
+    grid.innerHTML = list.map((r,i)=>`
+      <div class="glass card card-hover" style="text-align:center;">
+        <div style="display:flex; justify-content:center; margin-bottom:14px;">
+          ${r.mcUsername
+            ? `<img data-idx="${i}" class="skin-thumb avatar-sq" src="${ATL_DATA.mcAvatarUrl(r.mcUsername,96)}" alt="Minecraft skin of ${r.mcUsername}" style="width:72px;height:72px;object-fit:cover;border:2px solid var(--panel-3);" onerror="ATL_skinFallback(this,'${r.mcUsername.replace(/'/g,"")}')">`
+            : `<img class="avatar-sq" src="${r.avatar || `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(r.username)}&backgroundColor=141a29`}" alt="${r.username}" style="width:72px;height:72px;object-fit:cover;border:2px solid var(--panel-3);">`}
+        </div>
+        <div style="font-family:var(--f-sub); font-weight:700; color:var(--text-0);">${r.display}</div>
+        <div class="text-sm text-muted mono">@${r.username}</div>
+        <div class="mt-8" style="display:flex; gap:6px; flex-wrap:wrap; justify-content:center;">
+          ${(r.roles||[]).filter(Boolean).slice(0,2).map(role=>ATL_roleBadge(role)).join('')}
+        </div>
+        ${r.discordId
+          ? `<a href="profile.html?id=${r.discordId}" class="btn btn-ghost btn-sm mt-16" style="text-transform:none;">View Profile</a>`
+          : `<span class="text-sm text-muted mt-16" style="display:block;">Hasn't signed in yet</span>`}
+      </div>
+    `).join('');
+  }
+
+  btn.addEventListener('click', runSearch);
+  input.addEventListener('keydown', e=>{ if(e.key==='Enter') runSearch(); });
+  document.querySelectorAll('[data-quick]').forEach(chip=>{
+    chip.addEventListener('click', ()=>{ input.value = chip.dataset.quick; runSearch(); });
+  });
+</script>
+</body>
+</html>
