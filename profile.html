@@ -19,11 +19,33 @@
 <script src="assets/js/cursor.js"></script>
 
 <script type="module">
+  window.ATL_skinFallback = function(img, mcUsername){
+    const parent = img.parentElement;
+    if(!parent) return;
+    parent.innerHTML = '';
+    const div = document.createElement('div');
+    div.className = 'skin-empty';
+    const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    icon.setAttribute('viewBox', '0 0 24 24');
+    icon.setAttribute('fill', 'none');
+    icon.setAttribute('stroke', 'currentColor');
+    icon.setAttribute('stroke-width', '1.4');
+    icon.innerHTML = '<rect x="4" y="4" width="16" height="16"/><path d="M4 4l16 16M20 4L4 20"/>';
+    const span = document.createElement('span');
+    span.textContent = `Couldn't load a skin for "${mcUsername}"`;
+    div.appendChild(icon); div.appendChild(span);
+    parent.appendChild(div);
+  };
+
   ATL_mountBackground('profile');
   const session = ATL_initShell('profile.html');
   const root = document.getElementById('profileRoot');
 
-  if(!session.authenticated){
+  const params = new URLSearchParams(location.search);
+  const viewId = params.get('id');
+  const isOwnProfile = !viewId || (session.authenticated && viewId === session.user.id);
+
+  if(!viewId && !session.authenticated){
     root.innerHTML = `
       <div class="glass empty-state" style="margin-top:40px;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
@@ -33,20 +55,46 @@
       </div>`;
     document.getElementById('profileLogin').addEventListener('click', ATL_SESSION.loginWithDiscord);
   } else {
-    const u = session.user;
-    const links = await ATL_SESSION.loadStore('mc_usernames', {});
-    const mcUsername = links[u.id] || '';
-    const tierRecord = await ATL_SESSION.loadStore('tier_'+u.id, null);
+    let u, mcUsername, tierRecord, notFound = false;
 
-    root.innerHTML = `
+    if(isOwnProfile){
+      u = session.user;
+      const links = await ATL_SESSION.loadStore('mc_usernames', {});
+      mcUsername = links[u.id] || '';
+      tierRecord = await ATL_SESSION.loadStore('tier_'+u.id, null);
+    } else {
+      const known = await ATL_SESSION.loadStore('known_users', { byUsername:{}, byId:{} });
+      const match = known.byId && known.byId[viewId];
+      if(!match){
+        notFound = true;
+      } else {
+        u = match;
+        const links = await ATL_SESSION.loadStore('mc_usernames', {});
+        mcUsername = links[viewId] || '';
+        tierRecord = await ATL_SESSION.loadStore('tier_'+viewId, null);
+      }
+    }
+
+    if(notFound){
+      root.innerHTML = `
+        <div class="glass empty-state" style="margin-top:40px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <h3>Player not found</h3>
+          <p>This account hasn't signed in to Asian Tier List yet, so there's no profile to show.</p>
+          <a href="search.html" class="btn btn-ghost mt-16" style="text-transform:none;">Back to Search</a>
+        </div>`;
+    } else {
+      const roles = u.roles && u.roles.length ? u.roles : (u.role ? [u.role] : []);
+
+      root.innerHTML = `
       <div class="glass card" style="padding:0; overflow:hidden; margin-top:20px;">
         <div style="height:150px; background:linear-gradient(120deg, rgba(230,57,70,.35), rgba(58,134,255,.35)), radial-gradient(circle at 20% 20%, rgba(255,255,255,.08), transparent 60%); position:relative;"></div>
         <div style="padding:0 28px 26px;">
           <div style="display:flex; align-items:flex-end; gap:22px; margin-top:-64px; flex-wrap:wrap;">
             <div class="skin-hero pixel-frame">
               ${mcUsername ? `
-                <img src="${ATL_DATA.mcBodyUrl(mcUsername,8)}" alt="${mcUsername}'s Minecraft skin"
-                  onerror="this.parentElement.innerHTML='<div class=&quot;skin-empty&quot;><svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.4&quot;><rect x=&quot;4&quot; y=&quot;4&quot; width=&quot;16&quot; height=&quot;16&quot;/></svg><span>Couldn\\'t load a skin for &quot;'+${JSON.stringify(mcUsername)}+'&quot;</span></div>'">
+                <img src="${ATL_DATA.mcBodyUrl(mcUsername,8)}" alt="Minecraft skin of ${mcUsername}" data-mcname="${mcUsername}"
+                  onerror="ATL_skinFallback(this, this.dataset.mcname)">
               ` : `
                 <div class="skin-empty">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="4" y="4" width="16" height="16"/></svg>
@@ -63,13 +111,14 @@
               <div class="text-sm text-muted mono">@${u.username} · ID ${u.id}</div>
             </div>
             <div style="margin-left:auto; padding-bottom:6px;">
-              <button class="btn btn-outline-red btn-sm" id="logoutBtn" style="text-transform:none;">Log out</button>
+              ${isOwnProfile ? '<button class="btn btn-outline-red btn-sm" id="logoutBtn" style="text-transform:none;">Log out</button>' : ''}
             </div>
           </div>
           <div class="mt-16" style="display:flex; gap:8px; flex-wrap:wrap;">
-            ${u.roles.map(r=>ATL_roleBadge(r)).join('')}
+            ${roles.length ? roles.map(r=>ATL_roleBadge(r)).join('') : '<span class="text-sm text-muted">Member</span>'}
           </div>
 
+          ${isOwnProfile ? `
           <div class="glass card mt-24" style="background:rgba(255,255,255,.02);">
             <div class="eyebrow">Minecraft account</div>
             <p class="text-sm text-muted mt-8" style="margin-bottom:14px;">Link your Minecraft username to show your real skin here, on the leaderboards, and anywhere else your name appears.</p>
@@ -78,11 +127,11 @@
               <button class="btn btn-secondary btn-sm" id="mcSave" style="text-transform:none;">${mcUsername?'Update':'Link account'}</button>
               ${mcUsername?'<button class="btn btn-ghost btn-sm" id="mcUnlink" style="text-transform:none;">Unlink</button>':''}
             </div>
-          </div>
+          </div>` : ''}
 
           <div class="grid-3 mt-24">
-            <div class="glass stat-card"><div class="s-label">Highest role</div><div class="s-val" style="font-size:20px;">${u.highestRole}</div></div>
-            <div class="glass stat-card"><div class="s-label">Server join date</div><div class="s-val" style="font-size:20px;">${u.joined}</div></div>
+            <div class="glass stat-card"><div class="s-label">Highest role</div><div class="s-val" style="font-size:20px;">${u.highestRole || u.role || roles[0] || 'Member'}</div></div>
+            <div class="glass stat-card"><div class="s-label">Server join date</div><div class="s-val" style="font-size:20px;">${u.joined || '—'}</div></div>
             <div class="glass stat-card"><div class="s-label">Overall highest tier</div><div style="margin-top:6px;">${tierRecord && tierRecord.overall ? ATL_hex(tierRecord.overall,'sm') : '<span class="text-muted text-sm">Not yet tested</span>'}</div></div>
           </div>
         </div>
@@ -99,47 +148,51 @@
       <div class="table-wrap glass" id="historyWrap"></div>
     `;
 
-    document.getElementById('mcSave').addEventListener('click', async ()=>{
-      const val = document.getElementById('mcInput').value.trim();
-      if(!val){ ATL_toast('Enter a Minecraft username.', 'error'); return; }
-      const current = await ATL_SESSION.loadStore('mc_usernames', {});
-      current[u.id] = val;
-      await ATL_SESSION.saveStore('mc_usernames', current);
-      ATL_toast('Minecraft account linked.', 'success');
-      location.reload();
-    });
-    const mcUnlinkBtn = document.getElementById('mcUnlink');
-    if(mcUnlinkBtn) mcUnlinkBtn.addEventListener('click', async ()=>{
-      const current = await ATL_SESSION.loadStore('mc_usernames', {});
-      delete current[u.id];
-      await ATL_SESSION.saveStore('mc_usernames', current);
-      ATL_toast('Minecraft account unlinked.', 'success');
-      location.reload();
-    });
+      if(isOwnProfile){
+        document.getElementById('mcSave').addEventListener('click', async ()=>{
+          const val = document.getElementById('mcInput').value.trim();
+          if(!val){ ATL_toast('Enter a Minecraft username.', 'error'); return; }
+          const current = await ATL_SESSION.loadStore('mc_usernames', {});
+          current[u.id] = val;
+          await ATL_SESSION.saveStore('mc_usernames', current);
+          ATL_toast('Minecraft account linked.', 'success');
+          location.reload();
+        });
+        const mcUnlinkBtn = document.getElementById('mcUnlink');
+        if(mcUnlinkBtn) mcUnlinkBtn.addEventListener('click', async ()=>{
+          const current = await ATL_SESSION.loadStore('mc_usernames', {});
+          delete current[u.id];
+          await ATL_SESSION.saveStore('mc_usernames', current);
+          ATL_toast('Minecraft account unlinked.', 'success');
+          location.reload();
+        });
+        const logoutBtn = document.getElementById('logoutBtn');
+        if(logoutBtn) logoutBtn.addEventListener('click', ATL_SESSION.logout);
+      }
 
-    const gmGrid = document.getElementById('gmTierGrid');
-    document.getElementById('logoutBtn').addEventListener('click', ATL_SESSION.logout);
-    gmGrid.innerHTML = ATL_DATA.GAMEMODES.map(g=>{
-      const t = tierRecord && tierRecord.gamemodes[g.id];
-      return `<div class="glass card" style="text-align:center;">
-        <div class="text-sm text-muted">${g.label}</div>
-        <div class="mt-16">${t ? ATL_hex(t,'sm') : '<span class="text-muted text-sm">—</span>'}</div>
-      </div>`;
-    }).join('');
+      const gmGrid = document.getElementById('gmTierGrid');
+      gmGrid.innerHTML = ATL_DATA.GAMEMODES.map(g=>{
+        const t = tierRecord && tierRecord.gamemodes[g.id];
+        return `<div class="glass card" style="text-align:center;">
+          <div class="text-sm text-muted">${g.label}</div>
+          <div class="mt-16">${t ? ATL_hex(t,'sm') : '<span class="text-muted text-sm">—</span>'}</div>
+        </div>`;
+      }).join('');
 
-    const historyWrap = document.getElementById('historyWrap');
-    const history = (tierRecord && tierRecord.history) || [];
-    if(history.length === 0){
-      historyWrap.innerHTML = `<div class="empty-state">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
-        <h3>No tier assignments yet</h3>
-        <p>Request a test to start building your tier history.</p>
-      </div>`;
-    } else {
-      historyWrap.innerHTML = `<table class="dt">
-        <thead><tr><th>Gamemode</th><th>Tier</th><th>Tester</th><th>Assigned</th></tr></thead>
-        <tbody>${history.map(h=>`<tr><td>${(ATL_DATA.GAMEMODES.find(x=>x.id===h.gamemode)||{label:h.gamemode}).label}</td><td>${ATL_hex(h.tier,'sm')}</td><td class="text-muted">${h.tester}</td><td class="mono text-muted">${h.date}</td></tr>`).join('')}</tbody>
-      </table>`;
+      const historyWrap = document.getElementById('historyWrap');
+      const history = (tierRecord && tierRecord.history) || [];
+      if(history.length === 0){
+        historyWrap.innerHTML = `<div class="empty-state">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+          <h3>No tier assignments yet</h3>
+          <p>${isOwnProfile ? 'Request a test to start building your tier history.' : 'This player hasn\u2019t been tested yet.'}</p>
+        </div>`;
+      } else {
+        historyWrap.innerHTML = `<table class="dt">
+          <thead><tr><th>Gamemode</th><th>Tier</th><th>Tester</th><th>Assigned</th></tr></thead>
+          <tbody>${history.map(h=>`<tr><td>${(ATL_DATA.GAMEMODES.find(x=>x.id===h.gamemode)||{label:h.gamemode}).label}</td><td>${ATL_hex(h.tier,'sm')}</td><td class="text-muted">${h.tester}</td><td class="mono text-muted">${h.date}</td></tr>`).join('')}</tbody>
+        </table>`;
+      }
     }
   }
 </script>
