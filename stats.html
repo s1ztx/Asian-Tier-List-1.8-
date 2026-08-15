@@ -36,7 +36,7 @@
       <div class="glass card mt-32">
         <div class="eyebrow">Look up a player</div>
         <h3 class="mt-8" style="font-size:19px;">Player statistics</h3>
-        <p class="text-sm text-muted mt-8">ELO, wins/losses, K/D, and per-gamemode breakdowns, once the server's stats API is connected.</p>
+        <p class="text-sm text-muted mt-8">Wins, losses, K/D, and win rate — reported by testers after real matches, not pulled from any external server.</p>
         <div class="mt-16" style="display:flex; gap:10px; max-width:420px; flex-wrap:wrap;">
           <input class="input" id="statsPlayerInput" placeholder="Minecraft username" style="flex:1; min-width:200px;">
           <button class="btn btn-secondary" id="statsPlayerBtn" style="text-transform:none;">Look up</button>
@@ -63,8 +63,11 @@
   ATL_initShell('stats.html');
 
   const SERVER_IP = 'stammer-predictive.tun.ply.gg';
+  let statusRefreshing = false;
 
   async function loadServerStatus(){
+    if(statusRefreshing) return;
+    statusRefreshing = true;
     const data = await ATL_SESSION.fetchMcServerStatus(SERVER_IP);
     const title = document.getElementById('ssTitle');
     const badge = document.getElementById('ssBadge');
@@ -74,7 +77,8 @@
     if(data.error){
       title.textContent = 'Status unavailable right now';
       badge.innerHTML = `<span class="pill pill-red">Unreachable</span>`;
-      statsGrid.innerHTML = `<div class="glass stat-card" style="grid-column: 1 / -1;"><p class="text-sm text-muted" style="margin:0;">Couldn't reach the status service for ${SERVER_IP}. It'll retry next time you load this page.</p></div>`;
+      statsGrid.innerHTML = `<div class="glass stat-card" style="grid-column: 1 / -1;"><p class="text-sm text-muted" style="margin:0;">Couldn't reach the status service for ${SERVER_IP}. It'll retry automatically.</p></div>`;
+      statusRefreshing = false;
       return;
     }
 
@@ -82,6 +86,8 @@
       title.textContent = 'Server is offline';
       badge.innerHTML = `<span class="pill pill-red"><span class="pill-dot"></span>Offline</span>`;
       statsGrid.innerHTML = '';
+      playerList.innerHTML = '';
+      statusRefreshing = false;
       return;
     }
 
@@ -112,9 +118,11 @@
     } else {
       playerList.innerHTML = '';
     }
+    statusRefreshing = false;
   }
 
   loadServerStatus();
+  setInterval(loadServerStatus, 30000);
 
   document.getElementById('statsPlayerBtn').addEventListener('click', async ()=>{
     const username = document.getElementById('statsPlayerInput').value.trim();
@@ -122,30 +130,34 @@
     if(!username){ ATL_toast('Enter a Minecraft username.', 'error'); return; }
     resultEl.innerHTML = `<p class="text-sm text-muted">Looking up…</p>`;
 
-    const data = await ATL_SESSION.fetchPlayerServerStats(username);
+    const allStats = await ATL_SESSION.loadStore('player_stats', {});
+    const d = allStats[username.toLowerCase()];
 
-    if(!data.configured){
+    if(!d){
       resultEl.innerHTML = `
         <div class="empty-state">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="4" y="4" width="16" height="16"/><path d="M4 4l16 16M20 4L4 20"/></svg>
-          <h3>Stats aren't connected yet</h3>
-          <p>This server's stats API hasn't been wired up on the backend yet, so there's nothing real to show here — no made-up numbers either.</p>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <h3>No stats found for "${username}"</h3>
+          <p>Nobody has reported a match result for this player yet. Testers can log one from the Tester Panel.</p>
         </div>`;
       return;
     }
-    if(!data.found){
-      resultEl.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><h3>No stats found for "${username}"</h3></div>`;
-      return;
-    }
 
-    const d = data.data || {};
+    const kd = d.deaths>0 ? (d.kills/d.deaths).toFixed(2) : d.kills;
+    const winRate = d.games>0 ? Math.round((d.wins/d.games)*100)+'%' : 'N/A';
     resultEl.innerHTML = `
       <div style="display:flex; align-items:center; gap:14px; margin-bottom:18px;">
         <img class="avatar-sq" src="${ATL_DATA.mcAvatarUrl(username,96)}" alt="Minecraft skin of ${username}" style="width:56px;height:56px;object-fit:cover; border:2px solid var(--panel-3);" onerror="ATL_skinFallback(this,'${username.replace(/'/g,"")}')">
-        <div style="font-family:var(--f-sub); font-weight:700; font-size:17px; color:var(--text-0);">${username}</div>
+        <div>
+          <div style="font-family:var(--f-sub); font-weight:700; font-size:17px; color:var(--text-0);">${d.username}</div>
+          <div class="text-sm text-muted">Last reported by ${d.reportedBy||'—'}</div>
+        </div>
       </div>
       <div class="grid-4">
-        ${['elo','wins','losses','kd','winRate','games'].map(k=>`<div class="glass stat-card"><div class="s-val" style="font-size:18px;">${d[k] ?? 'N/A'}</div><div class="s-label">${k}</div></div>`).join('')}
+        <div class="glass stat-card"><div class="s-val" style="font-size:18px;">${d.wins}-${d.losses}</div><div class="s-label">Win-loss</div></div>
+        <div class="glass stat-card"><div class="s-val" style="font-size:18px;">${kd}</div><div class="s-label">K/D</div></div>
+        <div class="glass stat-card"><div class="s-val" style="font-size:18px;">${winRate}</div><div class="s-label">Win rate</div></div>
+        <div class="glass stat-card"><div class="s-val" style="font-size:18px;">${d.games}</div><div class="s-label">Games</div></div>
       </div>`;
   });
   document.getElementById('statsPlayerInput').addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('statsPlayerBtn').click(); });
