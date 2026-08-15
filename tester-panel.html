@@ -70,6 +70,7 @@
           <h5>Testing</h5>
           <div class="panel-tab" data-view="requests">Test Requests</div>
           <div class="panel-tab" data-view="submit">Submit Tier Result</div>
+          <div class="panel-tab" data-view="matchstats">Report Match Stats</div>
         </div>
         ${canReviewApps ? `
         <div class="panel-nav-group">
@@ -110,6 +111,30 @@
           </div>
         </div>
 
+        <div class="panel-view" id="view-matchstats">
+          <div class="glass card" style="max-width:560px;">
+            <div class="eyebrow">Real match data</div>
+            <h3 class="mt-8">Report a match result</h3>
+            <p class="text-sm text-muted mt-8">Log a real result you tested or witnessed — it feeds Compare and the Stats page directly. This is staff-attested data, not pulled from any external server.</p>
+            <div class="field mt-16"><label>Minecraft username</label><input class="input" id="msPlayer" placeholder="e.g. kairo_ace"></div>
+            <div class="field"><label>Gamemode</label><select class="select" id="msGm">${ATL_DATA.GAMEMODES.map(g=>`<option value="${g.id}">${g.label}</option>`).join('')}</select></div>
+            <div class="grid-2">
+              <div class="field"><label>Result</label><select class="select" id="msResult"><option value="win">Win</option><option value="loss">Loss</option></select></div>
+              <div class="field"><label>Games (usually 1)</label><input class="input" type="number" id="msGames" value="1" min="1"></div>
+            </div>
+            <div class="grid-2">
+              <div class="field"><label>Kills</label><input class="input" type="number" id="msKills" value="0" min="0"></div>
+              <div class="field"><label>Deaths</label><input class="input" type="number" id="msDeaths" value="0" min="0"></div>
+            </div>
+            <button class="btn btn-primary btn-block" id="submitMatchStats">Report Result</button>
+          </div>
+
+          <div class="glass card mt-24">
+            <div class="eyebrow">Recently reported</div>
+            <div class="table-wrap mt-16" id="recentStatsWrap"></div>
+          </div>
+        </div>
+
         <div class="panel-view" id="view-applications">
           <div class="table-wrap glass" id="testerAppsWrap"></div>
         </div>
@@ -125,7 +150,7 @@
       </div>
     </div>`;
 
-    const TAB_TITLES = { dashboard:'Dashboard', requests:'Test Requests', submit:'Submit Tier Result', applications:'Tester Applications', profile:'My Certification' };
+    const TAB_TITLES = { dashboard:'Dashboard', requests:'Test Requests', submit:'Submit Tier Result', matchstats:'Report Match Stats', applications:'Tester Applications', profile:'My Certification' };
     root.querySelectorAll('.panel-tab, [data-goto]').forEach(el=>{
       el.addEventListener('click', ()=>{
         const target = el.dataset.view || el.dataset.goto;
@@ -133,6 +158,7 @@
         root.querySelectorAll('.panel-view').forEach(v=>v.classList.toggle('active', v.id==='view-'+target));
         document.title = `${TAB_TITLES[target]||'Tester Panel'} · Tester Panel — Asian Tier List [1.8+]`;
         if(target==='applications') renderTesterApplications();
+        if(target==='matchstats') renderRecentStats();
       });
     });
 
@@ -157,6 +183,52 @@
       document.getElementById('subPlayer').value=''; document.getElementById('subMc').value='';
       renderRequestsAndStats();
     });
+
+    document.getElementById('submitMatchStats').addEventListener('click', async ()=>{
+      const username = document.getElementById('msPlayer').value.trim();
+      if(!username){ ATL_toast('Enter a Minecraft username.', 'error'); return; }
+      const gamemode = document.getElementById('msGm').value;
+      const result = document.getElementById('msResult').value;
+      const games = Math.max(1, parseInt(document.getElementById('msGames').value,10) || 1);
+      const kills = Math.max(0, parseInt(document.getElementById('msKills').value,10) || 0);
+      const deaths = Math.max(0, parseInt(document.getElementById('msDeaths').value,10) || 0);
+
+      const stats = await ATL_SESSION.loadStore('player_stats', {});
+      const key = username.toLowerCase();
+      const rec = stats[key] || { username, wins:0, losses:0, kills:0, deaths:0, games:0, gamemodes:{} };
+      rec.username = username;
+      rec.games += games;
+      rec.wins += result==='win' ? 1 : 0;
+      rec.losses += result==='loss' ? 1 : 0;
+      rec.kills += kills;
+      rec.deaths += deaths;
+      const gm = rec.gamemodes[gamemode] || { wins:0, losses:0, games:0 };
+      gm.games += games; gm.wins += result==='win'?1:0; gm.losses += result==='loss'?1:0;
+      rec.gamemodes[gamemode] = gm;
+      rec.reportedBy = session.user.display;
+      rec.updatedAt = new Date().toISOString();
+      stats[key] = rec;
+      await ATL_SESSION.saveStore('player_stats', stats);
+      await audit('Reported match stats', `${username} · ${result} in ${gamemode}`);
+
+      document.getElementById('msPlayer').value='';
+      document.getElementById('msKills').value='0'; document.getElementById('msDeaths').value='0'; document.getElementById('msGames').value='1';
+      ATL_toast(`Recorded ${result} for ${username}.`, 'success');
+      renderRecentStats();
+    });
+
+    async function renderRecentStats(){
+      const wrap = document.getElementById('recentStatsWrap');
+      if(!wrap) return;
+      const stats = await ATL_SESSION.loadStore('player_stats', {});
+      const rows = Object.values(stats).sort((a,b)=> new Date(b.updatedAt||0)-new Date(a.updatedAt||0)).slice(0,15);
+      if(rows.length===0){
+        wrap.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 12h18M3 6h18M3 18h18"/></svg><h3>No match results reported yet</h3><p>Reports you and other testers log will show up here.</p></div>`;
+        return;
+      }
+      wrap.innerHTML = `<table class="dt"><thead><tr><th>Player</th><th>W/L</th><th>K/D</th><th>Games</th><th>Reported by</th></tr></thead>
+        <tbody>${rows.map(r=>`<tr><td>${r.username}</td><td class="mono">${r.wins}-${r.losses}</td><td class="mono">${r.deaths>0?(r.kills/r.deaths).toFixed(2):r.kills}</td><td class="mono">${r.games}</td><td class="text-muted">${r.reportedBy||'—'}</td></tr>`).join('')}</tbody></table>`;
+    }
   }
 
   async function logTierResult(player, gamemode, tier, mcUsername){
