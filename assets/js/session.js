@@ -140,20 +140,6 @@ window.ATL_SESSION = (function(){
       return await resp.json();
     }catch(e){ return { error:'unavailable' }; }
   }
-  async function fetchPopularServerStats(){
-    try{
-      const resp = await fetch(`${OAUTH_WORKER_URL}/api/server-stats`);
-      if(!resp.ok) return { configured:false };
-      return await resp.json();
-    }catch(e){ return { configured:false }; }
-  }
-  async function fetchPlayerServerStats(username){
-    try{
-      const resp = await fetch(`${OAUTH_WORKER_URL}/api/player-stats?username=${encodeURIComponent(username)}`);
-      if(!resp.ok) return { configured:false };
-      return await resp.json();
-    }catch(e){ return { configured:false }; }
-  }
 
-  return { loginWithDiscord, current, logout, loadStore, saveStore, consumeCallbackHash, resolveAvatar, lookupLinkedMcUsername, resolveByPlayerName, fetchMcServerStatus, fetchPopularServerStats, fetchPlayerServerStats };
+  return { loginWithDiscord, current, logout, loadStore, saveStore, consumeCallbackHash, resolveAvatar, lookupLinkedMcUsername, resolveByPlayerName, fetchMcServerStatus };
 })();
