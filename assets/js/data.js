@@ -67,10 +67,13 @@ window.ATL_DATA = {
   },
 
   // Minecraft skin avatars via Crafatar (free, no key, resolves by username server-side)
+  // mc-heads.net: free, CORS-enabled, no key required, resolves real
+  // Minecraft skins by username. (Previously used Crafatar, which has
+  // been intermittently down for months — swapped for reliability.)
   mcAvatarUrl(mcUsername, size){
-    return `https://crafatar.com/avatars/${encodeURIComponent(mcUsername)}?size=${size||128}&overlay`;
+    return `https://mc-heads.net/avatar/${encodeURIComponent(mcUsername)}/${size||128}`;
   },
-  mcBodyUrl(mcUsername, scale){
-    return `https://crafatar.com/renders/body/${encodeURIComponent(mcUsername)}?scale=${scale||8}&overlay`;
+  mcBodyUrl(mcUsername, size){
+    return `https://mc-heads.net/body/${encodeURIComponent(mcUsername)}/${size||300}`;
   }
 };
