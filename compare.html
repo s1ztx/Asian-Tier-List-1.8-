@@ -100,7 +100,7 @@
       <div class="eyebrow" style="justify-content:center; color:rgb(${color});">${label}</div>
       <div style="display:flex; justify-content:center; margin:16px 0;">
         ${p.mcUsername
-          ? `<img class="avatar-sq" src="${ATL_DATA.mcBodyUrl(p.mcUsername,7)}" alt="Minecraft skin of ${p.mcUsername}" style="height:150px; image-rendering:pixelated;" onerror="ATL_skinFallback(this,'${p.mcUsername.replace(/'/g,"")}')">`
+          ? `<img class="avatar-sq" src="${ATL_DATA.mcBodyUrl(p.mcUsername,300)}" alt="Minecraft skin of ${p.mcUsername}" style="height:150px; image-rendering:pixelated;" onerror="ATL_skinFallback(this,'${p.mcUsername.replace(/'/g,"")}')">`
           : `<img class="avatar-sq" src="${p.avatar || `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(p.username)}&backgroundColor=141a29`}" alt="${p.username}" style="width:96px;height:96px;object-fit:cover;">`}
       </div>
       <div style="font-family:var(--f-sub); font-weight:700; font-size:17px; color:var(--text-0);">${p.display}</div>
