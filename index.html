@@ -135,7 +135,10 @@
   // every third-party call routed through one trusted place).
   const FROST_SERVER_ADDRESS = 'stammer-predictive.tun.ply.gg';
 
-  (async function loadServerStatus(){
+  let statusRefreshing = false;
+  async function loadServerStatus(){
+    if(statusRefreshing) return; // don't stack overlapping fetches
+    statusRefreshing = true;
     const body = document.getElementById('serverStatusBody');
     const badge = document.getElementById('serverStatusBadge');
     const title = document.getElementById('serverStatusTitle');
@@ -146,11 +149,14 @@
     if(data.error){
       badge.innerHTML = `<span class="pill pill-red">Unreachable</span>`;
       body.innerHTML = `<p class="text-sm text-muted">Couldn't reach the server status service right now. Try again shortly.</p>`;
+      statusRefreshing = false;
       return;
     }
     if(!data.online){
       badge.innerHTML = `<span class="pill pill-red"><span class="pill-dot"></span>Offline</span>`;
       body.innerHTML = `<p class="text-sm text-muted">Server is currently offline.</p>`;
+      playersEl.innerHTML = '';
+      statusRefreshing = false;
       return;
     }
 
@@ -175,8 +181,14 @@
               ${name}
             </div>`).join('')}
         </div>`;
+    } else {
+      playersEl.innerHTML = '';
     }
-  })();
+    statusRefreshing = false;
+  }
+
+  loadServerStatus();
+  setInterval(loadServerStatus, 30000);
 
   document.getElementById('tierStrip').innerHTML = ATL_DATA.TIERS.slice(0,8).map(t=>`
     <div style="text-align:center;">${ATL_hex(t.id,'sm')}<div class="text-sm text-muted mt-8" style="font-family:var(--f-mono); font-size:11px;">${t.id}</div></div>
