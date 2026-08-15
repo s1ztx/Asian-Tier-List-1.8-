@@ -59,12 +59,18 @@
   async function findPlayer(query){
     query = query.trim().toLowerCase();
     if(!query) return null;
-    const [known, staff, testers, mcLinks] = await Promise.all([
+    const [known, staff, testers, mcLinks, playerStats] = await Promise.all([
       ATL_SESSION.loadStore('known_users', { byUsername:{}, byId:{} }),
       ATL_SESSION.loadStore('staff', []),
       ATL_SESSION.loadStore('testers', []),
-      ATL_SESSION.loadStore('mc_usernames', {})
+      ATL_SESSION.loadStore('mc_usernames', {}),
+      ATL_SESSION.loadStore('player_stats', {})
     ]);
+
+    function statsFor(mcUsername){
+      if(!mcUsername) return null;
+      return playerStats[mcUsername.toLowerCase()] || null;
+    }
 
     // exact username match on a real account first
     let account = known.byUsername && known.byUsername[query];
@@ -75,13 +81,21 @@
     }
     if(account){
       const tierRecord = await ATL_SESSION.loadStore('tier_'+account.id, null);
-      return { discordId: account.id, username: account.username, display: account.display, avatar: account.avatar, mcUsername: mcLinks[account.id]||'', roles: account.roles && account.roles.length ? account.roles : (account.role?[account.role]:[]), tierRecord };
+      const mc = mcLinks[account.id]||'';
+      return { discordId: account.id, username: account.username, display: account.display, avatar: account.avatar, mcUsername: mc, roles: account.roles && account.roles.length ? account.roles : (account.role?[account.role]:[]), tierRecord, matchStats: statsFor(mc) || statsFor(account.username) };
     }
 
     // fall back to staff/tester roster (may not have a real login yet)
     const rosterMatch = staff.find(s=>s.username.toLowerCase()===query) || testers.find(t=>t.username.toLowerCase()===query);
     if(rosterMatch){
-      return { discordId:null, username: rosterMatch.username, display: rosterMatch.display||rosterMatch.username, avatar:null, mcUsername: rosterMatch.mcUsername||'', roles:[rosterMatch.role||rosterMatch.rank], tierRecord:null };
+      return { discordId:null, username: rosterMatch.username, display: rosterMatch.display||rosterMatch.username, avatar:null, mcUsername: rosterMatch.mcUsername||'', roles:[rosterMatch.role||rosterMatch.rank], tierRecord:null, matchStats: statsFor(rosterMatch.mcUsername) || statsFor(rosterMatch.username) };
+    }
+
+    // last resort: someone with reported match stats but no linked
+    // account or roster entry (a Minecraft-only player)
+    const directStats = playerStats[query];
+    if(directStats){
+      return { discordId:null, username: directStats.username, display: directStats.username, avatar:null, mcUsername: directStats.username, roles:[], tierRecord:null, matchStats: directStats };
     }
     return null;
   }
@@ -141,9 +155,20 @@
       </tr>`;
     }).join('');
 
-    const statRows = ['ELO / Rating','Wins','Losses','K/D','Win rate','Games played'].map(label=>`
-      <tr><td style="text-align:center;" class="text-muted mono">N/A</td><td class="text-muted" style="text-align:center;">${label}</td><td style="text-align:center;" class="text-muted mono">N/A</td></tr>
+    function statVal(matchStats, key){
+      if(!matchStats) return 'N/A';
+      if(key==='wins') return matchStats.wins ?? 'N/A';
+      if(key==='losses') return matchStats.losses ?? 'N/A';
+      if(key==='kd') return matchStats.deaths>0 ? (matchStats.kills/matchStats.deaths).toFixed(2) : (matchStats.kills ?? 'N/A');
+      if(key==='winrate') return matchStats.games>0 ? Math.round((matchStats.wins/matchStats.games)*100)+'%' : 'N/A';
+      if(key==='games') return matchStats.games ?? 'N/A';
+      return 'N/A';
+    }
+    const statDefs = [['wins','Wins'],['losses','Losses'],['kd','K/D'],['winrate','Win rate'],['games','Games played']];
+    const statRows = statDefs.map(([key,label])=>`
+      <tr><td style="text-align:center;" class="mono">${statVal(a && a.matchStats, key)}</td><td class="text-muted" style="text-align:center;">${label}</td><td style="text-align:center;" class="mono">${statVal(b && b.matchStats, key)}</td></tr>
     `).join('');
+    const anyRealStats = (a && a.matchStats) || (b && b.matchStats);
 
     resultEl.innerHTML = `
       <div class="grid-2">
@@ -157,8 +182,8 @@
       </div>
 
       <div class="glass card mt-24">
-        <div class="eyebrow">Server statistics</div>
-        <p class="text-sm text-muted mt-8">These come from live server stats and aren't connected yet, so they show N/A rather than made-up numbers.</p>
+        <div class="eyebrow">Match statistics</div>
+        <p class="text-sm text-muted mt-8">${anyRealStats ? 'Reported by testers after real matches.' : 'Neither player has any match results reported yet — testers can log them from the Tester Panel.'}</p>
         <div class="table-wrap mt-16"><table class="dt"><tbody>${statRows}</tbody></table></div>
       </div>
     `;
