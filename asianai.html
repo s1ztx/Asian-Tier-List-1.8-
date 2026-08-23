@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Asian AI — Asian Tier List [1.8+]</title>
+<meta name="description" content="Asian AI — the assistant of the Asian Tier List ecosystem.">
+<link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+<main>
+  <section style="padding: 28px 0 0;">
+    <div class="container">
+      <div class="eyebrow">Asian Tier List</div>
+      <h1 style="font-size:clamp(24px,3.2vw,32px); margin:8px 0 4px;">Asian AI</h1>
+      <p class="text-sm text-muted" style="margin:0 0 20px;">Your intelligent assistant for everything — general chat, code, research, and more.</p>
+    </div>
+  </section>
+
+  <section style="padding-top:0;">
+    <div class="container">
+      <div class="ai-shell">
+        <aside class="glass ai-sidebar">
+          <button class="btn btn-primary btn-block" id="newChatBtn" style="text-transform:none;">+ New Chat</button>
+
+          <div>
+            <h5>Projects</h5>
+            <div class="ai-project-item" data-project="Website">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/></svg>
+              Website
+            </div>
+            <div class="ai-project-item" data-project="Minecraft Plugin">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>
+              Minecraft Plugin
+            </div>
+            <div class="ai-project-item" data-project="Discord Bot">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/></svg>
+              Discord Bot
+            </div>
+            <div class="ai-project-item" data-project="School">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12v5c0 1.5 2.5 3 6 3s6-1.5 6-3v-5"/></svg>
+              School
+            </div>
+            <div class="ai-project-item" data-project="Asian Tier List">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+              Asian Tier List
+            </div>
+          </div>
+
+          <div>
+            <h5>Capabilities</h5>
+            <div class="text-sm text-muted" style="line-height:2; font-size:12.5px;">
+              General · Code · Research<br>Vision · Files · Create · Agent
+            </div>
+          </div>
+        </aside>
+
+        <div class="glass ai-chat-panel">
+          <div class="chat-header">
+            <div>
+              <div style="font-family:var(--f-sub); font-weight:700; color:var(--text-0);">Asian AI</div>
+              <div class="text-sm text-muted" id="aiStatusLine">Checking connection…</div>
+            </div>
+            <span id="aiStatusPill"></span>
+          </div>
+
+          <div class="chat-messages" id="aiMessages"></div>
+
+          <div id="aiAttachRow"></div>
+          <div class="ai-input-row">
+            <input type="file" id="aiFileInput" style="display:none;" accept=".png,.jpg,.jpeg,.gif,.webp,.pdf,.txt,.md,.json,.js,.py,.html,.css">
+            <button class="ai-icon-btn" id="aiAttachBtn" title="Attach a file" aria-label="Attach a file">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21.44 11.05l-9.19 9.19a5 5 0 01-7.07-7.07l9.19-9.19a3.5 3.5 0 014.95 4.95l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+            </button>
+            <textarea class="input" id="aiInput" placeholder="Message Asian AI…" rows="1" aria-label="Message Asian AI"></textarea>
+            <button class="ai-icon-btn hidden" id="aiStopBtn" title="Stop generating" aria-label="Stop generating">
+              <svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
+            </button>
+            <button class="btn btn-primary" id="aiSendBtn" style="text-transform:none; flex-shrink:0;">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/session.js"></script>
+<script src="assets/js/nav.js"></script>
+<script src="assets/js/backgrounds.js"></script>
+<script src="assets/js/cursor.js"></script>
+<script src="assets/js/ai.js"></script>
+<script type="module">
+  ATL_mountBackground('asianai');
+  const session = ATL_initShell('asianai.html');
+
+  const messagesEl = document.getElementById('aiMessages');
+  const inputEl = document.getElementById('aiInput');
+  const sendBtn = document.getElementById('aiSendBtn');
+  const stopBtn = document.getElementById('aiStopBtn');
+  const attachBtn = document.getElementById('aiAttachBtn');
+  const fileInput = document.getElementById('aiFileInput');
+  const attachRow = document.getElementById('aiAttachRow');
+  const statusLine = document.getElementById('aiStatusLine');
+  const statusPill = document.getElementById('aiStatusPill');
+
+  let history = []; // in-memory only for now — see PROJECTS/MEMORY note below
+  let attachedFile = null;
+  let generating = false;
+  let backendConfigured = null; // null = unknown yet, checked on first send
+
+  const SUGGESTIONS = [
+    'Help me build a website',
+    'Explain this code',
+    'Research a topic',
+    'Analyze this image',
+    'Help me study',
+    'Brainstorm an idea'
+  ];
+
+  function escapeHtml(str){
+    return str.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  // Minimal, dependency-free markdown: fenced code blocks (with a copy
+  // button), inline code, bold, italic, links. Escapes HTML first so
+  // nothing — from the user or a future real model — can inject markup.
+  function renderMarkdown(raw){
+    const escaped = escapeHtml(raw);
+    let blockIdx = 0;
+    let html = escaped.replace(/```(\w*)\n([\s\S]*?)```/g, (m, lang, code) => {
+      blockIdx++;
+      const id = 'code-block-' + Date.now() + '-' + blockIdx;
+      return `<pre><button class="code-copy-btn" data-copy-target="${id}">Copy</button><code id="${id}" class="lang-${lang||'text'}">${code}</code></pre>`;
+    });
+    html = html.replace(/`([^`\n]+)`/g, '<code>$1</code>');
+    html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+    html = html.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" style="color:var(--blue-400); text-decoration:underline;">$1</a>');
+    html = html.replace(/\n/g, '<br>');
+    return html;
+  }
+
+  function avatarFor(){
+    if(session.authenticated) return session.user.avatar || `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(session.user.username)}&backgroundColor=141a29`;
+    return `https://api.dicebear.com/7.x/identicon/svg?seed=guest&backgroundColor=141a29`;
+  }
+
+  function renderEmptyState(){
+    messagesEl.innerHTML = `
+      <div class="ai-empty">
+        <div class="ai-empty-mark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"/><circle cx="12" cy="12" r="3"/></svg>
+        </div>
+        <h2 style="font-size:22px; margin:0;">Asian AI</h2>
+        <p class="text-sm text-muted mt-8" style="max-width:380px;">Your intelligent assistant for everything.</p>
+        <div class="ai-suggest-grid">
+          ${SUGGESTIONS.map(s=>`<button class="ai-suggest-card" data-suggestion="${s}">${s}</button>`).join('')}
+        </div>
+        <div class="ai-capability-row">
+          ${['General','Code','Research','Vision','Files','Create','Agent'].map(c=>`<span class="ai-cap-chip">${c}</span>`).join('')}
+        </div>
+      </div>`;
+    messagesEl.querySelectorAll('[data-suggestion]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{ inputEl.value = btn.dataset.suggestion; handleSend(); });
+    });
+  }
+
+  function scrollToBottom(){ messagesEl.scrollTop = messagesEl.scrollHeight; }
+
+  function appendUserMessage(text, fileName){
+    const row = document.createElement('div');
+    row.className = 'msg-row mine';
+    row.innerHTML = `
+      <img src="${avatarFor()}" alt="">
+      <div>
+        <div class="msg-bubble">${fileName ? `<div class="text-sm" style="opacity:.85; margin-bottom:4px;">📎 ${escapeHtml(fileName)}</div>` : ''}${escapeHtml(text)}</div>
+      </div>`;
+    messagesEl.appendChild(row);
+    scrollToBottom();
+  }
+
+  function appendTyping(){
+    const row = document.createElement('div');
+    row.className = 'msg-row';
+    row.id = 'aiTypingRow';
+    row.innerHTML = `<img src="assets/images/favicon.svg" alt=""><div class="msg-bubble ai-typing"><span></span><span></span><span></span></div>`;
+    messagesEl.appendChild(row);
+    scrollToBottom();
+  }
+  function removeTyping(){
+    const row = document.getElementById('aiTypingRow');
+    if(row) row.remove();
+  }
+
+  function appendAssistantMessage(text){
+    const row = document.createElement('div');
+    row.className = 'msg-row';
+    row.innerHTML = `
+      <img src="assets/images/favicon.svg" alt="">
+      <div>
+        <div class="msg-bubble">${renderMarkdown(text)}</div>
+        <div class="ai-msg-actions">
+          <button class="copy-msg-btn" title="Copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button>
+          <button class="regen-msg-btn" title="Regenerate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg></button>
+        </div>
+      </div>`;
+    messagesEl.appendChild(row);
+    row.querySelector('.copy-msg-btn').addEventListener('click', ()=>{
+      navigator.clipboard.writeText(text);
+      ATL_toast('Copied.', 'success');
+    });
+    row.querySelector('.regen-msg-btn').addEventListener('click', ()=>{
+      if(history.length>=1){
+        const lastUser = [...history].reverse().find(m=>m.role==='user');
+        if(lastUser) runRequest();
+      }
+    });
+    row.querySelectorAll('.code-copy-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const code = document.getElementById(btn.dataset.copyTarget);
+        if(code){ navigator.clipboard.writeText(code.textContent); btn.textContent='Copied'; setTimeout(()=>btn.textContent='Copy',1500); }
+      });
+    });
+    scrollToBottom();
+  }
+
+  function appendNotice(text){
+    const row = document.createElement('div');
+    row.className = 'msg-row';
+    row.innerHTML = `
+      <img src="assets/images/favicon.svg" alt="">
+      <div class="ai-notice">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 9v4M12 17h.01"/><circle cx="12" cy="12" r="9"/></svg>
+        <span>${escapeHtml(text)}</span>
+      </div>`;
+    messagesEl.appendChild(row);
+    scrollToBottom();
+  }
+
+  function setGenerating(state){
+    generating = state;
+    sendBtn.classList.toggle('hidden', state);
+    stopBtn.classList.toggle('hidden', !state);
+    inputEl.disabled = state;
+  }
+
+  async function runRequest(){
+    setGenerating(true);
+    appendTyping();
+    const result = await ATL_AI.sendMessage(history);
+    removeTyping();
+    setGenerating(false);
+
+    if(!result.ok && result.configured === false){
+      backendConfigured = false;
+      statusLine.textContent = "Not connected to a model yet";
+      statusPill.innerHTML = `<span class="pill pill-gold">Preview</span>`;
+      appendNotice("Asian AI isn't connected to a model yet — the full interface is built and ready, it just needs a provider API key configured on the backend. This message is an honest status notice, not a generated reply.");
+      return;
+    }
+    if(!result.ok){
+      appendNotice(result.error === 'network_failed' ? "Couldn't reach Asian AI's backend. Check your connection and try again." : "Something went wrong on the backend. Try again in a moment.");
+      return;
+    }
+
+    backendConfigured = true;
+    statusLine.textContent = 'Ready';
+    statusPill.innerHTML = `<span class="pill pill-teal">Connected</span>`;
+    history.push({ role:'assistant', content: result.reply });
+    appendAssistantMessage(result.reply);
+  }
+
+  async function handleSend(){
+    const text = inputEl.value.trim();
+    if(!text || generating) return;
+    if(messagesEl.querySelector('.ai-empty')) messagesEl.innerHTML = '';
+
+    appendUserMessage(text, attachedFile ? attachedFile.name : null);
+    history.push({ role:'user', content: attachedFile ? `${text}\n\n[Attached file: ${attachedFile.name} — not processed, no backend connected yet]` : text });
+    inputEl.value = '';
+    inputEl.style.height = 'auto';
+    clearAttachment();
+    await runRequest();
+  }
+
+  function clearAttachment(){
+    attachedFile = null;
+    fileInput.value = '';
+    attachRow.innerHTML = '';
+  }
+
+  attachBtn.addEventListener('click', ()=> fileInput.click());
+  fileInput.addEventListener('change', ()=>{
+    const file = fileInput.files[0];
+    if(!file) return;
+    attachedFile = file;
+    attachRow.innerHTML = `
+      <div class="ai-attach-chip">
+        <span class="status-dot status-idle"></span>
+        📎 ${escapeHtml(file.name)} — not sent to a backend yet
+        <button id="removeAttachBtn" title="Remove">✕</button>
+      </div>`;
+    document.getElementById('removeAttachBtn').addEventListener('click', clearAttachment);
+  });
+
+  sendBtn.addEventListener('click', handleSend);
+  inputEl.addEventListener('keydown', e=>{
+    if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); handleSend(); }
+  });
+  inputEl.addEventListener('input', ()=>{
+    inputEl.style.height = 'auto';
+    inputEl.style.height = Math.min(inputEl.scrollHeight, 160) + 'px';
+  });
+
+  stopBtn.addEventListener('click', ()=>{
+    // No real streaming to abort yet (requests resolve immediately
+    // against the "not configured" response) — wired up now so it
+    // works without changes once real streaming exists.
+    setGenerating(false);
+    removeTyping();
+  });
+
+  document.getElementById('newChatBtn').addEventListener('click', ()=>{
+    history = [];
+    clearAttachment();
+    renderEmptyState();
+  });
+
+  document.querySelectorAll('.ai-project-item').forEach(item=>{
+    item.addEventListener('click', ()=>{
+      ATL_toast(`"${item.dataset.project}" projects need a connected backend — coming soon.`, 'success');
+    });
+  });
+
+  // Initial connection check so the status pill is accurate before
+  // anyone sends a message, without spending a real "turn."
+  (async ()=>{
+    const probe = await ATL_AI.sendMessage([]);
+    if(probe.configured === false){
+      backendConfigured = false;
+      statusLine.textContent = 'Not connected to a model yet';
+      statusPill.innerHTML = `<span class="pill pill-gold">Preview</span>`;
+    } else {
+      backendConfigured = true;
+      statusLine.textContent = 'Ready';
+      statusPill.innerHTML = `<span class="pill pill-teal">Connected</span>`;
+    }
+  })();
+
+  renderEmptyState();
+</script>
+</body>
+</html>
