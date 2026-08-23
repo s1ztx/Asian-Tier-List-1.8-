@@ -44,6 +44,19 @@
    tier_log/etc.) — Compare and the Stats page read directly from it.
    No separate Worker endpoint needed for this; it's just another
    /api/store key like everything else.
+
+   ---- Asian AI (NOT yet connected to a model) ----
+   POST /api/ai/chat receives { messages: [{role, content}, ...] }
+   from asianai.html. Right now it always returns 501 because no
+   AI_PROVIDER_API_KEY is set — the frontend shows an honest "not
+   connected yet" notice instead of a fake reply. To wire up a real
+   model:
+     1. Pick a provider (Anthropic, OpenAI, etc.) and get an API key.
+     2. Set it as a Worker secret, e.g. AI_PROVIDER_API_KEY — never in
+        frontend code.
+     3. Fill in the real fetch call inside handleAiChat below — the
+        request/response shape from the frontend is already fixed,
+        so only this one function needs to change.
    ============================================================ */
 
 const SCOPE = 'identify guilds guilds.members.read';
@@ -75,6 +88,37 @@ async function handleStoreSet(request, env) {
 // real, public mcsrvstat.us API — proxied through the Worker because
 // (a) it requires a descriptive User-Agent header browsers can't set
 // themselves, and (b) it keeps every third-party call in one place.
+// Asian AI's chat endpoint. Returns 501 (not the generic 200/"empty
+// reply" shape) until a real provider key is set, so the frontend can
+// tell the difference between "not configured" and "something broke" —
+// and so it never has to fake a response either way.
+async function handleAiChat(request, env) {
+  let body;
+  try { body = await request.json(); } catch (e) { return jsonResponse({ error: 'bad_json' }, 400, env); }
+  if (!body || !Array.isArray(body.messages)) return jsonResponse({ error: 'missing_messages' }, 400, env);
+
+  if (!env.AI_PROVIDER_API_KEY) {
+    return jsonResponse({ configured: false }, 501, env);
+  }
+
+  // ---- Real provider call goes here once AI_PROVIDER_API_KEY exists ----
+  // Example shape (adjust to whichever provider is actually configured):
+  //
+  // const resp = await fetch('https://api.<provider>.com/v1/chat', {
+  //   method: 'POST',
+  //   headers: {
+  //     'Content-Type': 'application/json',
+  //     'Authorization': `Bearer ${env.AI_PROVIDER_API_KEY}`
+  //   },
+  //   body: JSON.stringify({ model: env.AI_MODEL || 'default-model', messages: body.messages })
+  // });
+  // if (!resp.ok) return jsonResponse({ error: 'upstream_error' }, 502, env);
+  // const data = await resp.json();
+  // return jsonResponse({ reply: data.choices[0].message.content }, 200, env);
+
+  return jsonResponse({ error: 'not_implemented' }, 501, env);
+}
+
 async function handleMcServerStatus(request, env) {
   const ip = new URL(request.url).searchParams.get('ip');
   if (!ip) return jsonResponse({ error: 'missing_ip' }, 400, env);
@@ -249,6 +293,7 @@ export default {
     if (url.pathname === '/api/store' && request.method === 'GET') return handleStoreGet(request, env);
     if (url.pathname === '/api/store' && request.method === 'POST') return handleStoreSet(request, env);
     if (url.pathname === '/api/mc-server-status' && request.method === 'GET') return handleMcServerStatus(request, env);
+    if (url.pathname === '/api/ai/chat' && request.method === 'POST') return handleAiChat(request, env);
 
     return new Response('Asian Tier List OAuth2 worker. Use /login to start sign-in.', { status: 200 });
   }
