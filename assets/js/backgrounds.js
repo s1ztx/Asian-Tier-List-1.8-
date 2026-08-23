@@ -450,6 +450,40 @@
   }
 
   /* ---------------- 404: glitch void ---------------- */
+  /* ---------------- ASIAN AI: soft flowing mesh + drifting motes ---------------- */
+  function meshFlowLayer(){
+    const blobs = Array.from({length:3},(_,i)=>({
+      color: ['58,134,255','230,57,70','255,214,10'][i],
+      x: rand(.2,.8), y: rand(.2,.8), r: rand(220,340), speed: rand(.0015,.003), phase: rand(0,10)
+    }));
+    return { draw(ctx,w,h,t){
+      ctx.save(); ctx.globalCompositeOperation='screen';
+      blobs.forEach(b=>{
+        const cx = w*b.x + Math.sin(t*b.speed+b.phase)*w*.08;
+        const cy = h*b.y + Math.cos(t*b.speed*.8+b.phase)*h*.08;
+        const grad = ctx.createRadialGradient(cx,cy,0,cx,cy,b.r);
+        grad.addColorStop(0, `rgba(${b.color},.10)`);
+        grad.addColorStop(1, 'transparent');
+        ctx.fillStyle = grad;
+        ctx.beginPath(); ctx.arc(cx,cy,b.r,0,Math.PI*2); ctx.fill();
+      });
+      ctx.restore();
+    }};
+  }
+  function driftingMotesLayer(){
+    let motes=[];
+    return {
+      resize(w,h){ motes = Array.from({length:40},()=>({ x:rand(0,w), y:rand(0,h), r:rand(.5,1.6), vy:rand(.03,.1), a:rand(.15,.4) })); },
+      draw(ctx,w,h){
+        motes.forEach(m=>{
+          m.y -= m.vy; if(m.y<-4) m.y = h+4;
+          ctx.beginPath(); ctx.fillStyle = `rgba(255,255,255,${m.a})`;
+          ctx.arc(m.x,m.y,m.r,0,7); ctx.fill();
+        });
+      }
+    };
+  }
+
   function voidGlitchLayer(){
     return { draw(ctx,w,h,t){
       if(Math.random()>.92){
@@ -606,6 +640,7 @@
     'owner-panel': ()=> [commandCenterLayer, neonNetworkLayer],
     'staff-applications': ()=> [()=>spotlightLayer('255,214,10'), floatingDocsLayer],
     support: ()=> [()=>spotlightLayer('58,134,255'), chatBubblesLayer],
+    asianai: ()=> [meshFlowLayer, driftingMotesLayer],
     '404': ()=> [voidGlitchLayer, ()=>particlesLayer(50,['#e63946'])]
   };
 
