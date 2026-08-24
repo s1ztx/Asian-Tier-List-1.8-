@@ -45,18 +45,17 @@
    No separate Worker endpoint needed for this; it's just another
    /api/store key like everything else.
 
-   ---- Asian AI (NOT yet connected to a model) ----
+   ---- Asian AI ----
    POST /api/ai/chat receives { messages: [{role, content}, ...] }
-   from asianai.html. Right now it always returns 501 because no
-   AI_PROVIDER_API_KEY is set — the frontend shows an honest "not
-   connected yet" notice instead of a fake reply. To wire up a real
-   model:
-     1. Pick a provider (Anthropic, OpenAI, etc.) and get an API key.
-     2. Set it as a Worker secret, e.g. AI_PROVIDER_API_KEY — never in
-        frontend code.
-     3. Fill in the real fetch call inside handleAiChat below — the
-        request/response shape from the frontend is already fixed,
-        so only this one function needs to change.
+   from asianai.html and forwards it to Google's Gemini API. Requires
+   these Worker environment variables:
+     AI_PROVIDER_API_KEY   (Secret) — a Google AI Studio API key
+     AI_MODEL               (Text, optional) — defaults to
+                             "gemini-2.0-flash" if not set
+   If AI_PROVIDER_API_KEY isn't set, this endpoint honestly returns
+   501 { configured:false } instead of faking a reply — the frontend
+   shows a clear "not connected yet" notice in that case rather than
+   pretending to be a working AI.
    ============================================================ */
 
 const SCOPE = 'identify guilds guilds.members.read';
@@ -101,22 +100,51 @@ async function handleAiChat(request, env) {
     return jsonResponse({ configured: false }, 501, env);
   }
 
-  // ---- Real provider call goes here once AI_PROVIDER_API_KEY exists ----
-  // Example shape (adjust to whichever provider is actually configured):
-  //
-  // const resp = await fetch('https://api.<provider>.com/v1/chat', {
-  //   method: 'POST',
-  //   headers: {
-  //     'Content-Type': 'application/json',
-  //     'Authorization': `Bearer ${env.AI_PROVIDER_API_KEY}`
-  //   },
-  //   body: JSON.stringify({ model: env.AI_MODEL || 'default-model', messages: body.messages })
-  // });
-  // if (!resp.ok) return jsonResponse({ error: 'upstream_error' }, 502, env);
-  // const data = await resp.json();
-  // return jsonResponse({ reply: data.choices[0].message.content }, 200, env);
+  // Empty messages array = connection probe from the frontend (checks
+  // "is this configured" without spending a real turn). Nothing to
+  // send to Gemini for an empty conversation.
+  if (body.messages.length === 0) {
+    return jsonResponse({ reply: '' }, 200, env);
+  }
 
-  return jsonResponse({ error: 'not_implemented' }, 501, env);
+  const model = env.AI_MODEL || 'gemini-2.0-flash';
+  const contents = body.messages.map(m => ({
+    role: m.role === 'assistant' ? 'model' : 'user',
+    parts: [{ text: String(m.content || '') }]
+  }));
+
+  try {
+    const resp = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-goog-api-key': env.AI_PROVIDER_API_KEY
+        },
+        body: JSON.stringify({ contents })
+      }
+    );
+
+    if (!resp.ok) {
+      return jsonResponse({ error: 'upstream_error' }, 502, env);
+    }
+
+    const data = await resp.json();
+    const candidate = data.candidates && data.candidates[0];
+
+    if (!candidate || !candidate.content || !candidate.content.parts) {
+      // Blocked by safety filters or genuinely empty response — still
+      // an honest state, not an error, so the frontend can say so.
+      const blockReason = data.promptFeedback && data.promptFeedback.blockReason;
+      return jsonResponse({ reply: blockReason ? `(Response blocked: ${blockReason})` : "(No response generated.)" }, 200, env);
+    }
+
+    const text = candidate.content.parts.map(p => p.text || '').join('');
+    return jsonResponse({ reply: text }, 200, env);
+  } catch (e) {
+    return jsonResponse({ error: 'fetch_failed' }, 502, env);
+  }
 }
 
 async function handleMcServerStatus(request, env) {
