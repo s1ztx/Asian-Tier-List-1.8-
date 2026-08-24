@@ -108,10 +108,19 @@ async function handleAiChat(request, env) {
   }
 
   const model = env.AI_MODEL || 'gemini-2.0-flash';
-  const contents = body.messages.map(m => ({
-    role: m.role === 'assistant' ? 'model' : 'user',
-    parts: [{ text: String(m.content || '') }]
-  }));
+  const contents = body.messages.map(m => {
+    const parts = [];
+    if (m.content) parts.push({ text: String(m.content) });
+    if (m.attachment && m.attachment.data && m.attachment.mimeType) {
+      parts.push({ inlineData: { mimeType: m.attachment.mimeType, data: m.attachment.data } });
+    }
+    return { role: m.role === 'assistant' ? 'model' : 'user', parts };
+  });
+
+  const requestBody = { contents };
+  if (body.instructions && String(body.instructions).trim()) {
+    requestBody.systemInstruction = { parts: [{ text: String(body.instructions).trim() }] };
+  }
 
   try {
     const resp = await fetch(
@@ -122,7 +131,7 @@ async function handleAiChat(request, env) {
           'Content-Type': 'application/json',
           'x-goog-api-key': env.AI_PROVIDER_API_KEY
         },
-        body: JSON.stringify({ contents })
+        body: JSON.stringify(requestBody)
       }
     );
 
