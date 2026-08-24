@@ -22,35 +22,33 @@
     <div class="container">
       <div class="ai-shell">
         <aside class="glass ai-sidebar">
+          <div id="sidebarUserRow"></div>
           <button class="btn btn-primary btn-block" id="newChatBtn" style="text-transform:none;">+ New Chat</button>
 
-          <div>
-            <h5>Projects</h5>
-            <div class="ai-project-item" data-project="Website">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/></svg>
-              Website
+          <div id="sidebarAuthedArea" class="hidden">
+            <div class="flex-between">
+              <h5 style="margin:0;">Projects</h5>
+              <button class="ai-icon-btn" id="addProjectBtn" title="New project" style="width:26px; height:26px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
             </div>
-            <div class="ai-project-item" data-project="Minecraft Plugin">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>
-              Minecraft Plugin
-            </div>
-            <div class="ai-project-item" data-project="Discord Bot">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/></svg>
-              Discord Bot
-            </div>
-            <div class="ai-project-item" data-project="School">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12v5c0 1.5 2.5 3 6 3s6-1.5 6-3v-5"/></svg>
-              School
-            </div>
-            <div class="ai-project-item" data-project="Asian Tier List">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-              Asian Tier List
-            </div>
+            <div id="projectList" class="mt-8"></div>
+
+            <div class="ai-sidebar-divider"></div>
+            <h5>History</h5>
+            <div id="historyList" style="display:flex; flex-direction:column; gap:2px; max-height:260px; overflow-y:auto;"></div>
           </div>
 
+          <div id="sidebarGuestArea">
+            <div class="text-sm text-muted" style="line-height:1.6;">Login with Discord to save conversation history and create Projects.</div>
+            <button class="btn btn-ghost btn-sm btn-block mt-16" id="sidebarLoginBtn" style="text-transform:none;">Login with Discord</button>
+          </div>
+
+          <div class="ai-sidebar-divider"></div>
           <div>
-            <h5>Capabilities</h5>
-            <div class="text-sm text-muted" style="line-height:2; font-size:12.5px;">
+            <div class="flex-between">
+              <h5 style="margin:0;">Capabilities</h5>
+              <button class="ai-icon-btn" id="instructionsBtn" title="Custom instructions" style="width:26px; height:26px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+            </div>
+            <div class="text-sm text-muted mt-8" style="line-height:2; font-size:12.5px;">
               General · Code · Research<br>Vision · Files · Create · Agent
             </div>
           </div>
@@ -59,7 +57,7 @@
         <div class="glass ai-chat-panel">
           <div class="chat-header">
             <div>
-              <div style="font-family:var(--f-sub); font-weight:700; color:var(--text-0);">Asian AI</div>
+              <div style="font-family:var(--f-sub); font-weight:700; color:var(--text-0);" id="aiChatTitle">Asian AI</div>
               <div class="text-sm text-muted" id="aiStatusLine">Checking connection…</div>
             </div>
             <span id="aiStatusPill"></span>
@@ -85,6 +83,18 @@
   </section>
 </main>
 
+<div class="modal-backdrop" id="instructionsModal">
+  <div class="glass modal">
+    <div class="modal-head">
+      <div><div class="eyebrow">Memory</div><h3 style="margin:6px 0 0;">Custom instructions</h3></div>
+      <button class="modal-close" id="instructionsClose">✕</button>
+    </div>
+    <p class="text-sm text-muted">Saved instructions Asian AI follows in every conversation — tone, context about you, anything you want it to always know. Stored on your account, only visible to you.</p>
+    <textarea class="textarea" id="instructionsInput" placeholder="e.g. I'm a Tester on Asian Tier List. Keep answers concise. I'm most interested in Minecraft PvP and web dev." style="min-height:140px;"></textarea>
+    <button class="btn btn-primary btn-block mt-16" id="instructionsSave">Save</button>
+  </div>
+</div>
+
 <script src="assets/js/data.js"></script>
 <script src="assets/js/session.js"></script>
 <script src="assets/js/nav.js"></script>
@@ -104,28 +114,34 @@
   const attachRow = document.getElementById('aiAttachRow');
   const statusLine = document.getElementById('aiStatusLine');
   const statusPill = document.getElementById('aiStatusPill');
+  const chatTitle = document.getElementById('aiChatTitle');
 
-  let history = []; // in-memory only for now — see PROJECTS/MEMORY note below
+  const MAX_FILE_MB = 6;
+  const IMAGE_TYPES = { 'image/png':1,'image/jpeg':1,'image/gif':1,'image/webp':1 };
+
+  let history = [];           // [{role, content, attachmentMeta?}] — text only, persisted
+  let pendingAttachment = null; // {mimeType, data(base64), name} — live only, never persisted
   let attachedFile = null;
   let generating = false;
-  let backendConfigured = null; // null = unknown yet, checked on first send
+  let currentConversationId = null;
+  let currentProjectId = null;
+  let conversations = [];
+  let projects = [];
+  let customInstructions = '';
 
   const SUGGESTIONS = [
-    'Help me build a website',
-    'Explain this code',
-    'Research a topic',
-    'Analyze this image',
-    'Help me study',
-    'Brainstorm an idea'
+    { text:'Help me build a website', icon:'<path d="M3 4h18v16H3z"/><path d="M3 9h18"/>' },
+    { text:'Explain this code', icon:'<path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/>' },
+    { text:'Research a topic', icon:'<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>' },
+    { text:'Analyze this image', icon:'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/>' },
+    { text:'Help me study', icon:'<path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12v5c0 1.5 2.5 3 6 3s6-1.5 6-3v-5"/>' },
+    { text:'Brainstorm an idea', icon:'<path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.5.4.9 1.1.9 1.8v.5h6.2v-.5c0-.7.4-1.4.9-1.8A7 7 0 0 0 12 2Z"/>' }
   ];
 
   function escapeHtml(str){
     return str.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   }
 
-  // Minimal, dependency-free markdown: fenced code blocks (with a copy
-  // button), inline code, bold, italic, links. Escapes HTML first so
-  // nothing — from the user or a future real model — can inject markup.
   function renderMarkdown(raw){
     const escaped = escapeHtml(raw);
     let blockIdx = 0;
@@ -147,6 +163,139 @@
     return `https://api.dicebear.com/7.x/identicon/svg?seed=guest&backgroundColor=141a29`;
   }
 
+  /* ---------------- persistence (authenticated users only) ---------------- */
+  async function loadSidebarData(){
+    if(!session.authenticated) return;
+    const [conv, proj, instr] = await Promise.all([
+      ATL_SESSION.loadStore('ai_conversations_'+session.user.id, []),
+      ATL_SESSION.loadStore('ai_projects_'+session.user.id, []),
+      ATL_SESSION.loadStore('ai_instructions_'+session.user.id, '')
+    ]);
+    conversations = conv;
+    projects = proj;
+    customInstructions = instr || '';
+    document.getElementById('instructionsInput').value = customInstructions;
+    renderProjects();
+    renderHistory();
+  }
+  async function saveConversations(){
+    if(!session.authenticated) return;
+    await ATL_SESSION.saveStore('ai_conversations_'+session.user.id, conversations);
+  }
+  async function saveProjects(){
+    if(!session.authenticated) return;
+    await ATL_SESSION.saveStore('ai_projects_'+session.user.id, projects);
+  }
+
+  function renderProjects(){
+    const el = document.getElementById('projectList');
+    const trashIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>`;
+    const allBtn = `<div class="ai-project-item ${currentProjectId===null?'active':''}" data-project-filter="all">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 6h16M4 12h16M4 18h16"/></svg> All chats
+    </div>`;
+    el.innerHTML = allBtn + projects.map(p=>`
+      <div class="ai-project-item ${currentProjectId===p.id?'active':''}" data-project-filter="${p.id}" style="justify-content:space-between;">
+        <span style="display:flex; align-items:center; gap:10px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="flex-shrink:0;"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/></svg>
+          ${escapeHtml(p.name)}
+        </span>
+        <button class="ai-item-delete" data-delete-project="${p.id}" title="Delete project">${trashIcon}</button>
+      </div>
+    `).join('');
+    el.querySelectorAll('[data-project-filter]').forEach(item=>{
+      item.addEventListener('click', (e)=>{
+        if(e.target.closest('[data-delete-project]')) return;
+        currentProjectId = item.dataset.projectFilter==='all' ? null : item.dataset.projectFilter;
+        renderProjects(); renderHistory();
+      });
+    });
+    el.querySelectorAll('[data-delete-project]').forEach(btn=>{
+      btn.addEventListener('click', async (e)=>{
+        e.stopPropagation();
+        const id = btn.dataset.deleteProject;
+        projects = projects.filter(p=>p.id!==id);
+        if(currentProjectId===id) currentProjectId = null;
+        await saveProjects();
+        renderProjects(); renderHistory();
+      });
+    });
+  }
+
+  function renderHistory(){
+    const el = document.getElementById('historyList');
+    const trashIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>`;
+    const visible = conversations.filter(c => currentProjectId===null || c.projectId===currentProjectId)
+                                  .sort((a,b)=> new Date(b.updatedAt)-new Date(a.updatedAt));
+    if(visible.length===0){
+      el.innerHTML = `<p class="text-sm text-muted" style="padding:8px 4px;">No conversations yet.</p>`;
+      return;
+    }
+    el.innerHTML = visible.map(c=>`
+      <div class="ai-project-item ${c.id===currentConversationId?'active':''}" data-load-conv="${c.id}" style="justify-content:space-between;">
+        <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(c.title)}</span>
+        <button class="ai-item-delete" data-delete-conv="${c.id}" title="Delete">${trashIcon}</button>
+      </div>
+    `).join('');
+    el.querySelectorAll('[data-load-conv]').forEach(item=>{
+      item.addEventListener('click', (e)=>{
+        if(e.target.closest('[data-delete-conv]')) return;
+        loadConversation(item.dataset.loadConv);
+      });
+    });
+    el.querySelectorAll('[data-delete-conv]').forEach(btn=>{
+      btn.addEventListener('click', async (e)=>{
+        e.stopPropagation();
+        const id = btn.dataset.deleteConv;
+        conversations = conversations.filter(c=>c.id!==id);
+        await saveConversations();
+        if(currentConversationId===id) startNewChat();
+        renderHistory();
+      });
+    });
+  }
+
+  function loadConversation(id){
+    const conv = conversations.find(c=>c.id===id);
+    if(!conv) return;
+    currentConversationId = id;
+    history = conv.messages.map(m=>({ role:m.role, content:m.content }));
+    chatTitle.textContent = conv.title;
+    messagesEl.innerHTML = '';
+    history.forEach(m=>{
+      if(m.role==='user') appendUserMessage(m.content, null, true);
+      else appendAssistantMessage(m.content, true);
+    });
+    renderHistory();
+  }
+
+  async function persistCurrentConversation(){
+    if(!session.authenticated || history.length===0) return;
+    const title = history[0].content.slice(0,48) + (history[0].content.length>48?'…':'');
+    if(!currentConversationId) currentConversationId = 'conv_'+Date.now();
+    const existingIdx = conversations.findIndex(c=>c.id===currentConversationId);
+    const record = {
+      id: currentConversationId, title,
+      projectId: currentProjectId,
+      messages: history.map(m=>({ role:m.role, content:m.content })),
+      createdAt: existingIdx>=0 ? conversations[existingIdx].createdAt : new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    if(existingIdx>=0) conversations[existingIdx] = record; else conversations.push(record);
+    await saveConversations();
+    chatTitle.textContent = title;
+    renderHistory();
+  }
+
+  function startNewChat(){
+    currentConversationId = null;
+    history = [];
+    clearAttachment();
+    chatTitle.textContent = 'Asian AI';
+    renderEmptyState();
+    renderHistory();
+  }
+
+  /* ---------------- rendering ---------------- */
   function renderEmptyState(){
     messagesEl.innerHTML = `
       <div class="ai-empty">
@@ -156,7 +305,7 @@
         <h2 style="font-size:22px; margin:0;">Asian AI</h2>
         <p class="text-sm text-muted mt-8" style="max-width:380px;">Your intelligent assistant for everything.</p>
         <div class="ai-suggest-grid">
-          ${SUGGESTIONS.map(s=>`<button class="ai-suggest-card" data-suggestion="${s}">${s}</button>`).join('')}
+          ${SUGGESTIONS.map(s=>`<button class="ai-suggest-card" data-suggestion="${s.text}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="width:16px;height:16px;margin-bottom:8px; color:var(--text-3);">${s.icon}</svg><br>${s.text}</button>`).join('')}
         </div>
         <div class="ai-capability-row">
           ${['General','Code','Research','Vision','Files','Create','Agent'].map(c=>`<span class="ai-cap-chip">${c}</span>`).join('')}
@@ -169,7 +318,7 @@
 
   function scrollToBottom(){ messagesEl.scrollTop = messagesEl.scrollHeight; }
 
-  function appendUserMessage(text, fileName){
+  function appendUserMessage(text, fileName, skipScroll){
     const row = document.createElement('div');
     row.className = 'msg-row mine';
     row.innerHTML = `
@@ -178,7 +327,7 @@
         <div class="msg-bubble">${fileName ? `<div class="text-sm" style="opacity:.85; margin-bottom:4px;">📎 ${escapeHtml(fileName)}</div>` : ''}${escapeHtml(text)}</div>
       </div>`;
     messagesEl.appendChild(row);
-    scrollToBottom();
+    if(!skipScroll) scrollToBottom();
   }
 
   function appendTyping(){
@@ -194,7 +343,7 @@
     if(row) row.remove();
   }
 
-  function appendAssistantMessage(text){
+  function appendAssistantMessage(text, skipScroll){
     const row = document.createElement('div');
     row.className = 'msg-row';
     row.innerHTML = `
@@ -212,10 +361,7 @@
       ATL_toast('Copied.', 'success');
     });
     row.querySelector('.regen-msg-btn').addEventListener('click', ()=>{
-      if(history.length>=1){
-        const lastUser = [...history].reverse().find(m=>m.role==='user');
-        if(lastUser) runRequest();
-      }
+      if(history.length>=1) runRequest();
     });
     row.querySelectorAll('.code-copy-btn').forEach(btn=>{
       btn.addEventListener('click', ()=>{
@@ -223,7 +369,7 @@
         if(code){ navigator.clipboard.writeText(code.textContent); btn.textContent='Copied'; setTimeout(()=>btn.textContent='Copy',1500); }
       });
     });
-    scrollToBottom();
+    if(!skipScroll) scrollToBottom();
   }
 
   function appendNotice(text){
@@ -249,12 +395,15 @@
   async function runRequest(){
     setGenerating(true);
     appendTyping();
-    const result = await ATL_AI.sendMessage(history);
+    const payload = history.map((m,i)=> i===history.length-1 && m.role==='user' && pendingAttachment
+      ? { role:m.role, content:m.content, attachment: pendingAttachment }
+      : { role:m.role, content:m.content });
+    const result = await ATL_AI.sendMessage(payload, customInstructions);
+    pendingAttachment = null;
     removeTyping();
     setGenerating(false);
 
     if(!result.ok && result.configured === false){
-      backendConfigured = false;
       statusLine.textContent = "Not connected to a model yet";
       statusPill.innerHTML = `<span class="pill pill-gold">Preview</span>`;
       appendNotice("Asian AI isn't connected to a model yet — the full interface is built and ready, it just needs a provider API key configured on the backend. This message is an honest status notice, not a generated reply.");
@@ -265,44 +414,93 @@
       return;
     }
 
-    backendConfigured = true;
     statusLine.textContent = 'Ready';
     statusPill.innerHTML = `<span class="pill pill-teal">Connected</span>`;
     history.push({ role:'assistant', content: result.reply });
     appendAssistantMessage(result.reply);
+    await persistCurrentConversation();
   }
 
   async function handleSend(){
     const text = inputEl.value.trim();
-    if(!text || generating) return;
+    if((!text && !attachedFile) || generating) return;
     if(messagesEl.querySelector('.ai-empty')) messagesEl.innerHTML = '';
 
-    appendUserMessage(text, attachedFile ? attachedFile.name : null);
-    history.push({ role:'user', content: attachedFile ? `${text}\n\n[Attached file: ${attachedFile.name} — not processed, no backend connected yet]` : text });
+    appendUserMessage(text || '(sent a file)', attachedFile ? attachedFile.name : null);
+    history.push({ role:'user', content: text || '(sent a file)' });
     inputEl.value = '';
     inputEl.style.height = 'auto';
-    clearAttachment();
+    clearAttachmentUIOnly();
     await runRequest();
   }
 
+  /* ---------------- file handling (real: images/PDFs -> Gemini vision, text files -> inline content) ---------------- */
+  function readFileAsBase64(file){
+    return new Promise((resolve, reject)=>{
+      const reader = new FileReader();
+      reader.onload = ()=> resolve(reader.result.split(',')[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+  function readFileAsText(file){
+    return new Promise((resolve, reject)=>{
+      const reader = new FileReader();
+      reader.onload = ()=> resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsText(file);
+    });
+  }
+
   function clearAttachment(){
-    attachedFile = null;
+    attachedFile = null; pendingAttachment = null;
     fileInput.value = '';
     attachRow.innerHTML = '';
   }
+  function clearAttachmentUIOnly(){
+    attachedFile = null;
+    fileInput.value = '';
+    attachRow.innerHTML = '';
+    // pendingAttachment stays set until consumed by runRequest()
+  }
 
   attachBtn.addEventListener('click', ()=> fileInput.click());
-  fileInput.addEventListener('change', ()=>{
+  fileInput.addEventListener('change', async ()=>{
     const file = fileInput.files[0];
     if(!file) return;
+    if(file.size > MAX_FILE_MB*1024*1024){
+      ATL_toast(`File too large — max ${MAX_FILE_MB}MB.`, 'error');
+      fileInput.value = '';
+      return;
+    }
     attachedFile = file;
-    attachRow.innerHTML = `
-      <div class="ai-attach-chip">
-        <span class="status-dot status-idle"></span>
-        📎 ${escapeHtml(file.name)} — not sent to a backend yet
-        <button id="removeAttachBtn" title="Remove">✕</button>
-      </div>`;
-    document.getElementById('removeAttachBtn').addEventListener('click', clearAttachment);
+    attachRow.innerHTML = `<div class="ai-attach-chip"><span class="status-dot status-idle"></span>📎 ${escapeHtml(file.name)} — reading…</div>`;
+
+    try{
+      if(IMAGE_TYPES[file.type] || file.type === 'application/pdf'){
+        const base64 = await readFileAsBase64(file);
+        pendingAttachment = { mimeType: file.type, data: base64, name: file.name };
+        attachRow.innerHTML = `
+          <div class="ai-attach-chip">
+            <span class="status-dot status-online"></span>
+            📎 ${escapeHtml(file.name)} — ready
+            <button id="removeAttachBtn" title="Remove">✕</button>
+          </div>`;
+        document.getElementById('removeAttachBtn').addEventListener('click', clearAttachment);
+      } else {
+        const text = await readFileAsText(file);
+        pendingAttachment = null;
+        attachedFile = null;
+        fileInput.value = '';
+        attachRow.innerHTML = '';
+        inputEl.value += (inputEl.value ? '\n\n' : '') + `Attached file "${file.name}":\n\`\`\`\n${text.slice(0,20000)}\n\`\`\``;
+        inputEl.dispatchEvent(new Event('input'));
+        ATL_toast(`Added "${file.name}" to your message.`, 'success');
+      }
+    }catch(e){
+      attachRow.innerHTML = `<div class="ai-attach-chip"><span class="status-dot status-dnd"></span>📎 ${escapeHtml(file.name)} — failed to read <button id="removeAttachBtn" title="Remove">✕</button></div>`;
+      document.getElementById('removeAttachBtn').addEventListener('click', clearAttachment);
+    }
   });
 
   sendBtn.addEventListener('click', handleSend);
@@ -315,35 +513,58 @@
   });
 
   stopBtn.addEventListener('click', ()=>{
-    // No real streaming to abort yet (requests resolve immediately
-    // against the "not configured" response) — wired up now so it
-    // works without changes once real streaming exists.
     setGenerating(false);
     removeTyping();
   });
 
-  document.getElementById('newChatBtn').addEventListener('click', ()=>{
-    history = [];
-    clearAttachment();
-    renderEmptyState();
+  document.getElementById('newChatBtn').addEventListener('click', startNewChat);
+  const sidebarLoginBtn = document.getElementById('sidebarLoginBtn');
+  if(sidebarLoginBtn) sidebarLoginBtn.addEventListener('click', ATL_SESSION.loginWithDiscord);
+
+  document.getElementById('addProjectBtn').addEventListener('click', async ()=>{
+    const name = prompt('Project name:');
+    if(!name || !name.trim()) return;
+    projects.push({ id:'proj_'+Date.now(), name:name.trim(), createdAt:new Date().toISOString() });
+    await saveProjects();
+    renderProjects();
+    ATL_toast('Project created.', 'success');
   });
 
-  document.querySelectorAll('.ai-project-item').forEach(item=>{
-    item.addEventListener('click', ()=>{
-      ATL_toast(`"${item.dataset.project}" projects need a connected backend — coming soon.`, 'success');
-    });
+  /* ---------------- custom instructions modal ---------------- */
+  document.getElementById('instructionsBtn').addEventListener('click', ()=>{
+    if(!session.authenticated){ ATL_toast('Login with Discord to save custom instructions.', 'error'); return; }
+    document.getElementById('instructionsModal').classList.add('open');
+  });
+  document.getElementById('instructionsClose').addEventListener('click', ()=> document.getElementById('instructionsModal').classList.remove('open'));
+  document.getElementById('instructionsModal').addEventListener('click', e=>{ if(e.target.id==='instructionsModal') e.currentTarget.classList.remove('open'); });
+  document.getElementById('instructionsSave').addEventListener('click', async ()=>{
+    customInstructions = document.getElementById('instructionsInput').value.trim();
+    await ATL_SESSION.saveStore('ai_instructions_'+session.user.id, customInstructions);
+    document.getElementById('instructionsModal').classList.remove('open');
+    ATL_toast('Instructions saved.', 'success');
   });
 
-  // Initial connection check so the status pill is accurate before
-  // anyone sends a message, without spending a real "turn."
+  /* ---------------- init ---------------- */
+  if(session.authenticated){
+    document.getElementById('sidebarAuthedArea').classList.remove('hidden');
+    document.getElementById('sidebarGuestArea').classList.add('hidden');
+    document.getElementById('sidebarUserRow').innerHTML = `
+      <div class="ai-sidebar-user">
+        <img src="${avatarFor()}" alt="">
+        <div style="overflow:hidden;">
+          <div class="u-name">${escapeHtml(session.user.display)}</div>
+          <div class="u-role">${escapeHtml(session.role)}</div>
+        </div>
+      </div>`;
+    await loadSidebarData();
+  }
+
   (async ()=>{
     const probe = await ATL_AI.sendMessage([]);
     if(probe.configured === false){
-      backendConfigured = false;
       statusLine.textContent = 'Not connected to a model yet';
       statusPill.innerHTML = `<span class="pill pill-gold">Preview</span>`;
     } else {
-      backendConfigured = true;
       statusLine.textContent = 'Ready';
       statusPill.innerHTML = `<span class="pill pill-teal">Connected</span>`;
     }
