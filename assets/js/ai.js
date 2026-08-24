@@ -16,16 +16,21 @@ window.ATL_AI = (function(){
   const WORKER_URL = 'https://atl-oauth.rekhaahlawat25.workers.dev';
 
   /**
-   * Sends a conversation to the AI backend.
-   * @param {Array<{role:'user'|'assistant', content:string}>} messages
+   * Sends a conversation to the AI backend. Each message is
+   * { role, content, attachment? } where attachment (only ever on the
+   * newest user message) is { mimeType, data (base64, no prefix), name }
+   * for images/PDFs — Gemini reads these natively as vision/document
+   * input, this isn't faked.
+   * @param {Array<{role:'user'|'assistant', content:string, attachment?:object}>} messages
+   * @param {string} [instructions] — optional custom system instructions
    * @returns {Promise<{ok:boolean, configured:boolean, reply?:string, error?:string}>}
    */
-  async function sendMessage(messages){
+  async function sendMessage(messages, instructions){
     try{
       const resp = await fetch(`${WORKER_URL}/api/ai/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages })
+        body: JSON.stringify({ messages, instructions: instructions || '' })
       });
       if(resp.status === 501){
         // Worker is reachable but no provider/key is configured yet —
