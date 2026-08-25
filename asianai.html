@@ -162,6 +162,9 @@
     if(session.authenticated) return session.user.avatar || `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(session.user.username)}&backgroundColor=141a29`;
     return `https://api.dicebear.com/7.x/identicon/svg?seed=guest&backgroundColor=141a29`;
   }
+  function aiAvatarHtml(pulsing){
+    return `<div class="ai-avatar${pulsing?' ai-avatar-pulsing':''}"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round"><path d="M12 3v3M12 18v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M3 12h3M18 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/><circle cx="12" cy="12" r="2.6" fill="#fff" stroke="none"/></svg></div>`;
+  }
 
   /* ---------------- persistence (authenticated users only) ---------------- */
   async function loadSidebarData(){
@@ -334,7 +337,7 @@
     const row = document.createElement('div');
     row.className = 'msg-row';
     row.id = 'aiTypingRow';
-    row.innerHTML = `<img src="assets/images/favicon.svg" alt=""><div class="msg-bubble ai-typing"><span></span><span></span><span></span></div>`;
+    row.innerHTML = `${aiAvatarHtml(true)}<div class="msg-bubble ai-typing"><span></span><span></span><span></span></div>`;
     messagesEl.appendChild(row);
     scrollToBottom();
   }
@@ -347,7 +350,7 @@
     const row = document.createElement('div');
     row.className = 'msg-row';
     row.innerHTML = `
-      <img src="assets/images/favicon.svg" alt="">
+      ${aiAvatarHtml(false)}
       <div>
         <div class="msg-bubble">${renderMarkdown(text)}</div>
         <div class="ai-msg-actions">
@@ -376,7 +379,7 @@
     const row = document.createElement('div');
     row.className = 'msg-row';
     row.innerHTML = `
-      <img src="assets/images/favicon.svg" alt="">
+      ${aiAvatarHtml(false)}
       <div class="ai-notice">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 9v4M12 17h.01"/><circle cx="12" cy="12" r="9"/></svg>
         <span>${escapeHtml(text)}</span>
