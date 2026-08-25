@@ -7,6 +7,111 @@
 <meta name="description" content="Asian AI — the assistant of the Asian Tier List ecosystem.">
 <link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="assets/css/main.css">
+
+<!-- ===================================================================
+     LAYOUT FIX: contain the chat to the viewport instead of letting it
+     stretch the whole page downward.
+
+     Root cause: .chat-messages was growing to fit its content (a flex
+     child with no min-height:0 refuses to shrink below its content
+     size), so overflow-y:auto never actually kicked in — the browser
+     just made the whole page taller instead of scrolling internally.
+
+     Fix: make body -> main -> the chat section -> .ai-shell -> 
+     .ai-chat-panel all proper flex columns with min-height:0 all the
+     way down, so height is capped at the viewport and only
+     .chat-messages scrolls. This is scoped with its own classes so it
+     doesn't depend on knowing every rule already in main.css.
+     =================================================================== -->
+<style>
+  html, body {
+    height: 100%;
+  }
+  body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  main {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  /* the section wrapping the chat shell — fills whatever space main
+     has left, and lets its children shrink instead of pushing out */
+  .ai-page-section {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    padding-bottom: 28px;
+  }
+  .ai-page-section .container {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .ai-shell {
+    flex: 1 1 auto;
+    display: flex;
+    gap: 20px;
+    min-height: 0;
+  }
+
+  .ai-sidebar {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  .ai-chat-panel {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .chat-header {
+    flex: 0 0 auto;
+  }
+
+  /* the actual fix: this is the only element that should scroll */
+  .chat-messages {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  #aiAttachRow,
+  .ai-input-row {
+    flex: 0 0 auto;
+  }
+
+  /* mobile: stack sidebar above chat, and give the chat panel a hard
+     cap so it still scrolls internally even if the flex chain above
+     it gets squeezed by other page chrome */
+  @media (max-width: 860px) {
+    .ai-shell {
+      flex-direction: column;
+      height: auto;
+    }
+    .ai-sidebar {
+      max-height: 200px;
+      flex: 0 0 auto;
+    }
+    .ai-chat-panel {
+      height: 70dvh;
+      flex: 0 0 auto;
+    }
+  }
+</style>
 </head>
 <body>
 <main>
@@ -18,7 +123,7 @@
     </div>
   </section>
 
-  <section style="padding-top:0;">
+  <section class="ai-page-section" style="padding-top:0;">
     <div class="container">
       <div class="ai-shell">
         <aside class="glass ai-sidebar">
