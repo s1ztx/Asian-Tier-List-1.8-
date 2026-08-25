@@ -324,7 +324,8 @@ table.dt tbody tr:last-child td{ border-bottom:none; }
 .chat-input-row{ padding:14px; border-top:1px solid var(--glass-brd); display:flex; gap:10px; align-items:flex-end; }
 .msg-row{ display:flex; gap:10px; max-width:78%; }
 .msg-row.mine{ align-self:flex-end; flex-direction:row-reverse; }
-.msg-row img{ width:30px; height:30px; border-radius: var(--avatar-radius); flex-shrink:0; image-rendering: pixelated; }
+.msg-row img, .msg-row .ai-avatar{ width:30px; height:30px; border-radius: var(--avatar-radius); flex-shrink:0; image-rendering: pixelated; }
+.msg-row .ai-avatar{ border-radius:50%; }
 .msg-bubble{ padding:10px 14px; border-radius: var(--r-sm); font-size:13.5px; line-height:1.5; }
 .msg-row:not(.mine) .msg-bubble{ background: var(--panel-2); border:1px solid var(--glass-brd); color: var(--text-1); border-bottom-left-radius:3px; }
 .msg-row.mine .msg-bubble{ background: linear-gradient(135deg, var(--blue-500), var(--blue-700)); color:#fff; border-bottom-right-radius:3px; }
@@ -549,3 +550,61 @@ table.dt tbody tr:last-child td{ border-bottom:none; }
   color: var(--text-2); font-size:11px; padding:3px 8px; border-radius:4px; cursor:pointer; font-family: var(--f-sub);
 }
 .code-copy-btn:hover{ color: var(--text-0); }
+
+/* ---------- Asian AI identity + motion ---------- */
+.ai-avatar{
+  border-radius: 50%; flex-shrink:0; position:relative;
+  background: conic-gradient(from 180deg, var(--red-500), var(--gold-500), var(--blue-500), var(--red-500));
+  display:flex; align-items:center; justify-content:center;
+}
+.ai-avatar::before{
+  content:''; position:absolute; inset:2px; border-radius:50%; background: var(--void);
+}
+.ai-avatar svg{ position:relative; width:56%; height:56%; z-index:1; }
+.ai-avatar.ai-avatar-pulsing{ animation: aiAvatarPulse 1.8s ease-in-out infinite; }
+@keyframes aiAvatarPulse{
+  0%,100%{ box-shadow: 0 0 0 0 rgba(230,57,70,.35); }
+  50%{ box-shadow: 0 0 0 6px rgba(58,134,255,0); }
+}
+.ai-avatar.spin::before{ content:none; }
+.ai-avatar.spin{ animation: aiAvatarSpin 3s linear infinite; }
+@keyframes aiAvatarSpin{ to{ transform: rotate(360deg); } }
+
+.msg-row{ animation: msgRise .32s var(--ease) both; }
+@keyframes msgRise{ from{ opacity:0; transform: translateY(10px) scale(.98); } to{ opacity:1; transform:none; } }
+
+.ai-empty-mark{ animation: aiMarkBreathe 3.2s ease-in-out infinite; }
+@keyframes aiMarkBreathe{
+  0%,100%{ transform: scale(1); box-shadow: var(--shadow-glow-red); }
+  50%{ transform: scale(1.05); box-shadow: 0 0 32px 4px var(--blue-glow); }
+}
+.ai-empty h2{ animation: msgRise .5s var(--ease) both; }
+.ai-empty > p{ animation: msgRise .5s var(--ease) .08s both; }
+
+.ai-suggest-card{ animation: msgRise .4s var(--ease) both; }
+.ai-suggest-grid .ai-suggest-card:nth-child(1){ animation-delay: .12s; }
+.ai-suggest-grid .ai-suggest-card:nth-child(2){ animation-delay: .17s; }
+.ai-suggest-grid .ai-suggest-card:nth-child(3){ animation-delay: .22s; }
+.ai-suggest-grid .ai-suggest-card:nth-child(4){ animation-delay: .27s; }
+.ai-suggest-grid .ai-suggest-card:nth-child(5){ animation-delay: .32s; }
+.ai-suggest-grid .ai-suggest-card:nth-child(6){ animation-delay: .37s; }
+.ai-capability-row{ animation: msgRise .4s var(--ease) .42s both; }
+.ai-cap-chip{ transition: border-color .2s, color .2s, transform .2s; }
+.ai-cap-chip:hover{ border-color: var(--glass-brd-strong); color: var(--text-1); transform: translateY(-1px); }
+
+#aiStatusPill .pill{ transition: all .3s var(--ease); }
+#aiStatusPill .pill-teal .pill-dot{ animation: statusDotPulse 1.6s ease-in-out infinite; }
+@keyframes statusDotPulse{ 0%,100%{ opacity:1; box-shadow: 0 0 0 0 rgba(46,196,182,.5); } 50%{ opacity:.7; box-shadow: 0 0 0 4px rgba(46,196,182,0); } }
+
+.ai-input-row textarea{ transition: height .15s var(--ease); }
+#aiSendBtn{ transition: transform .15s var(--ease), filter .15s; }
+#aiSendBtn:active{ transform: scale(.94); }
+.ai-icon-btn{ transition: border-color .15s, color .15s, transform .15s; }
+.ai-icon-btn:active{ transform: scale(.92); }
+
+.ai-attach-chip{ animation: msgRise .25s var(--ease) both; }
+
+@media (prefers-reduced-motion: reduce){
+  .msg-row, .ai-empty h2, .ai-empty > p, .ai-suggest-card, .ai-capability-row, .ai-attach-chip{ animation: none !important; }
+  .ai-empty-mark, .ai-avatar.ai-avatar-pulsing, #aiStatusPill .pill-teal .pill-dot{ animation: none !important; }
+}
